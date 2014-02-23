@@ -1,4 +1,0 @@
-Mouglotte
-=========
-
-Mouglotte
