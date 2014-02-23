@@ -15,7 +15,7 @@ public class MenuState extends BasicGameState implements ComponentListener {
 	// ID de l'état
 	private static final EnumGameState ID = EnumGameState.MENU;
 
-	// Jeu
+	// Le jeu
 	private StateBasedGame game;
 
 	// Bouton Jouer
