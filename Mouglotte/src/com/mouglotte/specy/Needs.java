@@ -97,7 +97,7 @@ public class Needs {
 	public void eventMinute() {
 		
 		// Mise à jour du besoin courant s'il est en train de s'accomplir
-		if (this.fulfilling) {
+		if (this.current != null && this.fulfilling) {
 			this.current.fulfill();
 		}
 	}

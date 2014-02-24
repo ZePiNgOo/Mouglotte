@@ -144,7 +144,7 @@ public class Desires {
 	public void eventMinute() {
 		
 		// Mise à jour de l'envie courante si elle est en train de s'accomplir
-		if (this.fulfilling) {
+		if (this.current != null && this.fulfilling) {
 			this.current.fulfill();
 		}
 	}

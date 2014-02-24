@@ -10,20 +10,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-//
-//import javax.imageio.ImageIO;
-import javax.swing.SwingUtilities;
+import java.util.Random;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
-import org.newdawn.slick.state.StateBasedGame;
-
 import com.mouglotte.game.GameState;
+import com.mouglotte.specy.MemoryType;
 
 /**
  * The data map from our example game. This holds the state and context of each
@@ -106,10 +101,10 @@ public class GameMap implements TileBasedMap {
 		// fillArea(0, 5, 3, 10, WATER);
 		// fillArea(0, 15, 7, 15, WATER);
 		// fillArea(7, 26, 22, 4, WATER);
-//		 fillArea(17, 5, 10, 3, TREES);
-//		 fillArea(20, 8, 5, 3, TREES);
-//		 fillArea(8, 2, 7, 3, TREES);
-//		 fillArea(10, 5, 3, 3, TREES);
+		 fillArea(2, 5, 2, 3, TREES);
+		 fillArea(8, 10, 3, 1, TREES);
+		 fillArea(15, 4, 2, 2, TREES);
+		 fillArea(3, 15, 1, 4, TREES);
 
 		// Instanciation du Pathfinder
 		this.finder = new AStarPathFinder(this, 500, true);
@@ -140,6 +135,16 @@ public class GameMap implements TileBasedMap {
 		// setVisible(true);
 	}
 
+	// Contrôle sur les coordonnées sont dans la carte
+	public boolean contains(int x, int y) {
+		if ((x > 0) && (y > 0)
+				&& (x < getWidthInTiles() * TILE_SIZE)
+				&& (y < getHeightInTiles() * TILE_SIZE))
+			return true;
+		else return false;
+	}
+
+	// Pour les tests
 	// Remplissage d'une zone avec le bon terrain
 	private void fillArea(int x, int y, int width, int height, int type) {
 
@@ -231,6 +236,14 @@ public class GameMap implements TileBasedMap {
 		this.visited[x][y] = true;
 	}
 
+	// Mise à jour
+	public void update() {
+
+		// Placement de la mouglotte (sur une zone)
+		// units[this.game.getMouglotte().getX()][this.game.getMouglotte().getY()]
+		// = MOUGLOTTE;
+	}
+	
 	// Affichage
 	public void render(GUIContext c, Graphics g) throws SlickException {
 
@@ -285,16 +298,6 @@ public class GameMap implements TileBasedMap {
 		// g.drawImage(buffer.getImage(), 0, 0, null);
 	}
 
-	// Mise à jour
-	public void update() {
-
-		// Placement de la mouglotte (sur une zone)
-		// units[this.game.getMouglotte().getX()][this.game.getMouglotte().getY()]
-		// = MOUGLOTTE;
-	}
-
-	// Conversion
-
 	// Trouver le chemin
 	public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
 
@@ -309,6 +312,16 @@ public class GameMap implements TileBasedMap {
 //		ty = ty % TILE_SIZE > TILE_SIZE / 2 ? ty / TILE_SIZE - 1 : ty / TILE_SIZE;
 
 		return this.finder.findPath(mover, sx, sy, tx, ty);
+	}
+	
+	// Recherche à côté
+	public Tile searchNear(MemoryType type, int x, int y) {
+		
+		Random r = new Random();
+		
+		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on cherche
+		if (r.nextInt(10) == 0) return new Tile(x, y, 0, 0, 1);
+		else return null;
 	}
 	
 //	// Chemin trouvé

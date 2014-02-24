@@ -27,7 +27,7 @@ public class Game extends StateBasedGame {
 			
 			addState(new MenuState());
 			addState(new GameState());
-			container.setShowFPS(false);
+			container.setShowFPS(true);
 			enterState(EnumGameState.MENU.getValue());
 		}
 	}

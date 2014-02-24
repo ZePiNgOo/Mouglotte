@@ -3,7 +3,7 @@ package com.mouglotte.specy;
 public enum MemoryType {
 
 	// Souvenirs
-	FOOD, FRIEND, FIGHT;
+	FOOD, FRIEND, LOVER, ENEMY, WORK;
 
 	// Conversion en String
 	public String toString() {
@@ -13,8 +13,12 @@ public enum MemoryType {
 			return "FOOD";
 		case FRIEND:
 			return "FRIEND";
-		case FIGHT:
-			return "FIGHT";
+		case LOVER:
+			return "LOVER";
+		case ENEMY:
+			return "ENEMY";
+		case WORK:
+			return "WORK";
 		default:
 			return "???";
 		}

@@ -11,19 +11,25 @@ import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.GUIContext;
 
+import com.mouglotte.game.GameState;
+import com.mouglotte.map.GameMap;
+import com.mouglotte.map.UnitMover;
 import com.mouglotte.specy.Mouglotte;
 
 public class MouglotteGraph extends AbstractComponent {
 
 	// Mouglotte
 	private Mouglotte mouglotte;
-
 	// Listener
 	private MouglotteListener listener;
+	// Jeu
+	private GameState game;
 
 	// Position
 	int x = -1;
 	int y = -1;
+	int lastX = -1;
+	int lastY = -1;
 
 	// Forme
 	private Shape shape;
@@ -44,20 +50,21 @@ public class MouglotteGraph extends AbstractComponent {
 	private boolean mouseRight = false;
 
 	// Constructeur
-	public MouglotteGraph(Mouglotte mouglotte, GameContainer container) {
+	public MouglotteGraph(Mouglotte mouglotte, GameState game) {
 
-		super(container);
+		super(game.getContainer());
 
-		this.listener = new MouglotteListener(container);
-
+		this.game = game;
 		this.mouglotte = mouglotte;
+		this.listener = new MouglotteListener(this.game.getContainer());
+		this.container = container;
 
 		addListener(this.listener);
 		// /**** les coordonnées de la case dans le jeu !! *******/
 		// this.posEcran = posEcran;
 		// this.nomCase = name;
 
-		Input input = container.getInput();
+		Input input = this.game.getContainer().getInput();
 		this.shape = new Circle(this.x, this.y, 10);
 		this.halo = new Circle(this.x, this.y, 20);
 		this.over = shape.contains(input.getMouseX(), input.getMouseY());
@@ -87,6 +94,16 @@ public class MouglotteGraph extends AbstractComponent {
 	public int getY() {
 		return this.y;
 	}
+	
+	// Récupération de la position précédente
+	public int getLastX() {
+		return this.lastX;
+	}
+
+	// Récupération de la position précédente
+	public int getLastY() {
+		return this.lastY;
+	}
 
 	// La mouglotte est-elle sélectionnée
 	public boolean isSelected() {
@@ -97,6 +114,9 @@ public class MouglotteGraph extends AbstractComponent {
 	// Définition de la position
 	public void setLocation(int x, int y) {
 
+		// Ancienne position
+		this.lastX = this.x;
+		this.lastY = this.y;
 		// Position
 		this.x = x;
 		this.y = y;
@@ -216,6 +236,9 @@ public class MouglotteGraph extends AbstractComponent {
 	// Bouton souris cliqué
 	public void mouseClicked(int button, int x, int y, int clickCount) {
 
+		// Si la souris est sortie de la carte on ne fait rien
+		if (!this.game.getMap().contains(x,y)) return;
+		
 		if (button == 0)
 			mouseLeftClicked(x, y, clickCount);
 		else if (button == 1)
@@ -237,10 +260,12 @@ public class MouglotteGraph extends AbstractComponent {
 	// Bouton souris cliqué bouton droit
 	public void mouseRightClicked(int x, int y) {
 
-		// Si la souris est dans la forme
-		// if (this.shape.contains(x,y)) this.selected = true;
+		// Si la mouglotte est sélectionnée
+		if (this.selected) {
 
-		// Mais il faut aussi déselectionner ce qui l'était
+			// Aller à l'endroit cliqué
+			this.mouglotte.goTo(x, y);
+		}
 	}
 
 }
