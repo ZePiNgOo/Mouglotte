@@ -9,14 +9,18 @@ package com.mouglotte.map;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.util.Random;
 
+import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.ImageBuffer;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
+import org.newdawn.slick.tiled.TiledMap;
+
 import com.mouglotte.game.GameState;
 import com.mouglotte.specy.MemoryType;
 
@@ -31,10 +35,10 @@ import com.mouglotte.specy.MemoryType;
 public class GameMap implements TileBasedMap {
 
 	// Taille d'une zone (tile)
-	public static final int TILE_SIZE = 16;
+	// public static final int TILE_SIZE = 16;
 	// Largeur et hauteur en zones
-	public static final int WIDTH = 20;
-	public static final int HEIGHT = 20;
+	// public static final int WIDTH = 20;
+	// public static final int HEIGHT = 20;
 
 	// Type de terrain
 	public static final int GRASS = 0;
@@ -47,6 +51,8 @@ public class GameMap implements TileBasedMap {
 
 	// Jeu
 	private GameState game;
+	// Carte
+	private TiledMap map;
 
 	// Types de zones
 	private Image[] tiles = new Image[4];
@@ -54,57 +60,91 @@ public class GameMap implements TileBasedMap {
 	// private Image buffer;
 	private ImageBuffer buffer;
 
+	private float totoX = 20, totoY = 20;
+	private int mapX, mapY;
+
 	// Terrain
-	private int[][] terrain = new int[WIDTH][HEIGHT];
+	private int[][] terrain;
 	// Unités
-	private int[][] units = new int[WIDTH][HEIGHT];
+	private int[][] units;
 	// Visité
-	private boolean[][] visited = new boolean[WIDTH][HEIGHT];
+	private boolean[][] visited;
+	/**
+	 * The collision map indicating which tiles block movement - generated based
+	 * on tile properties
+	 */
+	private boolean[][] blocked;
+
+	/** The width of the display in tiles */
+	private int widthInTiles;
+	/** The height of the display in tiles */
+	private int heightInTiles;
+
+	/** The offset from the centre of the screen to the top edge in tiles */
+	private int topOffsetInTiles;
+	/** The offset from the centre of the screen to the left edge in tiles */
+	private int leftOffsetInTiles;
 
 	// Pathfinder
 	private PathFinder finder;
-	//private Path path;
+
+	// private Path path;
 
 	// Constructeur
-	public GameMap(GameState game) {
+	public GameMap(GameState game) throws SlickException {
 
 		// Jeu
 		this.game = game;
+		// Carte
+		this.map = new TiledMap("res/test.tmx");
 
-		// Chargement des ressoures
-		try {
-			// tiles[GameMap.TREES] =
-			// ImageIO.read(getResource("res/trees.png"));
-			// tiles[GameMap.GRASS] =
-			// ImageIO.read(getResource("res/grass.png"));
-			// tiles[GameMap.WATER] =
-			// ImageIO.read(getResource("res/water.png"));
-			// tiles[GameMap.MOUGLOTTE] = ImageIO
-			// .read(getResource("res/tank.png"));
-			tiles[GameMap.TREES] = new Image(getResource("res/rocks.png"),
-					"res/rocks.png", false);
-			tiles[GameMap.GRASS] = new Image(getResource("res/grass.png"),
-					"res/grass.png", false);
-			// tiles[GameMap.WATER] = new
-			// Image(getResource("res/water.png"),"res/water.png",false);
-			// tiles[GameMap.MOUGLOTTE] = new
-			// Image(getResource("res/boat.png"),"res/boat.png",false);
-		} catch (IOException e) {
-			System.err.println("Failed to load resources: " + e.getMessage());
-			System.exit(0);
-		} catch (SlickException e) {
-			// e.printStackTrace();
+		// build a collision map based on tile properties in the TileD map
+		this.blocked = new boolean[this.map.getWidth()][this.map.getHeight()];
+		for (int x = 0; x < this.map.getWidth(); x++) {
+			for (int y = 0; y < this.map.getHeight(); y++) {
+				int tileID = this.map.getTileId(x, y, 0);
+				String value = this.map.getTileProperty(tileID, "blocked",
+						"false");
+				if ("true".equals(value)) {
+					this.blocked[x][y] = true;
+				}
+			}
 		}
 
-		// fillArea(0, 0, 5, 5, WATER);
-		// fillArea(0, 5, 3, 10, WATER);
-		// fillArea(0, 5, 3, 10, WATER);
-		// fillArea(0, 15, 7, 15, WATER);
-		// fillArea(7, 26, 22, 4, WATER);
-		 fillArea(2, 5, 2, 3, TREES);
-		 fillArea(8, 10, 3, 1, TREES);
-		 fillArea(15, 4, 2, 2, TREES);
-		 fillArea(3, 15, 1, 4, TREES);
+		// caculate some layout values for rendering the tilemap. How many tiles
+		// do we need to render to fill the screen in each dimension and how far
+		// is
+		// it from the centre of the screen
+		this.widthInTiles = this.game.getContainer().getWidth()
+				/ this.map.getTileWidth();
+		this.heightInTiles = this.game.getContainer().getHeight()
+				/ this.map.getTileHeight();
+		this.topOffsetInTiles = this.heightInTiles / 2;
+		this.leftOffsetInTiles = this.widthInTiles / 2;
+
+		// // Chargement des ressoures
+		// try {
+		// tiles[GameMap.TREES] = new Image(getResource("res/rocks.png"),
+		// "res/rocks.png", false);
+		// tiles[GameMap.GRASS] = new Image(getResource("res/grass.png"),
+		// "res/grass.png", false);
+		// } catch (IOException e) {
+		// System.err.println("Failed to load resources: " + e.getMessage());
+		// System.exit(0);
+		// } catch (SlickException e) {
+		// }
+		//
+		// fillArea(2, 5, 2, 3, TREES);
+		// fillArea(8, 10, 3, 1, TREES);
+		// fillArea(15, 4, 2, 2, TREES);
+		// fillArea(3, 15, 1, 4, TREES);
+
+		// Terrain
+		terrain = new int[getWidthInTiles()][getHeightInTiles()];
+		// Unités
+		units = new int[getWidthInTiles()][getHeightInTiles()];
+		// Visité
+		visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 
 		// Instanciation du Pathfinder
 		this.finder = new AStarPathFinder(this, 500, true);
@@ -135,13 +175,19 @@ public class GameMap implements TileBasedMap {
 		// setVisible(true);
 	}
 
+	// Récupération de la taille d'une zone
+	public int getTileSize() {
+		return this.map.getTileHeight();
+	}
+
 	// Contrôle sur les coordonnées sont dans la carte
 	public boolean contains(int x, int y) {
 		if ((x > 0) && (y > 0)
-				&& (x < getWidthInTiles() * TILE_SIZE)
-				&& (y < getHeightInTiles() * TILE_SIZE))
+				&& (x < getWidthInTiles() * this.map.getTileWidth())
+				&& (y < getHeightInTiles() * this.map.getTileHeight()))
 			return true;
-		else return false;
+		else
+			return false;
 	}
 
 	// Pour les tests
@@ -211,12 +257,14 @@ public class GameMap implements TileBasedMap {
 
 	// Récupération de la hauteur en zones
 	public int getHeightInTiles() {
-		return HEIGHT;
+		// return HEIGHT;
+		return this.map.getHeight();
 	}
 
 	// Récupération de la largeur en zones
 	public int getWidthInTiles() {
-		return WIDTH;
+		// return WIDTH;
+		return this.map.getWidth();
 	}
 
 	// Chargement des ressources
@@ -237,100 +285,141 @@ public class GameMap implements TileBasedMap {
 	}
 
 	// Mise à jour
-	public void update() {
+	public void update(GameContainer container, int delta)
+			throws SlickException {
 
-		// Placement de la mouglotte (sur une zone)
-		// units[this.game.getMouglotte().getX()][this.game.getMouglotte().getY()]
-		// = MOUGLOTTE;
-	}
-	
-	// Affichage
-	public void render(GUIContext c, Graphics g) throws SlickException {
-
-		// // Création d'un buffer
-		// if (buffer == null) {
-		// //buffer = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
-		// buffer = new ImageBuffer(600,600);
-		// }
-		// Graphics gBuff = this.buffer.getImage().getGraphics();
-		Graphics gBuff = g;
-
-		// Buffer déplacé de 50 (c'est pour ça les 50 partout)
-		// gBuff.clearRect(0,0,600,600);
-		//gBuff.clear();
-		// gBuff.translate(50, 50);
-
-		// Affichage de la carte
-		for (int x = 0; x < this.getWidthInTiles(); x++) {
-			for (int y = 0; y < this.getHeightInTiles(); y++) {
-				gBuff.drawImage(this.tiles[this.getTerrain(x, y)], x
-						* TILE_SIZE, y * TILE_SIZE, null);
-				if (this.getUnit(x, y) != 0) {
-					// gBuff.drawImage(tiles[this.getUnit(x,
-					// y)],x*TILE_SIZE,y*TILE_SIZE,null);
-				} else {
-					// Matérialisation du chemin
-//					if (this.path != null) {
-//						if (this.path.contains(x, y)) {
-//							gBuff.setColor(Color.blue);
-//							gBuff.fillRect(x * TILE_SIZE + TILE_SIZE / 2,
-//									y * TILE_SIZE + TILE_SIZE / 2, 7, 7);
-//						}
-//					}
-				}
-			}
+		if (container.getInput().isKeyDown(Input.KEY_RIGHT)) {
+			// this.totoX = this.totoX < getWidthInTiles() ? this.totoX
+			// + this.map.getWidth() : getWidthInTiles();
+			this.totoX -= delta / 3.0f;
+			if (this.totoX > getWidthInTiles()) this.totoX = getWidthInTiles();
 		}
+		if (container.getInput().isKeyDown(Input.KEY_LEFT)) {
+			// this.totoX = this.totoX > 0 ? this.totoX - this.map.getWidth() :
+			// 0;
+			this.totoX += delta / 3.0f;
+			if (this.totoX < 0) this.totoX = 0;
+		}
+		if (container.getInput().isKeyDown(Input.KEY_UP)) {
+			// this.totoY = this.totoY < getHeightInTiles() ? this.totoY
+			// + this.map.getHeight() : getHeightInTiles();
+			this.totoY += delta / 3.0f;
+			if (this.totoY < 0) this.totoY = 0;
+		}
+		if (container.getInput().isKeyDown(Input.KEY_DOWN)) {
+			// this.totoY = this.totoY > 0 ? this.totoY - this.map.getHeight() :
+			// 0;
+			this.totoY -= delta / 3.0f;
+			if (this.totoY > getHeightInTiles()) this.totoY = getHeightInTiles();
+		}
+		
+		// Smooth
+		if (this.totoX < 0) {
+			this.mapX++;
+			this.totoX = 32;
+		}
+		if (this.totoX > 32) {
+			this.mapX--;
+			this.totoX = 0;
+		}
+		if (this.totoY < 0) {
+			this.mapY++;
+			this.totoY = 32;
+		}
+		if (this.totoY > 32) {
+			this.mapY--;
+			this.totoY = 0;
+		}
+	}
 
-		// Si une unité est sélectionnée
-		// if (selectedx != -1) {
+	// Affichage
+	public void render(GUIContext container, Graphics g) throws SlickException {
+
+		// Graphics gBuff = g;
 		//
-		// // Affichage d'une carré autour
-		// gBuff.setColor(Color.black);
-		// gBuff.drawRect(selectedx*TILE_SIZE, selectedy*TILE_SIZE, 15, 15);
-		// gBuff.drawRect((selectedx*TILE_SIZE)-2, (selectedy*TILE_SIZE)-2, 19,
-		// 19);
-		// gBuff.setColor(Color.white);
-		// gBuff.drawRect((selectedx*TILE_SIZE)-1, (selectedy*TILE_SIZE)-1, 17,
-		// 17);
+		// // Affichage de la carte
+		// for (int x = 0; x < this.getWidthInTiles(); x++) {
+		// for (int y = 0; y < this.getHeightInTiles(); y++) {
+		// gBuff.drawImage(this.tiles[this.getTerrain(x, y)], x
+		// * TILE_SIZE, y * TILE_SIZE, null);
+		// }
 		// }
 
-		// Affichage du buffer
-		// g.drawImage(buffer.getImage(), 0, 0, null);
+		int playerTileX = (int) this.totoX - 32;
+		int playerTileY = (int) this.totoY - 32;
+		int playerTileOffsetX = (int) ((playerTileX - this.totoX) * this.map
+				.getTileWidth());
+		int playerTileOffsetY = (int) ((playerTileY - this.totoY) * this.map
+				.getTileHeight());
+		// int playerTileOffsetX = 5;
+		// int playerTileOffsetY = 5;
+
+		// render the section of the map that should be visible. Notice the -1
+		// and +3 which renders
+		// a little extra map around the edge of the screen to cope with tiles
+		// scrolling on and off
+		// the screen
+//		this.map.render(playerTileOffsetX - (10 / 2), playerTileOffsetY
+//				- (10 / 2), playerTileX - this.leftOffsetInTiles - 1,
+//				playerTileY - this.topOffsetInTiles - 1, this.widthInTiles + 3,
+//				this.heightInTiles + 3);
+		this.map.render(playerTileX, playerTileY, this.mapX, this.mapY, this.mapX+26, this.mapY+26 );
+		//this.map.render((int)totoX, (int)totoY,0,0,5,5);
+
+		Color color = g.getColor();
+		g.setColor(Color.red);
+		g.drawString(this.totoX+","+this.totoY, this.game.getContainer().getWidth()/2+10, this.game.getContainer().getHeight()/2);
+		g.fillRect(this.game.getContainer().getWidth()/2, this.game.getContainer().getHeight()/2, 10, 10);
+		g.setColor(color);
+		
+		// draw entities relative to the player that must appear in the centre
+		// of the screen
+//		g.translate(400 - (int) (this.totoX * 32),
+//				300 - (int) (this.totoY * 32));
+//		
+//		g.resetTransform();
 	}
 
 	// Trouver le chemin
 	public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
 
 		// On convertit les x et y en position position dans les zones
-		sx /= TILE_SIZE;
-		sy /= TILE_SIZE;
-		tx /= TILE_SIZE;
-		ty /= TILE_SIZE;
-//		sx = sx % TILE_SIZE > TILE_SIZE / 2 ? sx / TILE_SIZE - 1 : sx / TILE_SIZE;
-//		sy = sy % TILE_SIZE > TILE_SIZE / 2 ? sy / TILE_SIZE - 1 : sy / TILE_SIZE;
-//		tx = tx % TILE_SIZE > TILE_SIZE / 2 ? tx / TILE_SIZE - 1 : tx / TILE_SIZE;
-//		ty = ty % TILE_SIZE > TILE_SIZE / 2 ? ty / TILE_SIZE - 1 : ty / TILE_SIZE;
+		sx /= this.map.getTileWidth();
+		sy /= this.map.getTileHeight();
+		tx /= this.map.getTileWidth();
+		ty /= this.map.getTileHeight();
+		// sx = sx % TILE_SIZE > TILE_SIZE / 2 ? sx / TILE_SIZE - 1 : sx /
+		// TILE_SIZE;
+		// sy = sy % TILE_SIZE > TILE_SIZE / 2 ? sy / TILE_SIZE - 1 : sy /
+		// TILE_SIZE;
+		// tx = tx % TILE_SIZE > TILE_SIZE / 2 ? tx / TILE_SIZE - 1 : tx /
+		// TILE_SIZE;
+		// ty = ty % TILE_SIZE > TILE_SIZE / 2 ? ty / TILE_SIZE - 1 : ty /
+		// TILE_SIZE;
 
 		return this.finder.findPath(mover, sx, sy, tx, ty);
 	}
-	
+
 	// Recherche à côté
 	public Tile searchNear(MemoryType type, int x, int y) {
-		
+
 		Random r = new Random();
-		
-		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on cherche
-		if (r.nextInt(10) == 0) return new Tile(x, y, 0, 0, 1);
-		else return null;
+
+		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
+		// cherche
+		if (r.nextInt(10) == 0)
+			return new Tile(x, y, 0, 0, 1);
+		else
+			return null;
 	}
-	
-//	// Chemin trouvé
-//	public boolean pathFound() {
-//		return this.path != null;
-//	}
-//
-//	// Réinitialisation du chemin
-//	public void clearPath() {
-//		this.path = null;
-//	}
+
+	// // Chemin trouvé
+	// public boolean pathFound() {
+	// return this.path != null;
+	// }
+	//
+	// // Réinitialisation du chemin
+	// public void clearPath() {
+	// this.path = null;
+	// }
 }

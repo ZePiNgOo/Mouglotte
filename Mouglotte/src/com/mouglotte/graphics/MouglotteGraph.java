@@ -181,6 +181,17 @@ public class MouglotteGraph extends AbstractComponent {
 		default:
 		}
 
+		Color color = g.getColor();
+		
+		if (this.selected) {
+			this.color = Color.blue;
+			notifyListeners(); // Active le MouglotteListener
+		} else if (this.over) {
+			this.color = Color.green;
+		} else  {
+			this.color = Color.red;
+		}
+		
 		g.setColor(this.color);
 		g.fill(this.shape);
 
@@ -188,22 +199,8 @@ public class MouglotteGraph extends AbstractComponent {
 		if (this.selected)
 			g.draw(this.halo);
 
-		updateGraphics(g);
-	}
-
-	// Mise à jour de l'affichage
-	private void updateGraphics(Graphics g) {
-
-		if (!this.over) {
-			this.color = new Color(0.7f, 0.7f, 0.7f, 1f);
-		} else {
-			this.color = new Color(0.1f, 0.7f, 0.3f, 1f);
-			if (this.selected) {
-				this.color = new Color(0.1f, 0.9f, 0.3f, 1f);
-				notifyListeners(); // Active le MouglotteListener
-			}
-
-		}
+		// Retour à la couleur d'origine
+		g.setColor(color);
 	}
 
 	// @Override

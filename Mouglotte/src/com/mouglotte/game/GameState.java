@@ -89,21 +89,6 @@ public class GameState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 
-		// Input input = container.getInput();
-		//
-		// if (input.isKeyDown(Keyboard.KEY_UP)) {
-		//
-		// }
-		// if (input.isKeyDown(Keyboard.KEY_DOWN)) {
-		//
-		// }
-		// if (input.isKeyDown(Keyboard.KEY_LEFT)) {
-		//
-		// }
-		// if (input.isKeyDown(Keyboard.KEY_RIGHT)) {
-		//
-		// }
-
 		this.pastTime += delta;
 		this.pastTime *= TIME_FACTOR;
 
@@ -115,9 +100,6 @@ public class GameState extends BasicGameState {
 			this.mouglotte.eventMinute();
 //			this.mouglotte2.eventMinute();
 			this.pastTime -= 3000;
-
-			// Test
-			// this.mouglotte.setLocation(this.mouglotte.getX()+10,this.mouglotte.getY()+10);
 		}
 
 		// On fait un truc toutes les 3 minutes réelles
@@ -143,7 +125,7 @@ public class GameState extends BasicGameState {
 		deltaString = Integer.toString(minutes);
 
 		// Mise à jour de la carte
-		this.map.update();
+		this.map.update(container, delta);
 
 	}
 	
@@ -159,27 +141,6 @@ public class GameState extends BasicGameState {
 
 //		this.bottomPanel.drawGUI(container, g);
 //		this.rightPanel.drawGUI(container, g);
-
-		switch (GameState.ID.getValue()) {
-		// Démarrage
-		case 1:
-
-			// gestion d'un bouton "Jouer" pour réellement lancer l'action;
-			// si clic dessus alors on passe etatJeu = Bataille !!
-			// on ne veut pas de comportement souris sur la carte !!!
-
-			break;
-		// Jeu
-		case 2:
-			// gestion comportement souris
-			// action tir sur une case
-			// tour par tour
-			// IA ordinateur
-			// gestion tirs effectuée, tirs touché
-			// mise à jour
-
-			break;
-		}
 
 		this.map.render(container, g);
 		this.mouglotte.render(container, g);
@@ -254,8 +215,8 @@ public class GameState extends BasicGameState {
 
 		// Si la souris est sortie on ne fait rien
 		if ((newx < 0) || (newy < 0)
-				|| (newx >= this.map.getWidthInTiles() * GameMap.TILE_SIZE)
-				|| (newy >= this.map.getHeightInTiles() * GameMap.TILE_SIZE)) {
+				|| (newx >= this.map.getWidthInTiles() * this.map.getTileSize())
+				|| (newy >= this.map.getHeightInTiles() * this.map.getTileSize())) {
 			return;
 		}
 
@@ -267,8 +228,8 @@ public class GameState extends BasicGameState {
 					this.mouglotte.getY(), newx, newy);
 		}
 		this.infoString = Integer.toString(newx) + "," + Integer.toString(newy)
-				+ " => " + Integer.toString(newx / GameMap.TILE_SIZE) + ","
-				+ Integer.toString(newy / GameMap.TILE_SIZE);
+				+ " => " + Integer.toString(newx / this.map.getTileSize()) + ","
+				+ Integer.toString(newy / this.map.getTileSize());
 	}
 
 	// Pour les tests

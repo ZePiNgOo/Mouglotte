@@ -280,7 +280,7 @@ public class Mouglotte {
 	private void decide() {
 
 		System.out.println("Mouglotte::Decide");
-		
+
 		// Une nouvelle action va commencer ensuite
 		this.actionInProgress = false;
 
@@ -361,7 +361,7 @@ public class Mouglotte {
 	private void actionFulfilled() {
 
 		System.out.println("Mouglotte::ActionFulFilled");
-		
+
 		MemoryType memoryType = null;
 
 		// Qu'est ce que la mouglotte recherche ?
@@ -563,9 +563,12 @@ public class Mouglotte {
 			// Le step renvoie une position en zone
 			// setLocation(this.path.getStep(0).getX(),this.path.getStep(0).getY());
 			// On se place au milieu de la prochaine zone
-			setLocation(this.path.getStep(0).getX() * GameMap.TILE_SIZE
-					+ GameMap.TILE_SIZE / 2, this.path.getStep(0).getY()
-					* GameMap.TILE_SIZE + GameMap.TILE_SIZE / 2);
+			setLocation(this.path.getStep(0).getX()
+					* this.game.getMap().getTileSize()
+					+ this.game.getMap().getTileSize() / 2, this.path
+					.getStep(0).getY()
+					* this.game.getMap().getTileSize()
+					+ this.game.getMap().getTileSize() / 2);
 			this.path.removeStep(0);
 			if (this.path.getLength() == 0)
 				this.path = null;
@@ -574,12 +577,12 @@ public class Mouglotte {
 
 	// Accomplissement
 	private void fulfill() {
-		
+
 		System.out.println("Mouglotte::Fulfill");
 
 		// A décliner en véritable actions
 		// eat(), talk(), fuck(),...
-		
+
 		if (this.decision != null)
 			switch (this.decision) {
 			case NEED_HUNGER:
