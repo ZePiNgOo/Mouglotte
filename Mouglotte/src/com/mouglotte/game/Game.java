@@ -11,8 +11,8 @@ public class Game extends StateBasedGame {
 	// Titre
 	private static final String TITLE = "Mouglotte";
 	// Taille de l'écran
-	public static final int SCREEN_WIDTH = 640;
-	public static final int SCREEN_HEIGHT = 480;
+	public static final int SCREEN_WIDTH = 700;
+	public static final int SCREEN_HEIGHT = 512; // 8 tiles
 
 	// Constructeur
 	public Game(String name) {
@@ -37,7 +37,7 @@ public class Game extends StateBasedGame {
 		try {
 			AppGameContainer container = new AppGameContainer(new Game(TITLE));
 			//Display.setDisplayMode(new DisplayMode(640,480));
-			container.setDisplayMode(640, 480, false);
+			container.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, false);
 			container.setVSync(true);
 			container.setMultiSample(64);
 			container.setTargetFrameRate(60);

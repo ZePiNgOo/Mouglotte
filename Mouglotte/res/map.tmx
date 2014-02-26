@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="30" height="30" tilewidth="32" tileheight="32">
- <tileset firstgid="1" source="D:/documents/a178414/Desktop/terrain.tsx"/>
- <layer name="Calque de Tile 1" width="30" height="30">
-  <data encoding="base64" compression="zlib">
-   eJytVu1NxDAMTSUY4tgB2OFgB2AbYAdgAVbg2IFjB45/uSbZAVeKJffJTp0eP56ar/o5fnaSMYQwChwFRie8a3GdxnNUsGRTW5frWFLmotHG/1u8UfB7YoHjqX7LCfH1xsazJxmH92HuoxXnVlw9iIbWyKPZbfnCcx+EHeHT4LGAmiRjnWZr8vWLsCd8i/m4Ij5eTu7/EA6EX0Uzb43GBoelk2U/GWsyxILnsuiXMN+bpVErH08B+tejz3/50Nob90untq0+2mZdNK1anJpdq4YkstFOYBtzUHJ6zzjcD7dj0GsV8/iR8OSIheT11D/bOwzzMY7BC+G1tp8VvzRfuFY8GqAfWbH/FvS88NSDtIP+aOfLUm56akfTj+cvKc5XhOthvl7bm/c9YuUXc024INwQboe2Lav+imhbOc+8d8RxXvl2C7wYo9iZNxiDLfGcEfaC19IVxz1vIys3Jt6NiPOmaizvpKhwavovaSyxrXwSGGvPeY26a/9J3SeN7wEPgreAHdS49T7x6rX27kthfvd7attCzxvLOhO0ezLCP0n0cR3XjNeX3rh5zqE1GkzfP/YFGZ4=
-  </data>
- </layer>
-</map>

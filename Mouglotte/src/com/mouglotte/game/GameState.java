@@ -16,7 +16,7 @@ import com.mouglotte.ui.RightPanel;
 public class GameState extends BasicGameState {
 
 	// Pour les tests
-	public static final int TIME_FACTOR = 3;
+	public static final int TIME_FACTOR = 1;
 
 	// ID de l'état
 	private static final EnumGameState ID = EnumGameState.GAME;
@@ -25,7 +25,7 @@ public class GameState extends BasicGameState {
 	// private int x, y;
 
 	// Panneau du bas
-	private BottomPanel bottomPanel;
+	//private BottomPanel bottomPanel;
 	// Panneau de droite
 	private RightPanel rightPanel;
 	// Conteneur
@@ -33,12 +33,8 @@ public class GameState extends BasicGameState {
 	// Carte
 	private GameMap map;
 
-	private int pastTime = 0;
-	private int minutes = 0;
-	private int hours = 0;
-	private int days = 0;
 	private Mouglotte mouglotte;
-	//private Mouglotte mouglotte2;
+	// private Mouglotte mouglotte2;
 
 	private String deltaString = "";
 	private String infoString = "";
@@ -53,7 +49,7 @@ public class GameState extends BasicGameState {
 	public GameContainer getContainer() {
 		return this.container;
 	}
-	
+
 	// Récupération de la carte
 	public GameMap getMap() {
 		return this.map;
@@ -66,12 +62,12 @@ public class GameState extends BasicGameState {
 
 		// Conteneur
 		this.container = container;
-		
+
 		// Initialisation de la génétique
 		Genetics.initialize();
 
-		this.bottomPanel = new BottomPanel(container, "bottomPanel");
-		this.rightPanel = new RightPanel(container, "rightPanel", 1);
+		//this.bottomPanel = new BottomPanel(container, "bottomPanel");
+		this.rightPanel = new RightPanel(this);
 
 		// Création de la carte
 		this.map = new GameMap(this);
@@ -80,8 +76,8 @@ public class GameState extends BasicGameState {
 		// Pour les tests
 		this.mouglotte = new Mouglotte(this);
 		this.mouglotte.setLocation(15, 15);
-//		this.mouglotte2 = new Mouglotte(this);
-//		this.mouglotte2.setLocation(100, 100);
+		// this.mouglotte2 = new Mouglotte(this);
+		// this.mouglotte2.setLocation(100, 100);
 	}
 
 	@Override
@@ -89,62 +85,39 @@ public class GameState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 
-		this.pastTime += delta;
-		this.pastTime *= TIME_FACTOR;
-
-		// On fait un truc toutes les 3 secondes réelles
-		// = minute mouglotte
-		if (this.pastTime >= 3000) {
-
-			this.minutes++;
-			this.mouglotte.eventMinute();
-//			this.mouglotte2.eventMinute();
-			this.pastTime -= 3000;
-		}
-
-		// On fait un truc toutes les 3 minutes réelles
-		// = heure mouglotte
-		if (this.minutes >= 60) {
-
-			this.hours++;
-			this.mouglotte.eventHour();
-			//this.mouglotte2.eventHour();
-			this.minutes = 0;
-		}
-
-		// On fait un truc toutes les heures réelles
-		// = jour mouglotte
-		if (this.hours >= 20) {
-
-			this.days++;
-			this.mouglotte.eventDay();
-			//this.mouglotte2.eventDay();
-			this.hours = 0;
-		}
-
-		deltaString = Integer.toString(minutes);
+		// deltaString = Integer.toString(minutes);
+		this.rightPanel.update(container, delta);
 
 		// Mise à jour de la carte
 		this.map.update(container, delta);
 
+		// Mise à jour de la mouglotte
+		this.mouglotte.update(container, delta);
+
 	}
-	
+
 	@Override
 	// Affichage
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
 
+		this.rightPanel.render(container, g);
+		
 		g.setAntiAlias(true);
 		// g.setColor(Color.white);
 		// g.fillRect(0, 0, container.getWidth(), container.getHeight());
 		// g.setColor(Color.black);
 
-//		this.bottomPanel.drawGUI(container, g);
-//		this.rightPanel.drawGUI(container, g);
+		// this.bottomPanel.drawGUI(container, g);
+		// this.rightPanel.drawGUI(container, g);
 
+		// Affichage de la carte
+		// Contient le calcul du décalage du au scrolling, la méthode doit être
+		// la première appelée
 		this.map.render(container, g);
+
 		this.mouglotte.render(container, g);
-//		this.mouglotte2.render(container, g);
+		// this.mouglotte2.render(container, g);
 
 		g.drawString(this.deltaString, 300, 10);
 		g.drawString(this.infoString, 10, 300);
@@ -177,63 +150,65 @@ public class GameState extends BasicGameState {
 		// } else {
 
 		// Si une unité est sélectionnée
-//		if (this.mouglotte.isSelected()) {
-//
-//			// Réinitialisation des zones visitées
-//			this.map.clearVisited();
-//
-//			// Recherche du chemin
-//			this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
-//					this.mouglotte.getX(), this.mouglotte.getY(), x, y));
-//			// path = finder.findPath(
-//			// new UnitMover(map.getUnit(selectedx, selectedy)),
-//			// selectedx, selectedy, x, y);
-//
-//			// Si le chemin est trouvé
-//			// if (this.mouglotte.hasPath()) {
-//
-//			// Déplacement de l'unité
-//			// int unit = map.getUnit(selectedx, selectedy);
-//			// map.setUnit(selectedx, selectedy, 0);
-//			// map.setUnit(x, y, unit);
-//			// selectedx = x;
-//			// selectedy = y;
-//			// // Réinitialisation du dernier chemin recherché
-//			// lastFindX = -1;
-//
-//			// Déplacement instantané
-//			// this.mouglotte.setLocation(x, y);
-//
-//			// Réinitialisation du chemin
-//			// this.map.clearPath();
-//			// }
-//		}
+		// if (this.mouglotte.isSelected()) {
+		//
+		// // Réinitialisation des zones visitées
+		// this.map.clearVisited();
+		//
+		// // Recherche du chemin
+		// this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
+		// this.mouglotte.getX(), this.mouglotte.getY(), x, y));
+		// // path = finder.findPath(
+		// // new UnitMover(map.getUnit(selectedx, selectedy)),
+		// // selectedx, selectedy, x, y);
+		//
+		// // Si le chemin est trouvé
+		// // if (this.mouglotte.hasPath()) {
+		//
+		// // Déplacement de l'unité
+		// // int unit = map.getUnit(selectedx, selectedy);
+		// // map.setUnit(selectedx, selectedy, 0);
+		// // map.setUnit(x, y, unit);
+		// // selectedx = x;
+		// // selectedy = y;
+		// // // Réinitialisation du dernier chemin recherché
+		// // lastFindX = -1;
+		//
+		// // Déplacement instantané
+		// // this.mouglotte.setLocation(x, y);
+		//
+		// // Réinitialisation du chemin
+		// // this.map.clearPath();
+		// // }
+		// }
 	}
 
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 
 		// Si la souris est sortie on ne fait rien
-		if ((newx < 0) || (newy < 0)
+		if ((newx < 0)
+				|| (newy < 0)
 				|| (newx >= this.map.getWidthInTiles() * this.map.getTileSize())
-				|| (newy >= this.map.getHeightInTiles() * this.map.getTileSize())) {
+				|| (newy >= this.map.getHeightInTiles()
+						* this.map.getTileSize())) {
 			return;
 		}
 
 		// Si une unité est sélectionnée
 		if (this.mouglotte.isSelected()) {
 
-			// Recherche du chemin
-			this.map.findPath(new UnitMover(3), this.mouglotte.getX(),
-					this.mouglotte.getY(), newx, newy);
+			// // Recherche du chemin
+			// this.map.findPath(new UnitMover(3), this.mouglotte.getX(),
+			// this.mouglotte.getY(), newx, newy);
 		}
 		this.infoString = Integer.toString(newx) + "," + Integer.toString(newy)
-				+ " => " + Integer.toString(newx / this.map.getTileSize()) + ","
-				+ Integer.toString(newy / this.map.getTileSize());
+				+ " => " + Integer.toString(newx / this.map.getTileSize())
+				+ "," + Integer.toString(newy / this.map.getTileSize());
 	}
 
-	// Pour les tests
-	public Mouglotte getMouglotte() {
-		return this.mouglotte;
+	// Récupération de la mouglotte sélectionnée
+	public Mouglotte getSelectedMouglotte() {
+		return this.mouglotte.isSelected() ? this.mouglotte : null;
 	}
 }

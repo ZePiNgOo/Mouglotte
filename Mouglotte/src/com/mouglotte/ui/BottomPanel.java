@@ -15,12 +15,12 @@ public class BottomPanel extends MouglotteGUI implements ComponentListener {
 
 	private MouseOverArea play;
 
-	public BottomPanel(GameContainer c, String name) throws SlickException {
+	public BottomPanel(GameState game) throws SlickException {
 
-		super(c, name);
+		super(game);
 
 		// Création du bouton
-		this.play = new MouseOverArea(c, new Image("res/bouton.png"), 300, 450,
+		this.play = new MouseOverArea(game.getContainer(), new Image("res/bouton.png"), 300, 450,
 				this);
 		this.play.setNormalColor(new Color(0.7f, 0.7f, 0.7f, 1f));
 		this.play.setMouseOverColor(new Color(0.9f, 0.9f, 0.9f, 1f));
@@ -30,24 +30,20 @@ public class BottomPanel extends MouglotteGUI implements ComponentListener {
 	public void componentActivated(AbstractComponent source) {
 
 		// Passage à l'état 2 : le jeu
-		if (source.equals(this.play))
-			GameState.setGameState(2);
-	}
-
-	@Override
-	public void drawGUI(GameContainer container, Graphics g) {
-
-		switch (GameState.getGameState()) {
-		case 1:
-			play.render(container, g);
-			break;
-		}
+//		if (source.equals(this.play))
+//			GameState.setGameState(2);
 	}
 
 	@Override
 	public void update(GameContainer container, int state) {
 
 
+	}
+
+	@Override
+	public void render(GameContainer container, Graphics g) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

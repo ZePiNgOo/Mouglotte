@@ -46,7 +46,7 @@ public class TestDecisionUI extends JFrame implements ActionListener {
         Need need;
 		Desire desire;
 
-		this.mouglotte = new Mouglotte();
+		//this.mouglotte = new Mouglotte();
 		this.needs = new Needs(this.mouglotte);
 		this.desires = new Desires(this.mouglotte);
 

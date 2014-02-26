@@ -49,8 +49,14 @@ public class Mouglotte {
 
 	// Chemin
 	private Path path;
+
 	// Action en cours
 	private boolean actionInProgress;
+	// Temps écoulé
+	private int pastTime = 0;
+	private int minutes = 0;
+	private int hours = 0;
+	private int days = 0;
 
 	// Constructeur
 	public Mouglotte(GameState game) {
@@ -237,20 +243,73 @@ public class Mouglotte {
 	// eventYear();
 	// }
 
+	// Mise à jour
+	public void update(GameContainer container, int delta) {
+
+		// Calcul du temps passé
+		this.pastTime += delta;
+		this.pastTime *= GameState.TIME_FACTOR;
+
+		// Toutes les secondes réelles
+		if (this.pastTime >= 1000) {
+
+			// On effectue une action
+			action();
+		}
+
+		// On fait un truc toutes les 3 secondes réelles
+		// = minute mouglotte
+		if (this.pastTime >= 3000) {
+
+			this.pastTime -= 3000;
+			// Une minute mouglotte s'est écoulée
+			this.minutes++;
+			// Evénement lancé toutes les minutes
+			eventMinute();
+		}
+
+		// Toutes les 3 minutes réelles
+		// = heure mouglotte
+		if (this.minutes >= 60) {
+
+			// Une heure mouglotte s'est écoulée
+			this.hours++;
+			this.minutes = 0;
+			// Evénement lancé toutes les heures
+			eventHour();
+		}
+
+		// Toutes les heures réelles
+		// = jour mouglotte
+		if (this.hours >= 20) {
+
+			// Un jour mouglotte s'est écoulé
+			this.days++;
+			this.hours = 0;
+			// Evénement lancé tous les jours
+			eventDay();
+		}
+
+	}
+
 	// Evénement exécuté toutes les minutes
 	public void eventMinute() {
+
+		// Les besoins et les envies évoluent
+		// S'ils sont en cours d'accomplissement ils baissent
 
 		// Pour les besoins
 		this.needs.eventMinute();
 		// Pour les envies
 		this.desires.eventMinute();
-
-		// Effectue une action
-		action();
 	}
 
 	// Evénement exécuté toutes les heures
 	public void eventHour() {
+
+		// Les besoins augmentent et le besoin le plus pressant est choisi
+		// Une nouvelle envie est choisie si l'envie courante est en train de
+		// s'accomplir ou n'a pas pu l'être
 
 		// Pour les besoins
 		this.needs.eventHour();
@@ -258,6 +317,7 @@ public class Mouglotte {
 		this.desires.eventHour();
 
 		// Prise de décision
+		// Le besoin ou l'envie est choisi
 		decide();
 	}
 
@@ -280,6 +340,8 @@ public class Mouglotte {
 	private void decide() {
 
 		System.out.println("Mouglotte::Decide");
+
+		// Ajouter la gestion des ordres et des solicitations extérieurs
 
 		// Une nouvelle action va commencer ensuite
 		this.actionInProgress = false;
@@ -309,6 +371,7 @@ public class Mouglotte {
 
 			// Je veux suivre une envie
 		} else {
+
 			this.desires.setSearching(true);
 			this.needs.setSearching(false);
 			this.needs.setFulfilling(false);
@@ -344,6 +407,12 @@ public class Mouglotte {
 	// Effectuer une action
 	private void action() {
 
+		// Pour les tests
+		if (this.graphics.isSelected()) {
+			continueAction();
+			return;
+		}
+		
 		System.out.println("Mouglotte::Action");
 
 		// Rechercher si l'action peut être conclue
@@ -503,11 +572,20 @@ public class Mouglotte {
 		int dirX = this.graphics.getX() - this.graphics.getLastX();
 		int dirY = this.graphics.getY() - this.graphics.getLastY();
 
-		// Une chance sur 2 de continuer dans la même direction
+		// Une chance sur 2 de ne rien faire
 		if (r.nextBoolean() == true) {
 
-			destX = this.graphics.getX() + WALK_AROUND_DISTANCE * dirX;
-			destY = this.graphics.getY() + WALK_AROUND_DISTANCE * dirY;
+		}
+		// Une chance sur 2 de continuer dans la même direction
+		else if (r.nextBoolean() == true) {
+
+			// La mouglotte marchait, on continue dans la même direction
+			if (dirX != 0)
+				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * dirX
+						/ Math.abs(dirX);
+			if (dirY != 0)
+				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * dirY
+						/ Math.abs(dirY);
 
 			// On va dans une direction au hasard
 			// (y compris la direction actuelle pour simplifier)

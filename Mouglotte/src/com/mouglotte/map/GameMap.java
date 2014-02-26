@@ -39,6 +39,8 @@ public class GameMap implements TileBasedMap {
 	// Largeur et hauteur en zones
 	// public static final int WIDTH = 20;
 	// public static final int HEIGHT = 20;
+	// Nombre de zones (tiles) affichées
+	public static final int DISPLAYED_TILES = 8;
 
 	// Type de terrain
 	public static final int GRASS = 0;
@@ -60,8 +62,8 @@ public class GameMap implements TileBasedMap {
 	// private Image buffer;
 	private ImageBuffer buffer;
 
-	private float totoX = 20, totoY = 20;
-	private int mapX, mapY;
+	private float offsetX, offsetY;
+	private int tileOffsetX, tileOffsetY;
 
 	// Terrain
 	private int[][] terrain;
@@ -75,15 +77,15 @@ public class GameMap implements TileBasedMap {
 	 */
 	private boolean[][] blocked;
 
-	/** The width of the display in tiles */
-	private int widthInTiles;
-	/** The height of the display in tiles */
-	private int heightInTiles;
-
-	/** The offset from the centre of the screen to the top edge in tiles */
-	private int topOffsetInTiles;
-	/** The offset from the centre of the screen to the left edge in tiles */
-	private int leftOffsetInTiles;
+	// /** The width of the display in tiles */
+	// private int widthInTiles;
+	// /** The height of the display in tiles */
+	// private int heightInTiles;
+	//
+	// /** The offset from the centre of the screen to the top edge in tiles */
+	// private int topOffsetInTiles;
+	// /** The offset from the centre of the screen to the left edge in tiles */
+	// private int leftOffsetInTiles;
 
 	// Pathfinder
 	private PathFinder finder;
@@ -115,12 +117,12 @@ public class GameMap implements TileBasedMap {
 		// do we need to render to fill the screen in each dimension and how far
 		// is
 		// it from the centre of the screen
-		this.widthInTiles = this.game.getContainer().getWidth()
-				/ this.map.getTileWidth();
-		this.heightInTiles = this.game.getContainer().getHeight()
-				/ this.map.getTileHeight();
-		this.topOffsetInTiles = this.heightInTiles / 2;
-		this.leftOffsetInTiles = this.widthInTiles / 2;
+		// this.widthInTiles = this.game.getContainer().getWidth()
+		// / this.map.getTileWidth();
+		// this.heightInTiles = this.game.getContainer().getHeight()
+		// / this.map.getTileHeight();
+		// this.topOffsetInTiles = this.heightInTiles / 2;
+		// this.leftOffsetInTiles = this.widthInTiles / 2;
 
 		// // Chargement des ressoures
 		// try {
@@ -178,6 +180,38 @@ public class GameMap implements TileBasedMap {
 	// Récupération de la taille d'une zone
 	public int getTileSize() {
 		return this.map.getTileHeight();
+	}
+
+	// Récupération de la taille de la carte en pixels
+	public int getWidth() {
+		return this.map.getWidth() * this.map.getTileWidth();
+	}
+	
+	// Récupération de la taille de la carte en pixels
+	public int getheight() {
+		return this.map.getHeight() * this.map.getTileHeight();
+	}
+	
+	// Récupération de la hauteur en zones
+	public int getHeightInTiles() {
+		return this.map.getHeight();
+	}
+
+	// Récupération de la largeur en zones
+	public int getWidthInTiles() {
+		return this.map.getWidth();
+	}
+	
+	// Ligne de la zone
+	public int getTileRow(int y) {
+		return (y - (int) this.offsetY) / this.map.getTileHeight()
+				+ this.tileOffsetY;
+	}
+
+	// Colonne de la zone
+	public int getTileColumn(int x) {
+		return (x - (int) this.offsetX) / this.map.getTileWidth()
+				+ this.tileOffsetX;
 	}
 
 	// Contrôle sur les coordonnées sont dans la carte
@@ -255,18 +289,6 @@ public class GameMap implements TileBasedMap {
 		return 1;
 	}
 
-	// Récupération de la hauteur en zones
-	public int getHeightInTiles() {
-		// return HEIGHT;
-		return this.map.getHeight();
-	}
-
-	// Récupération de la largeur en zones
-	public int getWidthInTiles() {
-		// return WIDTH;
-		return this.map.getWidth();
-	}
-
 	// Chargement des ressources
 	private InputStream getResource(String ref) throws IOException {
 
@@ -288,114 +310,118 @@ public class GameMap implements TileBasedMap {
 	public void update(GameContainer container, int delta)
 			throws SlickException {
 
-		if (container.getInput().isKeyDown(Input.KEY_RIGHT)) {
-			// this.totoX = this.totoX < getWidthInTiles() ? this.totoX
-			// + this.map.getWidth() : getWidthInTiles();
-			this.totoX -= delta / 3.0f;
-			if (this.totoX > getWidthInTiles()) this.totoX = getWidthInTiles();
+		// Calcul du scrolling de la carte
+		scrolling(container, delta);
+	}
+
+	// Calcul du scrolling de la carte
+	private void scrolling(GameContainer container, int delta) {
+
+		// Le scrolling répond aux touches et à la souris
+		// - offsetX et offsetY permettent de décaler la fenêtre de manière plus
+		// fluide
+		// - tileOffsetX et tileOffsetY permettent de décaler la première zone
+		// affichée
+
+		if ((container.getInput().isKeyDown(Input.KEY_RIGHT))
+				|| (container.getInput().getMouseX() >= container.getWidth() - 10)) {
+			this.offsetX -= delta / 3.0f;
+			if (this.offsetX < 0
+					&& this.tileOffsetX >= this.map.getWidth()
+							- DISPLAYED_TILES)
+				this.offsetX = 0;
 		}
-		if (container.getInput().isKeyDown(Input.KEY_LEFT)) {
-			// this.totoX = this.totoX > 0 ? this.totoX - this.map.getWidth() :
-			// 0;
-			this.totoX += delta / 3.0f;
-			if (this.totoX < 0) this.totoX = 0;
+		if ((container.getInput().isKeyDown(Input.KEY_LEFT))
+				|| (container.getInput().getMouseX() <= 10)) {
+			this.offsetX += delta / 3.0f;
+			if (this.offsetX > 0 && this.tileOffsetX <= 0)
+				this.offsetX = 0;
 		}
-		if (container.getInput().isKeyDown(Input.KEY_UP)) {
-			// this.totoY = this.totoY < getHeightInTiles() ? this.totoY
-			// + this.map.getHeight() : getHeightInTiles();
-			this.totoY += delta / 3.0f;
-			if (this.totoY < 0) this.totoY = 0;
+		if ((container.getInput().isKeyDown(Input.KEY_UP))
+				|| (container.getInput().getMouseY() <= 10)) {
+			this.offsetY += delta / 3.0f;
+			if (this.offsetY > 0 && this.tileOffsetY <= 0)
+				this.offsetY = 0;
 		}
-		if (container.getInput().isKeyDown(Input.KEY_DOWN)) {
-			// this.totoY = this.totoY > 0 ? this.totoY - this.map.getHeight() :
-			// 0;
-			this.totoY -= delta / 3.0f;
-			if (this.totoY > getHeightInTiles()) this.totoY = getHeightInTiles();
+		if ((container.getInput().isKeyDown(Input.KEY_DOWN))
+				|| (container.getInput().getMouseY() >= container.getHeight() - 10)) {
+			this.offsetY -= delta / 3.0f;
+			if (this.offsetY < 0
+					&& this.tileOffsetY >= this.map.getHeight()
+							- DISPLAYED_TILES)
+				this.offsetY = 0;
 		}
-		
+
 		// Smooth
-		if (this.totoX < 0) {
-			this.mapX++;
-			this.totoX = 32;
+		if (this.offsetX < -64) {
+			this.tileOffsetX++;
+			this.offsetX = 0;
 		}
-		if (this.totoX > 32) {
-			this.mapX--;
-			this.totoX = 0;
+		if (this.offsetX > 0) {
+			this.tileOffsetX--;
+			this.offsetX = -64;
 		}
-		if (this.totoY < 0) {
-			this.mapY++;
-			this.totoY = 32;
+		if (this.offsetY < -64) {
+			this.tileOffsetY++;
+			this.offsetY = 0;
 		}
-		if (this.totoY > 32) {
-			this.mapY--;
-			this.totoY = 0;
+		if (this.offsetY > 0) {
+			this.tileOffsetY--;
+			this.offsetY = -64;
 		}
 	}
 
 	// Affichage
 	public void render(GUIContext container, Graphics g) throws SlickException {
 
-		// Graphics gBuff = g;
-		//
-		// // Affichage de la carte
-		// for (int x = 0; x < this.getWidthInTiles(); x++) {
-		// for (int y = 0; y < this.getHeightInTiles(); y++) {
-		// gBuff.drawImage(this.tiles[this.getTerrain(x, y)], x
-		// * TILE_SIZE, y * TILE_SIZE, null);
-		// }
-		// }
-
-		int playerTileX = (int) this.totoX - 32;
-		int playerTileY = (int) this.totoY - 32;
-		int playerTileOffsetX = (int) ((playerTileX - this.totoX) * this.map
-				.getTileWidth());
-		int playerTileOffsetY = (int) ((playerTileY - this.totoY) * this.map
-				.getTileHeight());
-		// int playerTileOffsetX = 5;
-		// int playerTileOffsetY = 5;
-
-		// render the section of the map that should be visible. Notice the -1
-		// and +3 which renders
-		// a little extra map around the edge of the screen to cope with tiles
-		// scrolling on and off
-		// the screen
-//		this.map.render(playerTileOffsetX - (10 / 2), playerTileOffsetY
-//				- (10 / 2), playerTileX - this.leftOffsetInTiles - 1,
-//				playerTileY - this.topOffsetInTiles - 1, this.widthInTiles + 3,
-//				this.heightInTiles + 3);
-		this.map.render(playerTileX, playerTileY, this.mapX, this.mapY, this.mapX+26, this.mapY+26 );
-		//this.map.render((int)totoX, (int)totoY,0,0,5,5);
+		// Affichage d'une partie de la carte
+		// render(x,y,sx,sy,width,height)
+		this.map.render((int) this.offsetX, (int) this.offsetY,
+				this.tileOffsetX, this.tileOffsetY, DISPLAYED_TILES,
+				DISPLAYED_TILES);
+		// - x :
+		// - y :
+		// - sx : tile de départ
+		// - sy : tile de départ
+		// - width : nombre de tiles affichés
+		// - height : nombre de tiles affichés
 
 		Color color = g.getColor();
 		g.setColor(Color.red);
-		g.drawString(this.totoX+","+this.totoY, this.game.getContainer().getWidth()/2+10, this.game.getContainer().getHeight()/2);
-		g.fillRect(this.game.getContainer().getWidth()/2, this.game.getContainer().getHeight()/2, 10, 10);
+		g.drawString(this.offsetX + "," + this.offsetY + " / "
+				+ this.tileOffsetX + "," + this.tileOffsetY,
+				container.getWidth() / 2 + 10, container.getHeight() / 2);
+		g.drawString(container.getInput().getMouseX() + ","
+				+ container.getInput().getMouseY() + " / "
+				+ getTileColumn(container.getInput().getMouseX()) + ","
+				+ getTileRow(container.getInput().getMouseY()),
+				container.getWidth() / 2 + 10, container.getHeight() / 2 + 15);
+
+		g.fillRect(container.getWidth() / 2, container.getHeight() / 2, 10, 10);
 		g.setColor(color);
-		
-		// draw entities relative to the player that must appear in the centre
-		// of the screen
-//		g.translate(400 - (int) (this.totoX * 32),
-//				300 - (int) (this.totoY * 32));
-//		
-//		g.resetTransform();
+
+		// Décalage de tout ce qui va être affiché après
+		// Cela permet que les choses restent à leur place malgré le scrolling
+		g.translate(this.offsetX - this.tileOffsetX * this.map.getTileWidth(),
+				this.offsetY - this.tileOffsetY * this.map.getTileHeight());
+
+		// A appeler si on veut annuler le translate et donc ne plus prendre en
+		// compte le scrolling
+		// g.resetTransform();
 	}
 
 	// Trouver le chemin
 	public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
 
 		// On convertit les x et y en position position dans les zones
-		sx /= this.map.getTileWidth();
-		sy /= this.map.getTileHeight();
-		tx /= this.map.getTileWidth();
-		ty /= this.map.getTileHeight();
-		// sx = sx % TILE_SIZE > TILE_SIZE / 2 ? sx / TILE_SIZE - 1 : sx /
-		// TILE_SIZE;
-		// sy = sy % TILE_SIZE > TILE_SIZE / 2 ? sy / TILE_SIZE - 1 : sy /
-		// TILE_SIZE;
-		// tx = tx % TILE_SIZE > TILE_SIZE / 2 ? tx / TILE_SIZE - 1 : tx /
-		// TILE_SIZE;
-		// ty = ty % TILE_SIZE > TILE_SIZE / 2 ? ty / TILE_SIZE - 1 : ty /
-		// TILE_SIZE;
+		// sx /= this.map.getTileWidth();
+		// sy /= this.map.getTileHeight();
+		// tx /= this.map.getTileWidth();
+		// ty /= this.map.getTileHeight();
+		sx = getTileColumn(sx);
+		sy = getTileRow(sy);
+		tx = getTileColumn(tx);
+		ty = getTileRow(ty);
 
 		return this.finder.findPath(mover, sx, sy, tx, ty);
 	}
@@ -407,6 +433,7 @@ public class GameMap implements TileBasedMap {
 
 		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
 		// cherche
+		// La recherche doit se faire dans le champ de vision autour du point
 		if (r.nextInt(10) == 0)
 			return new Tile(x, y, 0, 0, 1);
 		else

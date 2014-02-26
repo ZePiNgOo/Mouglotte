@@ -4,19 +4,20 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 
+import com.mouglotte.game.GameState;
+
 public abstract class MouglotteGUI {
 
-	protected Graphics g;
-	protected String name;
+	// Jeu
+	protected GameState game;
 
-	public MouglotteGUI(GameContainer c, String name) throws SlickException {
-		g = c.getGraphics();
-		this.name = name;
+	public MouglotteGUI(GameState game) throws SlickException {
+		this.game = game;
 	}
 
-	public abstract void drawGUI(GameContainer container, Graphics g);
+	public abstract void update(GameContainer container, int delta);
 
-	public abstract void update(GameContainer container, int state);
+	public abstract void render(GameContainer container, Graphics g);
 
 	//public static void setMessage(String message, Joueur joueur);
 }

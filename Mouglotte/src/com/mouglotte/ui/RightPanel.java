@@ -11,49 +11,57 @@ import org.newdawn.slick.gui.AbstractComponent;
 import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.MouseOverArea;
 
+import com.mouglotte.game.Game;
 import com.mouglotte.game.GameState;
+import com.mouglotte.map.GameMap;
 
 public class RightPanel extends MouglotteGUI implements ComponentListener {
 
-	private JPanel panel;
-	private int state;
 	private MouseOverArea play;
 
-	public RightPanel(GameContainer c, String name, int state)
-			throws SlickException {
+	public RightPanel(GameState game) throws SlickException {
 
-		super(c, name);
-		this.state = state;
-		
-//		panel = new JPanel();
-//		panel.setBackground((java.awt.Color) Color.yellow);
+		super(game);
+
+		// panel = new JPanel();
+		// panel.setBackground((java.awt.Color) Color.yellow);
 
 		// Création du bouton
-		this.play = new MouseOverArea(c, new Image("res/bouton.png"), 600, 300,
-				this);
+		this.play = new MouseOverArea(game.getContainer(), new Image(
+				"res/bouton.png"), 100, 100, this);
 		this.play.setNormalColor(new Color(0.7f, 0.7f, 0.7f, 1f));
 		this.play.setMouseOverColor(new Color(0.9f, 0.9f, 0.9f, 1f));
 	}
 
 	@Override
-	public void drawGUI(GameContainer container, Graphics g) {
-
-		g.drawString("Mouglotte", 50, 50);
-		g.drawString("--> Etat :" + this.state, 200, 50);
-
-		play.render(container, g);
+	public void update(GameContainer container, int delta) {
 
 	}
 
 	@Override
-	public void update(GameContainer container, int state) {
-		this.state = state;
+	public void render(GameContainer container, Graphics g) {
+
+		// Décalage pour bien se placer dans le panel
+		// La carte prend GameMap.DISPLAYED_TILES * GameMap.getTileSize()
+		g.translate(GameMap.DISPLAYED_TILES * this.game.getMap().getTileSize()
+				+ 1, 0);
+
+		// Affichage d'un cadre
+		g.setColor(Color.red);
+		g.drawRect(0, 0, Game.SCREEN_WIDTH - this.game.getMap().getTileSize()
+				* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
+
+		g.drawString("Mouglotte", 500, 50);
+		play.render(container, g);
+
+		// Réinitialisation de la position du Graphics
+		g.resetTransform();
 	}
 
 	@Override
 	public void componentActivated(AbstractComponent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
