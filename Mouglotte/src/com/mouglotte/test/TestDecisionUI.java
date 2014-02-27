@@ -89,10 +89,10 @@ public class TestDecisionUI extends JFrame implements ActionListener {
     	btTimer = new javax.swing.JButton("Timer");
     	txtTimer = new javax.swing.JTextField();
         txtCurrNeed = new javax.swing.JTextField();
-        txtCurrNeedVal = new ProgressBar(new Color(204, 204, 204), new Color(0, 255, 0), 0, 1000);
+        txtCurrNeedVal = new ProgressBar(0, 1000);
         txtCurrNeedState = new javax.swing.JTextField();
         txtCurrDesire = new javax.swing.JTextField();
-        txtCurrDesireVal = new ProgressBar(new Color(204, 204, 204), new Color(0, 255, 0), 0, 1000);
+        txtCurrDesireVal = new ProgressBar(0, 1000);
         txtCurrDesireState = new javax.swing.JTextField();
         txtChoice = new javax.swing.JTextField();
         btFulfill = new javax.swing.JButton("Fulfill");

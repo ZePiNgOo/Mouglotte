@@ -1,21 +1,10 @@
 package com.mouglotte.map;
 
-//import java.awt.event.MouseAdapter;
-//import java.awt.event.MouseEvent;
-//import java.awt.event.MouseMotionListener;
-//import java.awt.event.WindowAdapter;
-//import java.awt.event.WindowEvent;
-//import java.awt.image.BufferedImage;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Random;
 
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.ImageBuffer;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
@@ -25,130 +14,87 @@ import com.mouglotte.game.GameState;
 import com.mouglotte.specy.MemoryType;
 
 /**
- * The data map from our example game. This holds the state and context of each
- * tile on the map. It also implements the interface required by the path
- * finder. It's implementation of the path finder related methods add specific
- * handling for the types of units and terrain in the example game.
+ * Map for the game.
  * 
- * @author Kevin Glass
+ * @author Julien Miltat
  */
 public class GameMap implements TileBasedMap {
 
-	// Taille d'une zone (tile)
-	// public static final int TILE_SIZE = 16;
-	// Largeur et hauteur en zones
-	// public static final int WIDTH = 20;
-	// public static final int HEIGHT = 20;
-	// Nombre de zones (tiles) affichées
+	/** Number of displayed tiles */
 	public static final int DISPLAYED_TILES = 8;
+	/** Tile size */
+	public static int TILE_SIZE;
 
 	// Type de terrain
 	public static final int GRASS = 0;
 	public static final int WATER = 1;
 	public static final int TREES = 2;
-	// public static final int PLANE = 3;
-	// public static final int BOAT = 4;
-	// public static final int TANK = 5;
-	public static final int MOUGLOTTE = 3;
 
-	// Jeu
+	/** Game */
 	private GameState game;
-	// Carte
+	/** Tiled map */
 	private TiledMap map;
 
-	// Types de zones
-	private Image[] tiles = new Image[4];
-	// Buffer pour afficher la carte
-	// private Image buffer;
-	private ImageBuffer buffer;
-
+	/** Offsets for scrolling */
 	private float offsetX, offsetY;
 	private int tileOffsetX, tileOffsetY;
 
-	// Terrain
-	private int[][] terrain;
-	// Unités
-	private int[][] units;
-	// Visité
+	/** Objects */
+	private int[][] objects;
+	/** Entities */
+	private Object[][] entities;
+	/** Tiles visited by path finder */
 	private boolean[][] visited;
-	/**
-	 * The collision map indicating which tiles block movement - generated based
-	 * on tile properties
-	 */
-	private boolean[][] blocked;
 
-	// /** The width of the display in tiles */
-	// private int widthInTiles;
-	// /** The height of the display in tiles */
-	// private int heightInTiles;
-	//
-	// /** The offset from the centre of the screen to the top edge in tiles */
-	// private int topOffsetInTiles;
-	// /** The offset from the centre of the screen to the left edge in tiles */
-	// private int leftOffsetInTiles;
-
-	// Pathfinder
+	/** Pathfinder */
 	private PathFinder finder;
 
 	// private Path path;
 
-	// Constructeur
+	/**
+	 * Constructor
+	 * 
+	 * @param game
+	 *            GameState
+	 * @throws SlickException
+	 */
 	public GameMap(GameState game) throws SlickException {
 
-		// Jeu
+		// Game
 		this.game = game;
-		// Carte
+		// Map
 		this.map = new TiledMap("res/test.tmx");
+		// Get tile size
+		GameMap.TILE_SIZE = this.map.getTileWidth();
 
 		// build a collision map based on tile properties in the TileD map
-		this.blocked = new boolean[this.map.getWidth()][this.map.getHeight()];
-		for (int x = 0; x < this.map.getWidth(); x++) {
-			for (int y = 0; y < this.map.getHeight(); y++) {
-				int tileID = this.map.getTileId(x, y, 0);
-				String value = this.map.getTileProperty(tileID, "blocked",
-						"false");
-				if ("true".equals(value)) {
-					this.blocked[x][y] = true;
-				}
-			}
-		}
-
-		// caculate some layout values for rendering the tilemap. How many tiles
-		// do we need to render to fill the screen in each dimension and how far
-		// is
-		// it from the centre of the screen
-		// this.widthInTiles = this.game.getContainer().getWidth()
-		// / this.map.getTileWidth();
-		// this.heightInTiles = this.game.getContainer().getHeight()
-		// / this.map.getTileHeight();
-		// this.topOffsetInTiles = this.heightInTiles / 2;
-		// this.leftOffsetInTiles = this.widthInTiles / 2;
-
-		// // Chargement des ressoures
-		// try {
-		// tiles[GameMap.TREES] = new Image(getResource("res/rocks.png"),
-		// "res/rocks.png", false);
-		// tiles[GameMap.GRASS] = new Image(getResource("res/grass.png"),
-		// "res/grass.png", false);
-		// } catch (IOException e) {
-		// System.err.println("Failed to load resources: " + e.getMessage());
-		// System.exit(0);
-		// } catch (SlickException e) {
+		// this.blocked = new
+		// boolean[this.map.getWidth()][this.map.getHeight()];
+		// for (int x = 0; x < this.map.getWidth(); x++) {
+		// for (int y = 0; y < this.map.getHeight(); y++) {
+		// int tileID = this.map.getTileId(x, y, 0);
+		// String value = this.map.getTileProperty(tileID, "blocked",
+		// "false");
+		// if ("true".equals(value)) {
+		// this.blocked[x][y] = true;
 		// }
-		//
-		// fillArea(2, 5, 2, 3, TREES);
-		// fillArea(8, 10, 3, 1, TREES);
-		// fillArea(15, 4, 2, 2, TREES);
-		// fillArea(3, 15, 1, 4, TREES);
+		// }
+		// }
 
-		// Terrain
-		terrain = new int[getWidthInTiles()][getHeightInTiles()];
-		// Unités
-		units = new int[getWidthInTiles()][getHeightInTiles()];
-		// Visité
+		// // Terrain
+		// terrain = new int[getWidthInTiles()][getHeightInTiles()];
+		// // Unités
+		// units = new int[getWidthInTiles()][getHeightInTiles()];
+		// // Visité
+		// visited = new boolean[getWidthInTiles()][getHeightInTiles()];
+		// Objects
+		objects = new int[getWidthInTiles()][getHeightInTiles()];
+		// Entities
+		entities = new Object[getWidthInTiles()][getHeightInTiles()];
+		// Visited tiles bu the path finder
 		visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 
-		// Instanciation du Pathfinder
+		// Instantiation of the path finder
 		this.finder = new AStarPathFinder(this, 500, true);
 
 		// addMouseListener(new MouseAdapter() {
@@ -177,44 +123,74 @@ public class GameMap implements TileBasedMap {
 		// setVisible(true);
 	}
 
-	// Récupération de la taille d'une zone
-	public int getTileSize() {
-		return this.map.getTileHeight();
-	}
-
-	// Récupération de la taille de la carte en pixels
+	/**
+	 * Get map width in pixels
+	 * 
+	 * @return Map width in pixels
+	 */
 	public int getWidth() {
 		return this.map.getWidth() * this.map.getTileWidth();
 	}
-	
-	// Récupération de la taille de la carte en pixels
+
+	/**
+	 * Get map height in pixels
+	 * 
+	 * @return Map height in pixels
+	 */
 	public int getheight() {
 		return this.map.getHeight() * this.map.getTileHeight();
 	}
-	
-	// Récupération de la hauteur en zones
+
+	/**
+	 * Get map width in tiles
+	 * 
+	 * @return Map width in tiles
+	 */
+	public int getWidthInTiles() {
+		return this.map.getWidth();
+	}
+
+	/**
+	 * Get map height in tiles
+	 * 
+	 * @return Map height in tiles
+	 */
 	public int getHeightInTiles() {
 		return this.map.getHeight();
 	}
 
-	// Récupération de la largeur en zones
-	public int getWidthInTiles() {
-		return this.map.getWidth();
-	}
-	
-	// Ligne de la zone
+	/**
+	 * Get tile row index from a y coordinate
+	 * 
+	 * @param y
+	 *            y position
+	 * @return Row index of the tile
+	 */
 	public int getTileRow(int y) {
 		return (y - (int) this.offsetY) / this.map.getTileHeight()
 				+ this.tileOffsetY;
 	}
 
-	// Colonne de la zone
+	/**
+	 * Get tile column index from a x coordinate
+	 * 
+	 * @param x
+	 *            x position
+	 * @return Column index of the tile
+	 */
 	public int getTileColumn(int x) {
 		return (x - (int) this.offsetX) / this.map.getTileWidth()
 				+ this.tileOffsetX;
 	}
 
-	// Contrôle sur les coordonnées sont dans la carte
+	/**
+	 * Control if the coordinates are in the map
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 */
 	public boolean contains(int x, int y) {
 		if ((x > 0) && (y > 0)
 				&& (x < getWidthInTiles() * this.map.getTileWidth())
@@ -224,18 +200,9 @@ public class GameMap implements TileBasedMap {
 			return false;
 	}
 
-	// Pour les tests
-	// Remplissage d'une zone avec le bon terrain
-	private void fillArea(int x, int y, int width, int height, int type) {
-
-		for (int xp = x; xp < x + width; xp++) {
-			for (int yp = y; yp < y + height; yp++) {
-				terrain[xp][yp] = type;
-			}
-		}
-	}
-
-	// Réinitialisation des zones visitées
+	/**
+	 * Initialize tiles visited by the path finer
+	 */
 	public void clearVisited() {
 		for (int x = 0; x < getWidthInTiles(); x++) {
 			for (int y = 0; y < getHeightInTiles(); y++) {
@@ -244,69 +211,112 @@ public class GameMap implements TileBasedMap {
 		}
 	}
 
-	// Cette zone est-elle visitée
-	public boolean visited(int x, int y) {
-		return visited[x][y];
+	/**
+	 * has this tile been visited by the path finder ?
+	 * 
+	 * @param i
+	 *            Column index of the tile
+	 * @param j
+	 *            Row index of the tile
+	 */
+	public boolean visited(int i, int j) {
+		return visited[i][j];
 	}
 
-	// Récupération du terrain dans cette zone
-	public int getTerrain(int x, int y) {
-		return terrain[x][y];
-	}
+	// // Récupération du terrain dans cette zone
+	// public int getTerrain(int x, int y) {
+	// return terrain[x][y];
+	// }
 
-	// Récupération de l'unité dans cette zone
-	public int getUnit(int x, int y) {
-		return units[x][y];
-	}
+	// // Récupération de l'unité dans cette zone
+	// public int getUnit(int x, int y) {
+	// return units[x][y];
+	// }
 
-	// Définition de l'emplacement de l'unité
-	public void setUnit(int x, int y, int unit) {
-		units[x][y] = unit;
-	}
+	// // Définition de l'emplacement de l'unité
+	// public void setUnit(int x, int y, int unit) {
+	// units[x][y] = unit;
+	// }
 
-	// Cette zone est-elle un obstacle ?
-	public boolean blocked(Mover mover, int x, int y) {
+	/**
+	 * Is this tile blocked ?
+	 * 
+	 * @param mover
+	 *            Moving entity
+	 * @param i
+	 *            Column index of the tile
+	 * @param j
+	 *            Row index of the tile
+	 * @return true if the tile is blocked
+	 */
+	public boolean blocked(Mover mover, int i, int j) {
 
-		// S'il y a une unité dessus elle bloque
-		if (getUnit(x, y) != 0) {
+		// Blocking objects
+		if (objects[i][j] == WATER || objects[i][j] == TREES)
 			return true;
-		}
 
-		// int unit = ((UnitMover) mover).getType();
-
-		// Actuellement l'eau et les arbres sont bloquants
-		if (terrain[x][y] == WATER || terrain[x][y] == TREES)
+		// Blocking entities
+		if (entities[i][j] != null)
 			return true;
 
-		// Sinon ça passe
+		// Else tile is not blocked
 		return false;
 	}
 
-	// Coût pour passer dans cette zone
-	public float getCost(Mover mover, int sx, int sy, int tx, int ty) {
+	/**
+	 * Get movement cost of moving to this tile
+	 * 
+	 * @param mover
+	 *            Moving entity
+	 * @param si
+	 *            Column index of the tile we're moving from
+	 * @param sj
+	 *            Row index of the tile we're moving from
+	 * @param ti
+	 *            Column index of the tile we're moving to
+	 * @param tj
+	 *            Row index of the tile we're moving to
+	 * @return Movement cost
+	 */
+	public float getCost(Mover mover, int si, int sj, int ti, int tj) {
 
-		// Toujours 1
+		// Always 1
 		return 1;
 	}
 
-	// Chargement des ressources
-	private InputStream getResource(String ref) throws IOException {
+	// // Chargement des ressources
+	// private InputStream getResource(String ref) throws IOException {
+	//
+	// InputStream in = Thread.currentThread().getContextClassLoader()
+	// .getResourceAsStream(ref);
+	// if (in != null) {
+	// return in;
+	// }
+	//
+	// return new FileInputStream(ref);
+	// }
 
-		InputStream in = Thread.currentThread().getContextClassLoader()
-				.getResourceAsStream(ref);
-		if (in != null) {
-			return in;
-		}
-
-		return new FileInputStream(ref);
+	/**
+	 * Define the tile as visited
+	 * 
+	 * @param i
+	 *            Column index of the tile
+	 * @param j
+	 *            Row index of the tile
+	 */
+	public void pathFinderVisited(int i, int j) {
+		this.visited[j][j] = true;
 	}
 
-	// Définition de la zone comme visitée
-	public void pathFinderVisited(int x, int y) {
-		this.visited[x][y] = true;
-	}
-
-	// Mise à jour
+	/**
+	 * Update map
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param delta
+	 *            Delta time since last call
+	 * @throws SlickException
+	 */
 	public void update(GameContainer container, int delta)
 			throws SlickException {
 
@@ -314,7 +324,15 @@ public class GameMap implements TileBasedMap {
 		scrolling(container, delta);
 	}
 
-	// Calcul du scrolling de la carte
+	/**
+	 * Calculate the scrolling of the map. Sets the values of offsetX, offsetY,
+	 * tileOffsetX and tileOffsetY
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param delta
+	 *            Delta between last call
+	 */
 	private void scrolling(GameContainer container, int delta) {
 
 		// Le scrolling répond aux touches et à la souris
@@ -371,20 +389,28 @@ public class GameMap implements TileBasedMap {
 		}
 	}
 
-	// Affichage
+	/**
+	 * Render map
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 * @throws SlickException
+	 */
 	public void render(GUIContext container, Graphics g) throws SlickException {
 
-		// Affichage d'une partie de la carte
+		// Render a part of the map
 		// render(x,y,sx,sy,width,height)
 		this.map.render((int) this.offsetX, (int) this.offsetY,
 				this.tileOffsetX, this.tileOffsetY, DISPLAYED_TILES,
 				DISPLAYED_TILES);
-		// - x :
-		// - y :
-		// - sx : tile de départ
-		// - sy : tile de départ
-		// - width : nombre de tiles affichés
-		// - height : nombre de tiles affichés
+		// - x : x position to render the first tile
+		// - y : y position to render the first tile
+		// - sx : column index of begining tile
+		// - sy : row index of begining tile
+		// - width : number of tiles rendered horizontally
+		// - height : number of tiles rendered vertically
 
 		Color color = g.getColor();
 		g.setColor(Color.red);
@@ -400,17 +426,59 @@ public class GameMap implements TileBasedMap {
 		g.fillRect(container.getWidth() / 2, container.getHeight() / 2, 10, 10);
 		g.setColor(color);
 
-		// Décalage de tout ce qui va être affiché après
-		// Cela permet que les choses restent à leur place malgré le scrolling
+		// Translate everything rendered after this
+		// So things stays at the right place despite of scrolling
 		g.translate(this.offsetX - this.tileOffsetX * this.map.getTileWidth(),
 				this.offsetY - this.tileOffsetY * this.map.getTileHeight());
+
+		// Highlight mouse overed tile
+		highlightTile(container, g);
+
+		// Render objects and entities
+		// Render line by line to respect z order
+		for (int i = this.tileOffsetX; i < this.tileOffsetX + DISPLAYED_TILES; i++)
+			for (int j = this.tileOffsetY; j < this.tileOffsetY
+					+ DISPLAYED_TILES; j++) {
+				// Render object first because an entity must be displayed over
+				// an object
+				// if (objects[i][j] != 0)
+				// g.fillRect((x1, y1, width, height);
+				// if (entities[i][j] != null)
+				// entities[i][j].render(container, g);
+			}
 
 		// A appeler si on veut annuler le translate et donc ne plus prendre en
 		// compte le scrolling
 		// g.resetTransform();
 	}
 
-	// Trouver le chemin
+	/**
+	 * Highlight mouse overed tile
+	 */
+	private void highlightTile(GUIContext container, Graphics g) {
+
+		int i = getTileColumn(container.getInput().getMouseX());
+		int j = getTileRow(container.getInput().getMouseY());
+		g.drawRect(i * this.map.getTileWidth() + 1,
+				j * this.map.getTileHeight() + 1, this.map.getTileWidth(),
+				this.map.getTileHeight());
+	}
+
+	/**
+	 * Find a path
+	 * 
+	 * @param mover
+	 *            Moving entity
+	 * @param si
+	 *            Column index of the tile we're moving from
+	 * @param sj
+	 *            Row index of the tile we're moving from
+	 * @param ti
+	 *            Column index of the tile we're moving to
+	 * @param tj
+	 *            Row index of the tile we're moving to
+	 * @return The path
+	 */
 	public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
 
 		// On convertit les x et y en position position dans les zones
@@ -426,7 +494,17 @@ public class GameMap implements TileBasedMap {
 		return this.finder.findPath(mover, sx, sy, tx, ty);
 	}
 
-	// Recherche à côté
+	/**
+	 * Search for something next to a position
+	 * 
+	 * @param type
+	 *            Type of the thing searched
+	 * @param i
+	 *            Column index of the tile to search from
+	 * @param j
+	 *            Row index of the tile to search from
+	 * @return A tile containing the searched thing
+	 */
 	public Tile searchNear(MemoryType type, int x, int y) {
 
 		Random r = new Random();
@@ -439,14 +517,4 @@ public class GameMap implements TileBasedMap {
 		else
 			return null;
 	}
-
-	// // Chemin trouvé
-	// public boolean pathFound() {
-	// return this.path != null;
-	// }
-	//
-	// // Réinitialisation du chemin
-	// public void clearPath() {
-	// this.path = null;
-	// }
 }

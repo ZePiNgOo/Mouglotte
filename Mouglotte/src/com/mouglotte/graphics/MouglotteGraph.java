@@ -219,16 +219,6 @@ public class MouglotteGraph extends AbstractComponent {
 		this.over = this.shape.contains(newx, newy);
 	}
 
-	// @Override
-	// // Bouton souris pressé
-	// public void mousePressed(int button, int x, int y) {
-	//
-	// this.over = this.shape.contains(x, y);
-	// if (button == 0) {
-	// this.mouseDown = true;
-	// }
-	// }
-
 	@Override
 	// Bouton souris cliqué
 	public void mouseClicked(int button, int x, int y, int clickCount) {

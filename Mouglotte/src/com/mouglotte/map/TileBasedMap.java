@@ -58,15 +58,15 @@ public interface TileBasedMap {
 	 * 
 	 * @param mover
 	 *            The mover that is trying to move across the tile
-	 * @param sx
-	 *            The x coordinate of the tile we're moving from
-	 * @param sy
-	 *            The y coordinate of the tile we're moving from
-	 * @param tx
-	 *            The x coordinate of the tile we're moving to
-	 * @param ty
-	 *            The y coordinate of the tile we're moving to
+	 * @param si
+	 *            The column index of the tile we're moving from
+	 * @param sj
+	 *            The row index of the tile we're moving from
+	 * @param ti
+	 *            The column index of the tile we're moving to
+	 * @param tj
+	 *            The row index of the tile we're moving to
 	 * @return The relative cost of moving across the given tile
 	 */
-	public float getCost(Mover mover, int sx, int sy, int tx, int ty);
+	public float getCost(Mover mover, int si, int sj, int ti, int tj);
 }

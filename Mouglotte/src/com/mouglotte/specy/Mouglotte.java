@@ -17,6 +17,7 @@ import com.mouglotte.map.GameMap;
 import com.mouglotte.map.Path;
 import com.mouglotte.map.Tile;
 import com.mouglotte.map.UnitMover;
+import com.mouglotte.utilities.Debug;
 import com.mouglotte.utilities.MouglotteUtilities;
 
 public class Mouglotte {
@@ -42,7 +43,7 @@ public class Mouglotte {
 	// Graphismes
 	private MouglotteGraph graphics;
 
-	// Date de naissance
+	/** Birthdate */
 	private long birthDate;
 	// Age
 	private int age;
@@ -54,11 +55,18 @@ public class Mouglotte {
 	private boolean actionInProgress;
 	// Temps écoulé
 	private int pastTime = 0;
+	private int secondesR = 0;
 	private int minutes = 0;
 	private int hours = 0;
 	private int days = 0;
 
-	// Constructeur
+	/**
+	 * Constructor
+	 * 
+	 * @param game
+	 *            GameState
+	 */
+
 	public Mouglotte(GameState game) {
 
 		// Jeu
@@ -88,37 +96,171 @@ public class Mouglotte {
 		initDesires();
 	}
 
-	// Définition de la position
+	/**
+	 * Define current location
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 */
+
 	public void setLocation(int x, int y) {
 		this.graphics.setLocation(x, y);
 	}
 
-	// Définition du chemin
+	/**
+	 * Define current path
+	 * 
+	 * @param path
+	 *            Current path
+	 */
+
 	public void setPath(Path path) {
 		this.path = path;
 	}
 
-	// Récupération de l'âge
+	/**
+	 * Get age
+	 * 
+	 * @return Age
+	 */
+
 	public int getAge() {
 		return this.age;
 	}
 
-	// Récupération la position
+	/**
+	 * Get x position
+	 * 
+	 * @return x position
+	 */
 	public int getX() {
 		return this.graphics.getX();
 	}
 
-	// Récupération la position
+	/**
+	 * Get y position
+	 * 
+	 * @return y position
+	 */
 	public int getY() {
 		return this.graphics.getY();
 	}
 
-	// Récupération de la décision
+	/**
+	 * Get decision type
+	 * 
+	 * @return Decision type
+	 */
 	public DecisionType getDecision() {
 		return this.decision;
 	}
 
-	// La mouglotte est-elle sélectionnée
+	/**
+	 * Get hunger need value
+	 * 
+	 * @return Hunger need value
+	 */
+	public int getNeedHungerValue() {
+		return this.needs.get(NeedType.HUNGER).getValue();
+	}
+
+	/**
+	 * Get rest need value
+	 * 
+	 * @return Rest need value
+	 */
+	public int getNeedRestValue() {
+		return this.needs.get(NeedType.REST).getValue();
+	}
+
+	/**
+	 * Get social need value
+	 * 
+	 * @return Social need value
+	 */
+	public int getNeedSocialValue() {
+		return this.needs.get(NeedType.SOCIAL).getValue();
+	}
+
+	/**
+	 * Get fun need value
+	 * 
+	 * @return Fun need value
+	 */
+	public int getNeedFunValue() {
+		return this.needs.get(NeedType.FUN).getValue();
+	}
+
+	/**
+	 * Get hunger desire value
+	 * 
+	 * @return Hunger desire value
+	 */
+	public int getDesireHungerValue() {
+		return this.desires.get(DesireType.HUNGER).getValue();
+	}
+
+	/**
+	 * Get rest desire value
+	 * 
+	 * @return Rest desire value
+	 */
+	public int getDesireRestValue() {
+		return this.desires.get(DesireType.REST).getValue();
+	}
+
+	/**
+	 * Get social desire value
+	 * 
+	 * @return Social desire value
+	 */
+	public int getDesireSocialValue() {
+		return this.desires.get(DesireType.SOCIAL).getValue();
+	}
+
+	/**
+	 * Get fun desire value
+	 * 
+	 * @return Fun desire value
+	 */
+	public int getDesireFunValue() {
+		return this.desires.get(DesireType.FUN).getValue();
+	}
+
+	/**
+	 * Get love desire value
+	 * 
+	 * @return Love desire value
+	 */
+	public int getDesireLoveValue() {
+		return this.desires.get(DesireType.LOVE).getValue();
+	}
+
+	/**
+	 * Get fight desire value
+	 * 
+	 * @return Fight desire value
+	 */
+	public int getDesireFightValue() {
+		return this.desires.get(DesireType.FIGHT).getValue();
+	}
+
+	/**
+	 * Get work desire value
+	 * 
+	 * @return Work desire value
+	 */
+	public int getDesireWorkValue() {
+		return this.desires.get(DesireType.WORK).getValue();
+	}
+
+	/**
+	 * Is mouglotte selected
+	 * 
+	 * @return true if mouglotte is selected
+	 */
 	public boolean isSelected() {
 		return this.graphics.isSelected();
 	}
@@ -129,7 +271,9 @@ public class Mouglotte {
 	// return new Mouglotte();
 	// }
 
-	// Initialisation des traits de caractères
+	/**
+	 * Initialization of the traits
+	 */
 	private void initTraits() {
 
 		// Traits, Type, birthValue, babyGrowth, childGrowth, adultGrowth,
@@ -143,7 +287,9 @@ public class Mouglotte {
 
 	}
 
-	// Initialisation des besoins
+	/**
+	 * Initialization of the needs
+	 */
 	private void initNeeds() {
 
 		// Needs, Type, babyHourGain, childHourGain, adultHourGain, oldHourGain,
@@ -171,7 +317,9 @@ public class Mouglotte {
 		this.needs.put(need);
 	}
 
-	// Initialisation des envies
+	/**
+	 * Initialization of the desires
+	 */
 	private void initDesires() {
 
 		// Desires, Type, babyValue, childValue, adultValue, oldValue,
@@ -225,7 +373,14 @@ public class Mouglotte {
 
 	}
 
-	// Récupération de la valeur du gène
+	/**
+	 * Get gene value
+	 * 
+	 * @param name
+	 *            The name of the gene
+	 * 
+	 * @return Gene value
+	 */
 	private int getGeneValue(String name) {
 		return Genetics.getValue(name, this.karyotype);
 	}
@@ -243,7 +398,14 @@ public class Mouglotte {
 	// eventYear();
 	// }
 
-	// Mise à jour
+	/**
+	 * Update mouglotte
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param delta
+	 *            Delta time since last call
+	 */
 	public void update(GameContainer container, int delta) {
 
 		// Calcul du temps passé
@@ -253,17 +415,20 @@ public class Mouglotte {
 		// Toutes les secondes réelles
 		if (this.pastTime >= 1000) {
 
+			// Une seconde réelle s'est écoulée
+			this.secondesR++;
+			this.pastTime -= 1000;
 			// On effectue une action
 			action();
 		}
 
 		// On fait un truc toutes les 3 secondes réelles
 		// = minute mouglotte
-		if (this.pastTime >= 3000) {
+		if (this.secondesR >= 3) {
 
-			this.pastTime -= 3000;
 			// Une minute mouglotte s'est écoulée
 			this.minutes++;
+			this.secondesR = 0;
 			// Evénement lancé toutes les minutes
 			eventMinute();
 		}
@@ -292,7 +457,9 @@ public class Mouglotte {
 
 	}
 
-	// Evénement exécuté toutes les minutes
+	/**
+	 * Event called every mouglotte minute
+	 */
 	public void eventMinute() {
 
 		// Les besoins et les envies évoluent
@@ -304,7 +471,9 @@ public class Mouglotte {
 		this.desires.eventMinute();
 	}
 
-	// Evénement exécuté toutes les heures
+	/**
+	 * Event called every mouglotte hour
+	 */
 	public void eventHour() {
 
 		// Les besoins augmentent et le besoin le plus pressant est choisi
@@ -321,12 +490,16 @@ public class Mouglotte {
 		decide();
 	}
 
-	// Evénement exécuté tous les jours
+	/**
+	 * Event called every mouglotte day
+	 */
 	public void eventDay() {
 
 	}
 
-	// Evénement exécuté tous les ans
+	/**
+	 * Event called every mouglotte year
+	 */
 	public void eventYear() {
 
 		// Joyeux anniversaire
@@ -336,10 +509,12 @@ public class Mouglotte {
 		this.traits.eventYear();
 	}
 
-	// Decision
+	/**
+	 * Decide what to do
+	 */
 	private void decide() {
 
-		System.out.println("Mouglotte::Decide");
+		Debug.log("MOUGLOTTE", "Mouglotte::Decide");
 
 		// Ajouter la gestion des ordres et des solicitations extérieurs
 
@@ -401,19 +576,21 @@ public class Mouglotte {
 			}
 		}
 
-		System.out.println("Mouglotte::Decide:Decision=" + this.decision);
+		Debug.log("MOUGLOTTE", "Mouglotte::Decide:Decision=" + this.decision);
 	}
 
-	// Effectuer une action
+	/**
+	 * Do an action
+	 */
 	private void action() {
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Action");
 
 		// Pour les tests
 		if (this.graphics.isSelected()) {
 			continueAction();
 			return;
 		}
-		
-		System.out.println("Mouglotte::Action");
 
 		// Rechercher si l'action peut être conclue
 		// (nourriture à proximité,...)
@@ -426,10 +603,12 @@ public class Mouglotte {
 			newAction();
 	}
 
-	// Rechercher si l'action peut être conclue
+	/**
+	 * Try to fulfill the current action
+	 */
 	private void actionFulfilled() {
 
-		System.out.println("Mouglotte::ActionFulFilled");
+		Debug.log("MOUGLOTTE", "Mouglotte::ActionFulFilled");
 
 		MemoryType memoryType = null;
 
@@ -463,18 +642,18 @@ public class Mouglotte {
 		// La mouglotte a trouvé ce qu'elle cherche
 		if (tile != null) {
 
-			// Inutile de continuer à marcher
+			// La destination est annulée
 			this.path = null;
 
+			// La mouglotte est au bon endroit
+			if (tile.contains(this.graphics.getX(), this.graphics.getY()))
+				// Accomplissons
+				fulfill();
+
 			// La mouglotte est à côté de l'endroit
-			if (tile.getX() != this.graphics.getX()
-					|| tile.getY() != this.graphics.getY())
+			else
 				// Allons-y
 				goTo(tile.getX(), tile.getY());
-
-			// La mouglotte est au bon endroit, accomplissons
-			else
-				fulfill();
 
 			// La mouglotte n'a pas trouvé ce qu'elle cherche
 		} else {
@@ -482,14 +661,17 @@ public class Mouglotte {
 			// Si la mouglotte est à destination
 			if (this.path == null)
 				// L'action est terminée, on n'a rien trouvé
+				// Une nouvelle action va être déclenchée
 				this.actionInProgress = false;
 		}
 	}
 
-	// Nouvelle action
+	/**
+	 * Begin a new action
+	 */
 	private void newAction() {
 
-		System.out.println("Mouglotte::NewAction");
+		Debug.log("MOUGLOTTE", "Mouglotte::NewAction");
 
 		MemoryType memoryType = null;
 		Memory memory = null;
@@ -529,24 +711,33 @@ public class Mouglotte {
 		// Aller à l'endroit du souvenir
 		if (memory != null)
 			goTo(memory.getX(), memory.getY());
-		// Ou se promener au hasard
+		// Rien à faire
 		else
-			walkAround();
+			nothingToDo();
 	}
 
-	// Continuer l'action
+	/**
+	 * Continue the current action
+	 */
 	private void continueAction() {
 
-		System.out.println("Mouglotte::ContinueAction");
+		Debug.log("MOUGLOTTE", "Mouglotte::ContinueAction");
 
 		// Marcher
 		walk();
 	}
 
-	// Aller à
+	/**
+	 * Goto somewhere
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 */
 	public void goTo(int x, int y) {
 
-		System.out.println("Mouglotte::GoTo " + x + "," + y);
+		Debug.log("MOUGLOTTE", "Mouglotte::GoTo " + x + "," + y);
 
 		// Si la souris est sortie de la carte on ne fait rien
 		if (!this.game.getMap().contains(x, y))
@@ -560,24 +751,39 @@ public class Mouglotte {
 				x, y));
 	}
 
-	// Se promener au hasard
+	/**
+	 * Nothing to do, try to find what to do (except needs, desires or orders)
+	 */
+
+	private void nothingToDo() {
+
+		Random r = new Random();
+
+		// Une chance sur 2 de ne rien faire
+		if (r.nextBoolean() == true)
+			idle();
+		// Une chance sur 2 de se promener
+		else
+			walkAround();
+	}
+
+	/**
+	 * Walk around
+	 */
+
 	private void walkAround() {
 
-		System.out.println("Mouglotte::WalkAround");
+		Debug.log("MOUGLOTTE", "Mouglotte::WalkAround");
 
 		Random r = new Random();
 		int destX = 0, destY = 0;
 
-		// Direction actuelle
-		int dirX = this.graphics.getX() - this.graphics.getLastX();
-		int dirY = this.graphics.getY() - this.graphics.getLastY();
-
-		// Une chance sur 2 de ne rien faire
+		// Une chance sur 2 de continuer dans la même direction
 		if (r.nextBoolean() == true) {
 
-		}
-		// Une chance sur 2 de continuer dans la même direction
-		else if (r.nextBoolean() == true) {
+			// Direction actuelle
+			int dirX = this.graphics.getX() - this.graphics.getLastX();
+			int dirY = this.graphics.getY() - this.graphics.getLastY();
 
 			// La mouglotte marchait, on continue dans la même direction
 			if (dirX != 0)
@@ -631,32 +837,71 @@ public class Mouglotte {
 		goTo(destX, destY);
 	}
 
-	// Marche
+	/**
+	 * Walk or continue walking
+	 */
 	private void walk() {
 
-		System.out.println("Mouglotte::Walk");
+		Debug.log("MOUGLOTTE", "Mouglotte::Walk");
 
 		if (this.path != null) {
 
 			// Le step renvoie une position en zone
-			// setLocation(this.path.getStep(0).getX(),this.path.getStep(0).getY());
-			// On se place au milieu de la prochaine zone
-			setLocation(this.path.getStep(0).getX()
-					* this.game.getMap().getTileSize()
-					+ this.game.getMap().getTileSize() / 2, this.path
-					.getStep(0).getY()
-					* this.game.getMap().getTileSize()
-					+ this.game.getMap().getTileSize() / 2);
-			this.path.removeStep(0);
+
+			// Déplacement direct au centre de la zone
+			// setLocation(this.path.getStep(0).getX()
+			// * this.game.getMap().TILE_SIZE
+			// + this.game.getMap().TILE_SIZE / 2, this.path.getStep(0)
+			// .getY()
+			// * this.game.getMap().TILE_SIZE
+			// + this.game.getMap().TILE_SIZE / 2);
+
+			this.game.getMap();
+			this.game.getMap();
+			// On doit aller au milieu de la prochaine zone
+			int destX = this.path.getStep(0).getX() * GameMap.TILE_SIZE
+					+ GameMap.TILE_SIZE / 2;
+			this.game.getMap();
+			this.game.getMap();
+			int destY = this.path.getStep(0).getY() * GameMap.TILE_SIZE
+					+ GameMap.TILE_SIZE / 2;
+
+			// On avance d'un pixel dans cette direction
+			int dirX = destX - getX();
+			if (dirX != 0)
+				dirX /= Math.abs(dirX);
+			int dirY = destY - getY();
+			if (dirY != 0)
+				dirY /= Math.abs(dirY);
+
+			setLocation(getX() + dirX, getY() + dirY);
+
+			// Si on est arrivé au centre de la zone
+			if (getX() + dirX == destX && getY() + dirY == destY)
+				// L'étape est terminée, on la supprime
+				this.path.removeStep(0);
+
+			// S'il n'y a plus d'étape alors le chemin est terminé
 			if (this.path.getLength() == 0)
 				this.path = null;
 		}
 	}
 
-	// Accomplissement
+	/**
+	 * Idle
+	 */
+
+	private void idle() {
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Idle");
+	}
+
+	/**
+	 * Fulfill current need, desire or order
+	 */
 	private void fulfill() {
 
-		System.out.println("Mouglotte::Fulfill");
+		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill");
 
 		// A décliner en véritable actions
 		// eat(), talk(), fuck(),...
@@ -683,7 +928,14 @@ public class Mouglotte {
 			}
 	}
 
-	// Affichage
+	/**
+	 * Render mouglotte
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 */
 	public void render(GameContainer container, Graphics g)
 			throws SlickException {
 		this.graphics.render(container, g);

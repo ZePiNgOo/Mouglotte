@@ -8,9 +8,7 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.map.GameMap;
-import com.mouglotte.map.UnitMover;
 import com.mouglotte.specy.Mouglotte;
-import com.mouglotte.ui.BottomPanel;
 import com.mouglotte.ui.RightPanel;
 
 public class GameState extends BasicGameState {
@@ -25,7 +23,7 @@ public class GameState extends BasicGameState {
 	// private int x, y;
 
 	// Panneau du bas
-	//private BottomPanel bottomPanel;
+	// private BottomPanel bottomPanel;
 	// Panneau de droite
 	private RightPanel rightPanel;
 	// Conteneur
@@ -39,38 +37,58 @@ public class GameState extends BasicGameState {
 	private String deltaString = "";
 	private String infoString = "";
 
+	/**
+	 * Get game state ID
+	 * 
+	 * @return Game state ID
+	 */
 	@Override
-	// Récupération de l'ID du l'état
 	public int getID() {
 		return GameState.ID.getValue();
 	}
 
-	// Récupération du conteneur
+	/**
+	 * Get game container
+	 * 
+	 * @return Game container
+	 */
 	public GameContainer getContainer() {
 		return this.container;
 	}
 
-	// Récupération de la carte
+	/**
+	 * Get map
+	 * 
+	 * @return Map
+	 */
 	public GameMap getMap() {
 		return this.map;
 	}
 
+	/**
+	 * Initialize game
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param game
+	 *            General game
+	 * @throws SlickException
+	 */
 	@Override
-	// Initialisation
 	public void init(GameContainer container, StateBasedGame game)
 			throws SlickException {
 
-		// Conteneur
+		// Game container
 		this.container = container;
 
-		// Initialisation de la génétique
+		// Initialize genetics
 		Genetics.initialize();
 
-		//this.bottomPanel = new BottomPanel(container, "bottomPanel");
+		// Create map
+		this.map = new GameMap(this);
+		// Create right panel
 		this.rightPanel = new RightPanel(this);
 
-		// Création de la carte
-		this.map = new GameMap(this);
 		// this.map.init() pourrait être utile
 
 		// Pour les tests
@@ -80,8 +98,17 @@ public class GameState extends BasicGameState {
 		// this.mouglotte2.setLocation(100, 100);
 	}
 
+	/**
+	 * Update game
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param game
+	 *            General game
+	 * @param delta
+	 *            Delta time since last call
+	 */
 	@Override
-	// Mise à jour
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 
@@ -96,13 +123,21 @@ public class GameState extends BasicGameState {
 
 	}
 
+	/**
+	 * Render game
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 * @throws SlickException
+	 */
 	@Override
-	// Affichage
 	public void render(GameContainer container, StateBasedGame game, Graphics g)
 			throws SlickException {
 
 		this.rightPanel.render(container, g);
-		
+
 		g.setAntiAlias(true);
 		// g.setColor(Color.white);
 		// g.fillRect(0, 0, container.getWidth(), container.getHeight());
@@ -123,8 +158,19 @@ public class GameState extends BasicGameState {
 		g.drawString(this.infoString, 10, 300);
 	}
 
+	/**
+	 * Mouse clicked event
+	 * 
+	 * @param button
+	 *            Button clicked
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
 	@Override
-	// Bouton souris cliqué
 	public void mouseClicked(int button, int x, int y, int clickCount) {
 
 		if (button == 0)
@@ -133,12 +179,30 @@ public class GameState extends BasicGameState {
 			mouseRightClicked(x, y);
 	}
 
-	// Bouton souris cliqué bouton gauche
+	/**
+	 * Mouse left-clicked event
+	 * 
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
 	public void mouseLeftClicked(int x, int y, int clickCount) {
 
 	}
 
-	// Bouton souris cliqué bouton droit
+	/**
+	 * Mouse right-clicked event
+	 * 
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
 	public void mouseRightClicked(int x, int y) {
 
 		// S'il y a une unité ici
@@ -183,15 +247,25 @@ public class GameState extends BasicGameState {
 		// }
 	}
 
+	/**
+	 * Mouse moved event
+	 * 
+	 * @param oldx
+	 *            Old x position of the mouse
+	 * @param oldy
+	 *            Old y position of the mouse
+	 * @param newx
+	 *            Current x position of the mouse
+	 * @param newy
+	 *            Current y position of the mouse
+	 */
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 
 		// Si la souris est sortie on ne fait rien
-		if ((newx < 0)
-				|| (newy < 0)
-				|| (newx >= this.map.getWidthInTiles() * this.map.getTileSize())
-				|| (newy >= this.map.getHeightInTiles()
-						* this.map.getTileSize())) {
+		if ((newx < 0) || (newy < 0)
+				|| (newx >= this.map.getWidthInTiles() * GameMap.TILE_SIZE)
+				|| (newy >= this.map.getHeightInTiles() * GameMap.TILE_SIZE)) {
 			return;
 		}
 
@@ -203,11 +277,15 @@ public class GameState extends BasicGameState {
 			// this.mouglotte.getY(), newx, newy);
 		}
 		this.infoString = Integer.toString(newx) + "," + Integer.toString(newy)
-				+ " => " + Integer.toString(newx / this.map.getTileSize())
-				+ "," + Integer.toString(newy / this.map.getTileSize());
+				+ " => " + Integer.toString(newx / GameMap.TILE_SIZE) + ","
+				+ Integer.toString(newy / GameMap.TILE_SIZE);
 	}
 
-	// Récupération de la mouglotte sélectionnée
+	/**
+	 * Get selected mouglotte
+	 * 
+	 * @return Selected mouglotte
+	 */
 	public Mouglotte getSelectedMouglotte() {
 		return this.mouglotte.isSelected() ? this.mouglotte : null;
 	}
