@@ -14,6 +14,8 @@ import org.newdawn.slick.gui.GUIContext;
  */
 public class Bar extends AbstractComponent {
 
+	/** Position */
+	int x = 0, y = 0;
 	/** Width and height */
 	int width = 100, height = 20;
 	/** Minimum and maximum values */
@@ -43,7 +45,8 @@ public class Bar extends AbstractComponent {
 	 * @param y y position
 	 */
 	public void setLocation(int x, int y) {
-		setLocation(x, y);
+		this.x = x;
+		this.y = y;
 	}
 
 	/**
@@ -130,7 +133,7 @@ public class Bar extends AbstractComponent {
 	 */
 	@Override
 	public int getX() {
-		return getX();
+		return this.x;
 	}
 
 	/**
@@ -140,7 +143,7 @@ public class Bar extends AbstractComponent {
 	 */
 	@Override
 	public int getY() {
-		return getY();
+		return this.y;
 	}
 
 	/**
@@ -156,9 +159,9 @@ public class Bar extends AbstractComponent {
 
 		// Rectangle
 		g.setColor(this.line);
-		g.drawRect(getX(), getY(), this.width, this.height);
+		g.drawRect(this.x, this.y, this.width, this.height);
 		// Progress
 		g.setColor(this.foreground);
-		g.fillRect(getX() + 1, getY() + 1, this.progress, this.height - 2);
+		g.fillRect(this.x + 1, this.y + 1, this.progress, this.height - 2);
 	}
 }

@@ -869,10 +869,10 @@ public class Mouglotte {
 			// On avance d'un pixel dans cette direction
 			int dirX = destX - getX();
 			if (dirX != 0)
-				dirX /= Math.abs(dirX);
+				dirX = dirX * 5 / Math.abs(dirX);
 			int dirY = destY - getY();
 			if (dirY != 0)
-				dirY /= Math.abs(dirY);
+				dirY = dirY * 5 / Math.abs(dirY);
 
 			setLocation(getX() + dirX, getY() + dirY);
 

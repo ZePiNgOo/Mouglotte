@@ -459,9 +459,9 @@ public class GameMap implements TileBasedMap {
 
 		int i = getTileColumn(container.getInput().getMouseX());
 		int j = getTileRow(container.getInput().getMouseY());
-		g.drawRect(i * this.map.getTileWidth() + 1,
-				j * this.map.getTileHeight() + 1, this.map.getTileWidth(),
-				this.map.getTileHeight());
+		g.drawRect(i * this.map.getTileWidth(),
+				j * this.map.getTileHeight(), this.map.getTileWidth()-1,
+				this.map.getTileHeight()-1);
 	}
 
 	/**

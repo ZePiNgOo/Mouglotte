@@ -17,7 +17,7 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 
 	/** Game */
 	private GameState game;
-	
+
 	/** Needs progress bar */
 	private Bar barNeedHunger;
 	private Bar barNeedRest;
@@ -31,7 +31,7 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	private Bar barDesireLove;
 	private Bar barDesireFight;
 	private Bar barDesireWork;
-	
+
 	/**
 	 * Constructor
 	 * 
@@ -41,16 +41,16 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	public RightPanel(GameState game) throws SlickException {
 
 		super(game);
-		
+
 		// Game
 		this.game = game;
 
-//		// Création du bouton
-//		this.play = new MouseOverArea(game.getContainer(), new Image(
-//				"res/bouton.png"), 100, 100, this);
-//		this.play.setNormalColor(new Color(0.7f, 0.7f, 0.7f, 1f));
-//		this.play.setMouseOverColor(new Color(0.9f, 0.9f, 0.9f, 1f));
-		
+		// // Création du bouton
+		// this.play = new MouseOverArea(game.getContainer(), new Image(
+		// "res/bouton.png"), 100, 100, this);
+		// this.play.setNormalColor(new Color(0.7f, 0.7f, 0.7f, 1f));
+		// this.play.setMouseOverColor(new Color(0.9f, 0.9f, 0.9f, 1f));
+
 		// Initialize progress bars
 		// Needs
 		this.barNeedHunger = new Bar(game.getContainer());
@@ -83,9 +83,9 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 
 		// Get selected mouglotte
 		Mouglotte mouglotte = this.game.getSelectedMouglotte();
-		
+
 		if (mouglotte != null) {
-			
+
 			// Set needs and desires values
 			this.barNeedHunger.setValue(mouglotte.getNeedHungerValue());
 			this.barNeedRest.setValue(mouglotte.getNeedRestValue());
@@ -98,7 +98,7 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 			this.barDesireLove.setValue(mouglotte.getDesireLoveValue());
 			this.barDesireFight.setValue(mouglotte.getDesireFightValue());
 			this.barDesireWork.setValue(mouglotte.getDesireWorkValue());
-			
+
 			// Highlight current need or desire
 			switch (mouglotte.getDecision()) {
 			case NEED_HUNGER:
@@ -145,8 +145,7 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 
 		// Décalage pour bien se placer dans le panel
 		// La carte prend GameMap.DISPLAYED_TILES * GameMap.getTileSize()
-		g.translate(GameMap.DISPLAYED_TILES * GameMap.TILE_SIZE + 1,
-				0);
+		g.translate(GameMap.DISPLAYED_TILES * GameMap.TILE_SIZE + 1, 0);
 
 		// Affichage d'un cadre
 		g.setColor(Color.red);
@@ -154,6 +153,23 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 				* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
 
 		g.drawString("Mouglotte", 2, 2);
+		// Render needs and desires values
+		try {
+			this.barNeedHunger.render(container, g);
+			this.barNeedRest.render(container, g);
+			this.barNeedSocial.render(container, g);
+			this.barNeedFun.render(container, g);
+			this.barDesireHunger.render(container, g);
+			this.barDesireRest.render(container, g);
+			this.barDesireSocial.render(container, g);
+			this.barDesireFun.render(container, g);
+			this.barDesireLove.render(container, g);
+			this.barDesireFight.render(container, g);
+			this.barDesireWork.render(container, g);
+		} catch (SlickException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// Réinitialisation de la position du Graphics
 		g.resetTransform();
