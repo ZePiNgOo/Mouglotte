@@ -14,6 +14,12 @@ import org.newdawn.slick.gui.GUIContext;
  */
 public class Bar extends AbstractComponent {
 
+	/** Colors */
+	public static final Color COLOR_HIGHLIGHT = Color.green;
+	public static final Color COLOR_LINE = Color.red;
+	public static final Color COLOR_BACKGROUND = Color.black;
+	public static final Color COLOR_FOREGROUND = Color.green;
+	
 	/** Position */
 	int x = 0, y = 0;
 	/** Width and height */
@@ -21,8 +27,8 @@ public class Bar extends AbstractComponent {
 	/** Minimum and maximum values */
 	int min = 0, max = 1000;
 	/** Colors */
-	Color line = Color.red;
-	Color background = new Color(0, 255, 0), foreground = Color.black;
+	Color line = COLOR_LINE;
+	Color background = COLOR_BACKGROUND, foreground = COLOR_FOREGROUND;
 	/** Text */
 	String text = "";
 	/** Progress size */
@@ -51,7 +57,9 @@ public class Bar extends AbstractComponent {
 
 	/**
 	 * Set the color of the lines
-	 * @param color Color of the lines
+	 * 
+	 * @param color
+	 *            Color of the lines
 	 */
 	public void setLineColor(Color color) {
 		this.line = color;
@@ -69,11 +77,13 @@ public class Bar extends AbstractComponent {
 		setText(Integer.toString(value));
 
 		// Define progress size
-		this.progress = (value - this.min / this.max - this.min)
-				* (this.width - 2);
+		double interval = this.max - this.min;
+		double progress = (value - this.min) / interval;
+		progress = progress * (this.width - 2); 
+		this.progress = (int) progress;
 
 		// Update foreground color
-		int percentage = (value - this.min * 100 / this.max - this.min);
+		int percentage = (((value - this.min) * 100) / (this.max - this.min));
 		if (percentage < 10)
 			this.foreground = new Color(0, 255, 0);
 		else if (percentage < 20)
@@ -144,6 +154,18 @@ public class Bar extends AbstractComponent {
 	@Override
 	public int getY() {
 		return this.y;
+	}
+	
+	/**
+	 * Highlight bar
+	 * 
+	 * @param highlight True to highlight
+	 */
+	public void highlight(boolean highlight) {
+		if (highlight)
+			setLineColor(COLOR_HIGHLIGHT);
+		else
+			setLineColor(COLOR_LINE);
 	}
 
 	/**

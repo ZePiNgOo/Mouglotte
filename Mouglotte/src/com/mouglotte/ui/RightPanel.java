@@ -18,6 +18,10 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	/** Game */
 	private GameState game;
 
+	/** First time displayed */
+	private boolean firstTime = true;
+	private boolean mouglotteFirstTime = true;
+
 	/** Needs progress bar */
 	private Bar barNeedHunger;
 	private Bar barNeedRest;
@@ -44,12 +48,6 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 
 		// Game
 		this.game = game;
-
-		// // Création du bouton
-		// this.play = new MouseOverArea(game.getContainer(), new Image(
-		// "res/bouton.png"), 100, 100, this);
-		// this.play.setNormalColor(new Color(0.7f, 0.7f, 0.7f, 1f));
-		// this.play.setMouseOverColor(new Color(0.9f, 0.9f, 0.9f, 1f));
 
 		// Initialize progress bars
 		// Needs
@@ -78,81 +76,164 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 		this.barDesireWork.setLocation(2, 255);
 	}
 
+	/**
+	 * Update panel
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param delta
+	 *            Delta time since last call
+	 */
 	@Override
 	public void update(GameContainer container, int delta) {
 
 		// Get selected mouglotte
 		Mouglotte mouglotte = this.game.getSelectedMouglotte();
 
-		if (mouglotte != null) {
+		if (mouglotte != null)
+			updateForMouglotte(mouglotte);
+	}
 
-			// Set needs and desires values
-			this.barNeedHunger.setValue(mouglotte.getNeedHungerValue());
-			this.barNeedRest.setValue(mouglotte.getNeedRestValue());
-			this.barNeedSocial.setValue(mouglotte.getNeedSocialValue());
-			this.barNeedFun.setValue(mouglotte.getNeedFunValue());
-			this.barDesireHunger.setValue(mouglotte.getDesireHungerValue());
-			this.barDesireRest.setValue(mouglotte.getDesireRestValue());
-			this.barDesireSocial.setValue(mouglotte.getDesireSocialValue());
-			this.barDesireFun.setValue(mouglotte.getDesireFunValue());
-			this.barDesireLove.setValue(mouglotte.getDesireLoveValue());
-			this.barDesireFight.setValue(mouglotte.getDesireFightValue());
-			this.barDesireWork.setValue(mouglotte.getDesireWorkValue());
+	/**
+	 * Update for the selected mouglotte
+	 * 
+	 * @param mouglotte
+	 *            Selected mouglotte
+	 */
+	private void updateForMouglotte(Mouglotte mouglotte) {
 
-			// Highlight current need or desire
-			switch (mouglotte.getDecision()) {
-			case NEED_HUNGER:
-				this.barNeedHunger.setLineColor(Color.green);
-				break;
-			case NEED_REST:
-				this.barNeedRest.setLineColor(Color.green);
-				break;
-			case NEED_SOCIAL:
-				this.barNeedSocial.setLineColor(Color.green);
-				break;
-			case NEED_FUN:
-				this.barNeedFun.setLineColor(Color.green);
-				break;
-			case DESIRE_HUNGER:
-				this.barDesireHunger.setLineColor(Color.green);
-				break;
-			case DESIRE_REST:
-				this.barDesireRest.setLineColor(Color.green);
-				break;
-			case DESIRE_SOCIAL:
-				this.barDesireSocial.setLineColor(Color.green);
-				break;
-			case DESIRE_FUN:
-				this.barDesireFun.setLineColor(Color.green);
-				break;
-			case DESIRE_LOVE:
-				this.barDesireLove.setLineColor(Color.green);
-				break;
-			case DESIRE_FIGHT:
-				this.barDesireFight.setLineColor(Color.green);
-				break;
-			case DESIRE_WORK:
-				this.barDesireWork.setLineColor(Color.green);
-				break;
-			default:
-				break;
-			}
+		// Set needs and desires values
+		this.barNeedHunger.setValue(mouglotte.getNeedHungerValue());
+		this.barNeedRest.setValue(mouglotte.getNeedRestValue());
+		this.barNeedSocial.setValue(mouglotte.getNeedSocialValue());
+		this.barNeedFun.setValue(mouglotte.getNeedFunValue());
+		this.barDesireHunger.setValue(mouglotte.getDesireHungerValue());
+		this.barDesireRest.setValue(mouglotte.getDesireRestValue());
+		this.barDesireSocial.setValue(mouglotte.getDesireSocialValue());
+		this.barDesireFun.setValue(mouglotte.getDesireFunValue());
+		this.barDesireLove.setValue(mouglotte.getDesireLoveValue());
+		this.barDesireFight.setValue(mouglotte.getDesireFightValue());
+		this.barDesireWork.setValue(mouglotte.getDesireWorkValue());
+
+		// Highlight current need or desire
+		highlightDecision(mouglotte);
+	}
+
+	/**
+	 * Highlight decision in needs and desires
+	 */
+	private void highlightDecision(Mouglotte mouglotte) {
+
+		// Reset highlighting
+		this.barNeedHunger.highlight(false);
+		this.barNeedRest.highlight(false);
+		this.barNeedSocial.highlight(false);
+		this.barNeedFun.highlight(false);
+		this.barDesireHunger.highlight(false);
+		this.barDesireRest.highlight(false);
+		this.barDesireSocial.highlight(false);
+		this.barDesireFun.highlight(false);
+		this.barDesireLove.highlight(false);
+		this.barDesireFight.highlight(false);
+		this.barDesireWork.highlight(false);
+
+		switch (mouglotte.getDecision()) {
+		case NEED_HUNGER:
+			this.barNeedHunger.highlight(true);
+			break;
+		case NEED_REST:
+			this.barNeedRest.highlight(true);
+			break;
+		case NEED_SOCIAL:
+			this.barNeedSocial.highlight(true);
+			break;
+		case NEED_FUN:
+			this.barNeedFun.highlight(true);
+			break;
+		case DESIRE_HUNGER:
+			this.barDesireHunger.highlight(true);
+			break;
+		case DESIRE_REST:
+			this.barDesireRest.highlight(true);
+			break;
+		case DESIRE_SOCIAL:
+			this.barDesireSocial.highlight(true);
+			break;
+		case DESIRE_FUN:
+			this.barDesireFun.highlight(true);
+			break;
+		case DESIRE_LOVE:
+			this.barDesireLove.highlight(true);
+			break;
+		case DESIRE_FIGHT:
+			this.barDesireFight.highlight(true);
+			break;
+		case DESIRE_WORK:
+			this.barDesireWork.highlight(true);
+			break;
+		default:
+			break;
 		}
 	}
 
+	/**
+	 * Render panel
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 */
 	@Override
 	public void render(GameContainer container, Graphics g) {
 
-		// Décalage pour bien se placer dans le panel
-		// La carte prend GameMap.DISPLAYED_TILES * GameMap.getTileSize()
+		// Translate graphics to draw at the right place
+		// Game map takes this width: GameMap.DISPLAYED_TILES *
+		// GameMap.getTileSize()
 		g.translate(GameMap.DISPLAYED_TILES * GameMap.TILE_SIZE + 1, 0);
 
-		// Affichage d'un cadre
-		g.setColor(Color.red);
-		g.drawRect(0, 0, Game.SCREEN_WIDTH - GameMap.TILE_SIZE
-				* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
+		// Draw only the first time
+		if (this.firstTime) {
 
-		g.drawString("Mouglotte", 2, 2);
+			// Display panel border
+			g.setColor(Color.red);
+			g.drawRect(0, 0, Game.SCREEN_WIDTH - GameMap.TILE_SIZE
+					* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
+
+			this.firstTime = false;
+		}
+
+		// Get selected mouglotte
+		Mouglotte mouglotte = this.game.getSelectedMouglotte();
+
+		if (mouglotte != null)
+			renderForMouglotte(container,g,mouglotte);
+
+		// Initialize graphics position
+		g.resetTransform();
+	}
+
+	/**
+	 * Render panel for the selected mouglotte
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 * @param mouglotte
+	 *            Selected mouglotte
+	 */
+	private void renderForMouglotte(GameContainer container, Graphics g,
+			Mouglotte mouglotte) {
+
+		// Draw only the first time
+		if (this.mouglotteFirstTime) {
+		
+			g.drawString("Mouglotte", 2, 2);
+			
+			this.mouglotteFirstTime = false;
+		}
+		
 		// Render needs and desires values
 		try {
 			this.barNeedHunger.render(container, g);
@@ -167,12 +248,8 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 			this.barDesireFight.render(container, g);
 			this.barDesireWork.render(container, g);
 		} catch (SlickException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// Réinitialisation de la position du Graphics
-		g.resetTransform();
 	}
 
 	@Override

@@ -14,7 +14,7 @@ import com.mouglotte.ui.RightPanel;
 public class GameState extends BasicGameState {
 
 	// Pour les tests
-	public static final int TIME_FACTOR = 1;
+	public static final int TIME_FACTOR = 3;
 
 	// ID de l'état
 	private static final EnumGameState ID = EnumGameState.GAME;

@@ -385,19 +385,6 @@ public class Mouglotte {
 		return Genetics.getValue(name, this.karyotype);
 	}
 
-	// // Evénement exécuté par le timer
-	// public void event(long time) {
-	//
-	// if (MouglotteUtilities.isMinute(time))
-	// eventMinute();
-	// else if (MouglotteUtilities.isHour(time))
-	// eventHour();
-	// else if (MouglotteUtilities.isDay(time))
-	// eventDay();
-	// else if (MouglotteUtilities.isYear(time))
-	// eventYear();
-	// }
-
 	/**
 	 * Update mouglotte
 	 * 
@@ -408,9 +395,12 @@ public class Mouglotte {
 	 */
 	public void update(GameContainer container, int delta) {
 
+		Debug.log("MOUGLOTTE", "Mouglotte::Update");
+
+		delta *= GameState.TIME_FACTOR;
+
 		// Calcul du temps passé
 		this.pastTime += delta;
-		this.pastTime *= GameState.TIME_FACTOR;
 
 		// Toutes les secondes réelles
 		if (this.pastTime >= 1000) {
@@ -455,12 +445,15 @@ public class Mouglotte {
 			eventDay();
 		}
 
+		Debug.log("MOUGLOTTE", "Mouglotte::Update::End");
 	}
 
 	/**
 	 * Event called every mouglotte minute
 	 */
 	public void eventMinute() {
+
+		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute");
 
 		// Les besoins et les envies évoluent
 		// S'ils sont en cours d'accomplissement ils baissent
@@ -469,12 +462,16 @@ public class Mouglotte {
 		this.needs.eventMinute();
 		// Pour les envies
 		this.desires.eventMinute();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute::End");
 	}
 
 	/**
 	 * Event called every mouglotte hour
 	 */
 	public void eventHour() {
+
+		Debug.log("MOUGLOTTE", "Mouglotte::EventHour");
 
 		// Les besoins augmentent et le besoin le plus pressant est choisi
 		// Une nouvelle envie est choisie si l'envie courante est en train de
@@ -488,6 +485,8 @@ public class Mouglotte {
 		// Prise de décision
 		// Le besoin ou l'envie est choisi
 		decide();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::EventHour::End");
 	}
 
 	/**
@@ -495,6 +494,8 @@ public class Mouglotte {
 	 */
 	public void eventDay() {
 
+		Debug.log("MOUGLOTTE", "Mouglotte::EventDay");
+		Debug.log("MOUGLOTTE", "Mouglotte::EventDay::End");
 	}
 
 	/**
@@ -502,11 +503,15 @@ public class Mouglotte {
 	 */
 	public void eventYear() {
 
+		Debug.log("MOUGLOTTE", "Mouglotte::EventYear");
+
 		// Joyeux anniversaire
 		this.age++;
 
 		// Pour les traits de caractères
 		this.traits.eventYear();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::EventYear::End");
 	}
 
 	/**
@@ -577,6 +582,7 @@ public class Mouglotte {
 		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Decide:Decision=" + this.decision);
+		Debug.log("MOUGLOTTE", "Mouglotte::Decide::End");
 	}
 
 	/**
@@ -601,6 +607,8 @@ public class Mouglotte {
 			continueAction();
 		else
 			newAction();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Action::End");
 	}
 
 	/**
@@ -642,6 +650,9 @@ public class Mouglotte {
 		// La mouglotte a trouvé ce qu'elle cherche
 		if (tile != null) {
 
+			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
+					+ " found");
+
 			// La destination est annulée
 			this.path = null;
 
@@ -658,12 +669,20 @@ public class Mouglotte {
 			// La mouglotte n'a pas trouvé ce qu'elle cherche
 		} else {
 
+			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
+					+ " not found");
+
 			// Si la mouglotte est à destination
-			if (this.path == null)
+			if (this.path == null) {
 				// L'action est terminée, on n'a rien trouvé
 				// Une nouvelle action va être déclenchée
 				this.actionInProgress = false;
+
+				Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:No path");
+			}
 		}
+
+		Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled::End");
 	}
 
 	/**
@@ -714,6 +733,8 @@ public class Mouglotte {
 		// Rien à faire
 		else
 			nothingToDo();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::NewAction::End");
 	}
 
 	/**
@@ -725,6 +746,8 @@ public class Mouglotte {
 
 		// Marcher
 		walk();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::ContinueAction::End");
 	}
 
 	/**
@@ -747,8 +770,14 @@ public class Mouglotte {
 		this.game.getMap().clearVisited();
 
 		// Recherche du chemin
-		setPath(this.game.getMap().findPath(new UnitMover(3), getX(), getY(),
-				x, y));
+		Path path =this.game.getMap().findPath(new UnitMover(3), getX(), getY(),
+				x, y); 
+		setPath(path);
+		
+		if (path == null)
+			Debug.log("MOUGLOTTE", "Mouglotte::GoTo:No path found");
+		
+		Debug.log("MOUGLOTTE", "Mouglotte::GoTo::End");
 	}
 
 	/**
@@ -756,6 +785,8 @@ public class Mouglotte {
 	 */
 
 	private void nothingToDo() {
+
+		Debug.log("MOUGLOTTE", "Mouglotte::NothingToDo");
 
 		Random r = new Random();
 
@@ -765,6 +796,8 @@ public class Mouglotte {
 		// Une chance sur 2 de se promener
 		else
 			walkAround();
+
+		Debug.log("MOUGLOTTE", "Mouglotte::NothingToDo::End");
 	}
 
 	/**
@@ -835,6 +868,8 @@ public class Mouglotte {
 
 		// Aller à la destination trouvée
 		goTo(destX, destY);
+
+		Debug.log("MOUGLOTTE", "Mouglotte::WalkAround::End");
 	}
 
 	/**
@@ -885,6 +920,8 @@ public class Mouglotte {
 			if (this.path.getLength() == 0)
 				this.path = null;
 		}
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Walk::End");
 	}
 
 	/**
@@ -894,6 +931,8 @@ public class Mouglotte {
 	private void idle() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle");
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Idle::End");
 	}
 
 	/**
@@ -926,6 +965,8 @@ public class Mouglotte {
 			default:
 				break;
 			}
+
+		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill::End");
 	}
 
 	/**
