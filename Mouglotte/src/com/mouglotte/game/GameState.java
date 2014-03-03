@@ -10,6 +10,7 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.mouglotte.entities.MouglotteEntity;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.map.GameMap;
 import com.mouglotte.specy.Desire;
@@ -37,7 +38,7 @@ public class GameState extends BasicGameState {
 	// Carte
 	private GameMap map;
 
-	private List<Mouglotte> mouglottes;
+	private List<MouglotteEntity> mouglottes;
 
 	private String deltaString = "";
 
@@ -94,8 +95,8 @@ public class GameState extends BasicGameState {
 		this.rightPanel = new RightPanel(this);
 
 		// Pour les tests
-		this.mouglottes = new ArrayList<Mouglotte>();
-		this.mouglottes.add(new Mouglotte(this));
+		this.mouglottes = new ArrayList<MouglotteEntity>();
+		this.mouglottes.add(new MouglotteEntity(this));
 //		this.mouglottes.add(new Mouglotte(this));
 //		this.mouglottes.add(new Mouglotte(this));
 	}
@@ -121,7 +122,7 @@ public class GameState extends BasicGameState {
 		this.map.update(container, delta);
 
 		// Update mouglottes
-		for (final Mouglotte mouglotte : this.mouglottes){
+		for (final MouglotteEntity mouglotte : this.mouglottes){
 			mouglotte.update(container, delta);
 		}
 	}
@@ -155,7 +156,7 @@ public class GameState extends BasicGameState {
 		this.map.render(container, g);
 
 		// Render mouglottes
-		for (final Mouglotte mouglotte : this.mouglottes){
+		for (final MouglotteEntity mouglotte : this.mouglottes){
 			mouglotte.render(container, g);
 		}
 		// this.mouglotte2.render(container, g);
@@ -276,8 +277,8 @@ public class GameState extends BasicGameState {
 	 */
 	public Mouglotte getSelectedMouglotte() {
 		
-		for (final Mouglotte mouglotte : this.mouglottes){
-			if (mouglotte.isSelected()) return mouglotte;
+		for (final MouglotteEntity mouglotte : this.mouglottes){
+			if (mouglotte.isSelected()) return mouglotte.getMouglotte();
 		}
 		return null;
 	}

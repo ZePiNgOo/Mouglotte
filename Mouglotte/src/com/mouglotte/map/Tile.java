@@ -4,43 +4,100 @@ public class Tile {
 
 	// Champ de vision
 	// Actuellement en pixel, à mettre en tiles
-	private final int VISUAL_FIELD = 32;
+	// private final int VISUAL_FIELD = 32;
 
-	// Coordonnées en pixel
-	private int x, y;
-	// Coordonnées en zone
-	private int i, j;
-	// Type de zone
-	private int type;
+	/** Location */
+	private int x = 0;
+	private int y = 0;
 
-	// Constructeur
-	public Tile(int x, int y, int i, int j, int type) {
+	/** Column and row in the tiles table */
+	private int i = 0;
+	private int j = 0;
+
+	/**
+	 * Constructor
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 * @param i
+	 *            Column index in the tiles table
+	 * @param j
+	 *            Row index in the tiles table
+	 */
+	public Tile(int x, int y, int i, int j) {
 		this.x = x;
 		this.y = y;
 		this.i = i;
 		this.j = j;
-		this.type = type;
 	}
 
-	// Récupération de la position
+	/**
+	 * Get x position
+	 * 
+	 * @return x position
+	 */
 	public int getX() {
-		return this.x;
+		return (int) (this.x + GameMap.offsetX);
 	}
 
-	// Récupération de la position
+	/**
+	 * Get y position
+	 * 
+	 * @return y position
+	 */
 	public int getY() {
-		return this.y;
-	}
-	
-	// Récupération du centre de la zone
-	public static int getCenterX(int x) {
-		return 0;
+		return (int) (this.y + GameMap.offsetY);
 	}
 
-	// La zone contient les coordonnées
+	/**
+	 * Get column index
+	 * 
+	 * @return Column index
+	 */
+	public int getColumn() {
+		return this.i;
+	}
+
+	/**
+	 * Get row index
+	 * 
+	 * @return Row index
+	 */
+	public int getRow() {
+		return this.j;
+	}
+
+	/**
+	 * Get x position of the center of the tile
+	 * 
+	 * @return x position of the center of the tile
+	 */
+	public int getCenterX() {
+		return this.x + GameMap.TILE_SIZE / 2;
+	}
+
+	/**
+	 * Get y position of the center of the tile
+	 * 
+	 * @return y position of the center of the tile
+	 */
+	public int getCenterY() {
+		return this.y + GameMap.TILE_SIZE / 2;
+	}
+
+	/**
+	 * Are the coordinates in the tile ?
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 * @return True if the coordinates are in the tile
+	 */
 	public boolean contains(int x, int y) {
 		return x >= this.x && x <= this.x + GameMap.TILE_SIZE && y >= this.y
 				&& y <= this.y + GameMap.TILE_SIZE;
 	}
-
 }

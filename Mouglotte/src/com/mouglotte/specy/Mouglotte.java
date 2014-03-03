@@ -7,7 +7,10 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.Vector2f;
 
+import com.mouglotte.entities.EntityInterface;
+import com.mouglotte.entities.MouglotteEntity;
 import com.mouglotte.game.GameState;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.genetics.Karyotype;
@@ -20,13 +23,15 @@ import com.mouglotte.map.UnitMover;
 import com.mouglotte.utilities.Debug;
 import com.mouglotte.utilities.MouglotteUtilities;
 
-public class Mouglotte {
+public class Mouglotte implements EntityInterface {
 
 	// Distance de promenade au hasard
 	private final int WALK_AROUND_DISTANCE = 1000;
 
 	// Jeu
-	private GameState game;
+	// private GameState game;
+	/** Entity */
+	private MouglotteEntity entity;
 
 	// Caryotype
 	private Karyotype karyotype;
@@ -40,16 +45,16 @@ public class Mouglotte {
 	private Desires desires;
 	// Décision
 	private DecisionType decision = DecisionType.NEED_HUNGER;
-	// Graphismes
-	private MouglotteGraph graphics;
+	// // Graphismes
+	// private MouglotteGraph graphics;
 
 	/** Birthdate */
 	private long birthDate;
-	// Age
-	private int age;
+	// // Age
+	// private int age;
 
-	// Chemin
-	private Path path;
+	// // Chemin
+	// private Path path;
 
 	// Action en cours
 	private boolean actionInProgress;
@@ -67,10 +72,12 @@ public class Mouglotte {
 	 *            GameState
 	 */
 
-	public Mouglotte(GameState game) {
+	public Mouglotte(MouglotteEntity entity) {
 
-		// Jeu
-		this.game = game;
+		// // Jeu
+		// this.game = game;
+		// Entity
+		this.entity = entity;
 		// Caryotype
 		this.karyotype = new Karyotype();
 		// Mémoire
@@ -85,8 +92,8 @@ public class Mouglotte {
 		// Date de naissance
 		this.birthDate = System.currentTimeMillis();
 
-		// Graphismes
-		this.graphics = new MouglotteGraph(this, this.game);
+		// // Graphismes
+		// this.graphics = new MouglotteGraph(this, this.game);
 
 		// Initialisation des traits de caractères
 		initTraits();
@@ -104,30 +111,17 @@ public class Mouglotte {
 	 * @param y
 	 *            y position
 	 */
-
-	public void setLocation(int x, int y) {
-		this.graphics.setLocation(x, y);
-	}
-
-	/**
-	 * Define current path
-	 * 
-	 * @param path
-	 *            Current path
-	 */
-
-	public void setPath(Path path) {
-		this.path = path;
-	}
+	// public void setLocation(int x, int y) {
+	// this.graphics.setLocation(x, y);
+	// }
 
 	/**
 	 * Get age
 	 * 
 	 * @return Age
 	 */
-
 	public int getAge() {
-		return this.age;
+		return this.entity.getAge();
 	}
 
 	/**
@@ -135,18 +129,18 @@ public class Mouglotte {
 	 * 
 	 * @return x position
 	 */
-	public int getX() {
-		return this.graphics.getX();
-	}
+	// public int getX() {
+	// return this.graphics.getX();
+	// }
 
 	/**
 	 * Get y position
 	 * 
 	 * @return y position
 	 */
-	public int getY() {
-		return this.graphics.getY();
-	}
+	// public int getY() {
+	// return this.graphics.getY();
+	// }
 
 	/**
 	 * Get decision type
@@ -261,9 +255,9 @@ public class Mouglotte {
 	 * 
 	 * @return true if mouglotte is selected
 	 */
-	public boolean isSelected() {
-		return this.graphics.isSelected();
-	}
+	// public boolean isSelected() {
+	// return this.graphics.isSelected();
+	// }
 
 	// Naissance
 	// public static Mouglotte birth() {
@@ -393,63 +387,75 @@ public class Mouglotte {
 	 * @param delta
 	 *            Delta time since last call
 	 */
+	// public void update(GameContainer container, int delta) {
+	//
+	// Debug.log("MOUGLOTTE", "Mouglotte::Update");
+	//
+	// delta *= GameState.TIME_FACTOR;
+	//
+	// // Calcul du temps passé
+	// this.pastTime += delta;
+	//
+	// // It's mandatory tu put continueAction or walk here to have a smooth
+	// // movement
+	// continueAction();
+	//
+	// // Toutes les secondes réelles
+	// if (this.pastTime >= 1000) {
+	//
+	// // Une seconde réelle s'est écoulée
+	// this.secondesR++;
+	// this.pastTime -= 1000;
+	// // On effectue une action
+	// action();
+	// }
+	//
+	// // On fait un truc toutes les 3 secondes réelles
+	// // = minute mouglotte
+	// if (this.secondesR >= 3) {
+	//
+	// // Une minute mouglotte s'est écoulée
+	// this.minutes++;
+	// this.secondesR = 0;
+	// // Evénement lancé toutes les minutes
+	// eventMinute();
+	// }
+	//
+	// // Toutes les 3 minutes réelles
+	// // = heure mouglotte
+	// if (this.minutes >= 60) {
+	//
+	// // Une heure mouglotte s'est écoulée
+	// this.hours++;
+	// this.minutes = 0;
+	// // Evénement lancé toutes les heures
+	// eventHour();
+	// }
+	//
+	// // Toutes les heures réelles
+	// // = jour mouglotte
+	// if (this.hours >= 20) {
+	//
+	// // Un jour mouglotte s'est écoulé
+	// this.days++;
+	// this.hours = 0;
+	// // Evénement lancé tous les jours
+	// eventDay();
+	// }
+	//
+	// Debug.log("MOUGLOTTE", "Mouglotte::Update::End");
+	// }
+
+	@Override
 	public void update(GameContainer container, int delta) {
+		// TODO Auto-generated method stub
 
-		Debug.log("MOUGLOTTE", "Mouglotte::Update");
+	}
 
-		delta *= GameState.TIME_FACTOR;
+	@Override
+	public void eventRealSecond() {
+		// TODO Auto-generated method stub
 
-		// Calcul du temps passé
-		this.pastTime += delta;
-
-		// It's mandatory tu put continueAction or walk here to have a smooth
-		// movement
-		continueAction();
-
-		// Toutes les secondes réelles
-		if (this.pastTime >= 1000) {
-
-			// Une seconde réelle s'est écoulée
-			this.secondesR++;
-			this.pastTime -= 1000;
-			// On effectue une action
-			action();
-		}
-
-		// On fait un truc toutes les 3 secondes réelles
-		// = minute mouglotte
-		if (this.secondesR >= 3) {
-
-			// Une minute mouglotte s'est écoulée
-			this.minutes++;
-			this.secondesR = 0;
-			// Evénement lancé toutes les minutes
-			eventMinute();
-		}
-
-		// Toutes les 3 minutes réelles
-		// = heure mouglotte
-		if (this.minutes >= 60) {
-
-			// Une heure mouglotte s'est écoulée
-			this.hours++;
-			this.minutes = 0;
-			// Evénement lancé toutes les heures
-			eventHour();
-		}
-
-		// Toutes les heures réelles
-		// = jour mouglotte
-		if (this.hours >= 20) {
-
-			// Un jour mouglotte s'est écoulé
-			this.days++;
-			this.hours = 0;
-			// Evénement lancé tous les jours
-			eventDay();
-		}
-
-		Debug.log("MOUGLOTTE", "Mouglotte::Update::End");
 	}
 
 	/**
@@ -459,12 +465,12 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute");
 
-		// Les besoins et les envies évoluent
-		// S'ils sont en cours d'accomplissement ils baissent
+		// Needs and desires change
+		// If they are fulfilling, they decrease
 
-		// Pour les besoins
+		// Needs
 		this.needs.eventMinute();
-		// Pour les envies
+		// Desires
 		this.desires.eventMinute();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute::End");
@@ -477,17 +483,17 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventHour");
 
-		// Les besoins augmentent et le besoin le plus pressant est choisi
-		// Une nouvelle envie est choisie si l'envie courante est en train de
-		// s'accomplir ou n'a pas pu l'être
+		// Needs raise and the most urgent need is chosen
+		// A new desire is chosen if the current desire is fulfilling or
+		// couldn't be
 
-		// Pour les besoins
+		// Needs
 		this.needs.eventHour();
-		// Pour les envies
+		// Desires
 		this.desires.eventHour();
 
-		// Prise de décision
-		// Le besoin ou l'envie est choisi
+		// Take a decision
+		// The need or the desire is chosen
 		decide();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventHour::End");
@@ -502,6 +508,18 @@ public class Mouglotte {
 		Debug.log("MOUGLOTTE", "Mouglotte::EventDay::End");
 	}
 
+	@Override
+	public void eventMonth() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventSeason() {
+		// TODO Auto-generated method stub
+
+	}
+
 	/**
 	 * Event called every mouglotte year
 	 */
@@ -509,10 +527,7 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventYear");
 
-		// Joyeux anniversaire
-		this.age++;
-
-		// Pour les traits de caractères
+		// Traits change
 		this.traits.eventYear();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventYear::End");
@@ -592,12 +607,12 @@ public class Mouglotte {
 	/**
 	 * Do an action
 	 */
-	private void action() {
+	public void action() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Action");
 
 		// Pour les tests
-		if (this.graphics.isSelected()) {
+		if (this.entity.isSelected()) {
 			continueAction();
 			return;
 		}
@@ -647,9 +662,9 @@ public class Mouglotte {
 			break;
 		}
 
-		// Recherche à côté
-		Tile tile = this.game.getMap().searchNear(memoryType,
-				this.graphics.getX(), this.graphics.getY());
+		// Search near
+		Tile tile = this.entity.getGame().getMap()
+				.searchNear(memoryType, this.entity.getX(), this.entity.getY());
 
 		// La mouglotte a trouvé ce qu'elle cherche
 		if (tile != null) {
@@ -657,18 +672,18 @@ public class Mouglotte {
 			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
 					+ " found");
 
-			// La destination est annulée
-			this.path = null;
+			// Destination is cancelled
+			this.entity.clearPath();
 
 			// La mouglotte est au bon endroit
-			if (tile.contains(this.graphics.getX(), this.graphics.getY()))
+			if (tile.contains(this.entity.getX(), this.entity.getY()))
 				// Accomplissons
 				fulfill();
 
 			// La mouglotte est à côté de l'endroit
 			else
 				// Allons-y
-				goTo(tile.getX(), tile.getY());
+				this.entity.goTo(tile.getX(), tile.getY());
 
 			// La mouglotte n'a pas trouvé ce qu'elle cherche
 		} else {
@@ -676,8 +691,8 @@ public class Mouglotte {
 			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
 					+ " not found");
 
-			// Si la mouglotte est à destination
-			if (this.path == null) {
+			// If mouglotte is at destination
+			if (this.entity.arrived()) {
 				// L'action est terminée, on n'a rien trouvé
 				// Une nouvelle action va être déclenchée
 				this.actionInProgress = false;
@@ -728,12 +743,12 @@ public class Mouglotte {
 
 		// Récupération du souvenir le plus proche
 		if (memoryType != null)
-			memory = this.memories.getCloser(memoryType, this.graphics.getX(),
-					this.graphics.getY());
+			memory = this.memories.getCloser(memoryType, this.entity.getX(),
+					this.entity.getY());
 
 		// Aller à l'endroit du souvenir
 		if (memory != null)
-			goTo(memory.getX(), memory.getY());
+			this.entity.goTo(memory.getX(), memory.getY());
 		// Rien à faire
 		else
 			nothingToDo();
@@ -752,36 +767,6 @@ public class Mouglotte {
 		walk();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::ContinueAction::End");
-	}
-
-	/**
-	 * Goto somewhere
-	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
-	 */
-	public void goTo(int x, int y) {
-
-		Debug.log("MOUGLOTTE", "Mouglotte::GoTo " + x + "," + y);
-
-		// Si la souris est sortie de la carte on ne fait rien
-		if (!this.game.getMap().contains(x, y))
-			return;
-
-		// Réinitialisation des zones visitées
-		this.game.getMap().clearVisited();
-
-		// Recherche du chemin
-		Path path = this.game.getMap().findPath(new UnitMover(3), getX(),
-				getY(), x, y);
-		setPath(path);
-
-		if (path == null)
-			Debug.log("MOUGLOTTE", "Mouglotte::GoTo:No path found");
-
-		Debug.log("MOUGLOTTE", "Mouglotte::GoTo::End");
 	}
 
 	/**
@@ -821,73 +806,71 @@ public class Mouglotte {
 			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:Same direction");
 
 			// Current direction
-			int dirX = this.graphics.getX() - this.graphics.getLastX();
-			int dirY = this.graphics.getY() - this.graphics.getLastY();
+			Vector2f dir = this.entity.getDirection();
 
 			// La mouglotte marchait, on continue dans la même direction
-			if (dirX != 0)
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * dirX
-						/ Math.abs(dirX);
-			if (dirY != 0)
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * dirY
-						/ Math.abs(dirY);
+			if (dir.getX() != 0)
+				destX = (int) (this.entity.getX() + WALK_AROUND_DISTANCE
+						* dir.getX() / Math.abs(dir.getX()));
+			if (dir.getY() != 0)
+				destY = (int) (this.entity.getY() + WALK_AROUND_DISTANCE
+						* dir.getY() / Math.abs(dir.getY()));
 
 			// On va dans une direction au hasard
 			// (y compris la direction actuelle pour simplifier)
 		} else {
 
 			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:New direction");
-			
+
 			// Find a random destination on the map
 			// Destination is on a circle of radius WALK_AROUND_DISTANCE
-			while (!this.game.getMap().contains(destX, destY)) {
-			
+			while (!this.entity.getGame().getMap().contains(destX, destY)) {
+
 				destX = r.nextInt(WALK_AROUND_DISTANCE);
 				if (r.nextBoolean() == true)
-					destY = - (destX - WALK_AROUND_DISTANCE);
+					destY = -(destX - WALK_AROUND_DISTANCE);
 				else
 					destY = destX - WALK_AROUND_DISTANCE;
 			}
-			
-			
-//			switch (r.nextInt(8)) {
-//			case 0:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-//				break;
-//			case 1:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-//				break;
-//			case 2:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
-//				break;
-//			case 3:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-//				break;
-//			case 4:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-//				break;
-//			case 5:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-//				break;
-//			case 6:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
-//				break;
-//			case 7:
-//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-//				break;
-//			}
+
+			// switch (r.nextInt(8)) {
+			// case 0:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+			// break;
+			// case 1:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+			// break;
+			// case 2:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
+			// break;
+			// case 3:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+			// break;
+			// case 4:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+			// break;
+			// case 5:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+			// break;
+			// case 6:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
+			// break;
+			// case 7:
+			// destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+			// destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+			// break;
+			// }
 		}
 
 		// Aller à la destination trouvée
-		goTo(destX, destY);
+		this.entity.goTo(destX, destY);
 
 		Debug.log("MOUGLOTTE", "Mouglotte::WalkAround::End");
 	}
@@ -899,52 +882,7 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Walk");
 
-		if (this.path != null) {
-
-			// Le step renvoie une position en zone
-
-			// Déplacement direct au centre de la zone
-			// setLocation(this.path.getStep(0).getX()
-			// * this.game.getMap().TILE_SIZE
-			// + this.game.getMap().TILE_SIZE / 2, this.path.getStep(0)
-			// .getY()
-			// * this.game.getMap().TILE_SIZE
-			// + this.game.getMap().TILE_SIZE / 2);
-
-			// On doit aller au milieu de la prochaine zone
-			int destX = this.path.getStep(0).getX() * GameMap.TILE_SIZE
-					+ GameMap.TILE_SIZE / 2;
-			int destY = this.path.getStep(0).getY() * GameMap.TILE_SIZE
-					+ GameMap.TILE_SIZE / 2;
-
-			// On avance d'un pixel dans cette direction
-			int dirX = destX - getX();
-			if (dirX != 0)
-				dirX = dirX * 1 / Math.abs(dirX);
-			int dirY = destY - getY();
-			if (dirY != 0)
-				dirY = dirY * 1 / Math.abs(dirY);
-
-			setLocation(getX() + dirX, getY() + dirY);
-
-			// Arrived at target
-			if (Math.abs(getX() - destX) <= 1 && Math.abs(getY() - destY) <= 1) {
-
-				// Step is done, delete
-				this.path.removeStep(0);
-
-				Debug.log("MOUGLOTTE", "Mouglotte::Walk:Path step done");
-			}
-
-			// No more step, path is done
-			if (this.path.getLength() == 0) {
-
-				this.path = null;
-
-				Debug.log("MOUGLOTTE", "Mouglotte::Walk:Path done");
-			}
-		} else
-			Debug.log("MOUGLOTTE", "Mouglotte::Walk:No path");
+		this.entity.move();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Walk::End");
 	}
@@ -952,7 +890,6 @@ public class Mouglotte {
 	/**
 	 * Idle
 	 */
-
 	private void idle() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle");
@@ -1001,21 +938,9 @@ public class Mouglotte {
 			}
 
 		// Save memory
-		this.memories.put(new Memory(memoryType, getX(), getY()));
+		this.memories.put(new Memory(memoryType, this.entity.getX(),
+				this.entity.getY()));
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill::End");
-	}
-
-	/**
-	 * Render mouglotte
-	 * 
-	 * @param container
-	 *            Game container
-	 * @param g
-	 *            Graphics
-	 */
-	public void render(GameContainer container, Graphics g)
-			throws SlickException {
-		this.graphics.render(container, g);
 	}
 }

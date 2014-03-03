@@ -40,6 +40,15 @@ public class Path {
 	public Step getStep(int index) {
 		return (Step) steps.get(index);
 	}
+	
+	/**
+	 * Get the last step in the path
+	 * 
+	 * @return The step information, the position on the map.
+	 */
+	public Step getLastStep() {
+		return (Step) steps.get(getLength()-1);
+	}
 
 	/**
 	 * Get the x coordinate for the step at the given index
