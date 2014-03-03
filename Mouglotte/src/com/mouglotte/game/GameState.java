@@ -1,5 +1,9 @@
 package com.mouglotte.game;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
@@ -8,6 +12,8 @@ import org.newdawn.slick.state.StateBasedGame;
 
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.map.GameMap;
+import com.mouglotte.specy.Desire;
+import com.mouglotte.specy.DesireType;
 import com.mouglotte.specy.Mouglotte;
 import com.mouglotte.ui.RightPanel;
 
@@ -31,11 +37,9 @@ public class GameState extends BasicGameState {
 	// Carte
 	private GameMap map;
 
-	private Mouglotte mouglotte;
-	// private Mouglotte mouglotte2;
+	private List<Mouglotte> mouglottes;
 
 	private String deltaString = "";
-	private String infoString = "";
 
 	/**
 	 * Get game state ID
@@ -89,13 +93,11 @@ public class GameState extends BasicGameState {
 		// Create right panel
 		this.rightPanel = new RightPanel(this);
 
-		// this.map.init() pourrait être utile
-
 		// Pour les tests
-		this.mouglotte = new Mouglotte(this);
-		this.mouglotte.setLocation(15, 15);
-		// this.mouglotte2 = new Mouglotte(this);
-		// this.mouglotte2.setLocation(100, 100);
+		this.mouglottes = new ArrayList<Mouglotte>();
+		this.mouglottes.add(new Mouglotte(this));
+//		this.mouglottes.add(new Mouglotte(this));
+//		this.mouglottes.add(new Mouglotte(this));
 	}
 
 	/**
@@ -118,9 +120,10 @@ public class GameState extends BasicGameState {
 		// Mise à jour de la carte
 		this.map.update(container, delta);
 
-		// Mise à jour de la mouglotte
-		this.mouglotte.update(container, delta);
-
+		// Update mouglottes
+		for (final Mouglotte mouglotte : this.mouglottes){
+			mouglotte.update(container, delta);
+		}
 	}
 
 	/**
@@ -151,11 +154,13 @@ public class GameState extends BasicGameState {
 		// la première appelée
 		this.map.render(container, g);
 
-		this.mouglotte.render(container, g);
+		// Render mouglottes
+		for (final Mouglotte mouglotte : this.mouglottes){
+			mouglotte.render(container, g);
+		}
 		// this.mouglotte2.render(container, g);
 
 		g.drawString(this.deltaString, 300, 10);
-		g.drawString(this.infoString, 10, 300);
 	}
 
 	/**
@@ -262,23 +267,6 @@ public class GameState extends BasicGameState {
 	@Override
 	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 
-		// Si la souris est sortie on ne fait rien
-		if ((newx < 0) || (newy < 0)
-				|| (newx >= this.map.getWidthInTiles() * GameMap.TILE_SIZE)
-				|| (newy >= this.map.getHeightInTiles() * GameMap.TILE_SIZE)) {
-			return;
-		}
-
-		// Si une unité est sélectionnée
-		if (this.mouglotte.isSelected()) {
-
-			// // Recherche du chemin
-			// this.map.findPath(new UnitMover(3), this.mouglotte.getX(),
-			// this.mouglotte.getY(), newx, newy);
-		}
-		this.infoString = Integer.toString(newx) + "," + Integer.toString(newy)
-				+ " => " + Integer.toString(newx / GameMap.TILE_SIZE) + ","
-				+ Integer.toString(newy / GameMap.TILE_SIZE);
 	}
 
 	/**
@@ -287,6 +275,10 @@ public class GameState extends BasicGameState {
 	 * @return Selected mouglotte
 	 */
 	public Mouglotte getSelectedMouglotte() {
-		return this.mouglotte.isSelected() ? this.mouglotte : null;
+		
+		for (final Mouglotte mouglotte : this.mouglottes){
+			if (mouglotte.isSelected()) return mouglotte;
+		}
+		return null;
 	}
 }

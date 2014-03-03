@@ -23,7 +23,7 @@ import com.mouglotte.utilities.MouglotteUtilities;
 public class Mouglotte {
 
 	// Distance de promenade au hasard
-	private final int WALK_AROUND_DISTANCE = 10;
+	private final int WALK_AROUND_DISTANCE = 1000;
 
 	// Jeu
 	private GameState game;
@@ -402,6 +402,10 @@ public class Mouglotte {
 		// Calcul du temps passé
 		this.pastTime += delta;
 
+		// It's mandatory tu put continueAction or walk here to have a smooth
+		// movement
+		continueAction();
+
 		// Toutes les secondes réelles
 		if (this.pastTime >= 1000) {
 
@@ -770,13 +774,13 @@ public class Mouglotte {
 		this.game.getMap().clearVisited();
 
 		// Recherche du chemin
-		Path path =this.game.getMap().findPath(new UnitMover(3), getX(), getY(),
-				x, y); 
+		Path path = this.game.getMap().findPath(new UnitMover(3), getX(),
+				getY(), x, y);
 		setPath(path);
-		
+
 		if (path == null)
 			Debug.log("MOUGLOTTE", "Mouglotte::GoTo:No path found");
-		
+
 		Debug.log("MOUGLOTTE", "Mouglotte::GoTo::End");
 	}
 
@@ -814,7 +818,9 @@ public class Mouglotte {
 		// Une chance sur 2 de continuer dans la même direction
 		if (r.nextBoolean() == true) {
 
-			// Direction actuelle
+			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:Same direction");
+
+			// Current direction
 			int dirX = this.graphics.getX() - this.graphics.getLastX();
 			int dirY = this.graphics.getY() - this.graphics.getLastY();
 
@@ -830,40 +836,54 @@ public class Mouglotte {
 			// (y compris la direction actuelle pour simplifier)
 		} else {
 
-			switch (r.nextInt(8)) {
-			case 0:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-				break;
-			case 1:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-				break;
-			case 2:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
-				break;
-			case 3:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-				break;
-			case 4:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-				break;
-			case 5:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
-				break;
-			case 6:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
-				break;
-			case 7:
-				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
-				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
-				break;
+			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:New direction");
+			
+			// Find a random destination on the map
+			// Destination is on a circle of radius WALK_AROUND_DISTANCE
+			while (!this.game.getMap().contains(destX, destY)) {
+			
+				destX = r.nextInt(WALK_AROUND_DISTANCE);
+				if (r.nextBoolean() == true)
+					destY = - (destX - WALK_AROUND_DISTANCE);
+				else
+					destY = destX - WALK_AROUND_DISTANCE;
 			}
+			
+			
+//			switch (r.nextInt(8)) {
+//			case 0:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+//				break;
+//			case 1:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+//				break;
+//			case 2:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
+//				break;
+//			case 3:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+//				break;
+//			case 4:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * 0;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+//				break;
+//			case 5:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * -1;
+//				break;
+//			case 6:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 0;
+//				break;
+//			case 7:
+//				destX = this.graphics.getX() + WALK_AROUND_DISTANCE * -1;
+//				destY = this.graphics.getY() + WALK_AROUND_DISTANCE * 1;
+//				break;
+//			}
 		}
 
 		// Aller à la destination trouvée
@@ -891,35 +911,40 @@ public class Mouglotte {
 			// * this.game.getMap().TILE_SIZE
 			// + this.game.getMap().TILE_SIZE / 2);
 
-			this.game.getMap();
-			this.game.getMap();
 			// On doit aller au milieu de la prochaine zone
 			int destX = this.path.getStep(0).getX() * GameMap.TILE_SIZE
 					+ GameMap.TILE_SIZE / 2;
-			this.game.getMap();
-			this.game.getMap();
 			int destY = this.path.getStep(0).getY() * GameMap.TILE_SIZE
 					+ GameMap.TILE_SIZE / 2;
 
 			// On avance d'un pixel dans cette direction
 			int dirX = destX - getX();
 			if (dirX != 0)
-				dirX = dirX * 5 / Math.abs(dirX);
+				dirX = dirX * 1 / Math.abs(dirX);
 			int dirY = destY - getY();
 			if (dirY != 0)
-				dirY = dirY * 5 / Math.abs(dirY);
+				dirY = dirY * 1 / Math.abs(dirY);
 
 			setLocation(getX() + dirX, getY() + dirY);
 
-			// Si on est arrivé au centre de la zone
-			if (getX() + dirX == destX && getY() + dirY == destY)
-				// L'étape est terminée, on la supprime
+			// Arrived at target
+			if (Math.abs(getX() - destX) <= 1 && Math.abs(getY() - destY) <= 1) {
+
+				// Step is done, delete
 				this.path.removeStep(0);
 
-			// S'il n'y a plus d'étape alors le chemin est terminé
-			if (this.path.getLength() == 0)
+				Debug.log("MOUGLOTTE", "Mouglotte::Walk:Path step done");
+			}
+
+			// No more step, path is done
+			if (this.path.getLength() == 0) {
+
 				this.path = null;
-		}
+
+				Debug.log("MOUGLOTTE", "Mouglotte::Walk:Path done");
+			}
+		} else
+			Debug.log("MOUGLOTTE", "Mouglotte::Walk:No path");
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Walk::End");
 	}
@@ -940,6 +965,8 @@ public class Mouglotte {
 	 */
 	private void fulfill() {
 
+		MemoryType memoryType = null;
+
 		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill");
 
 		// A décliner en véritable actions
@@ -948,23 +975,33 @@ public class Mouglotte {
 		if (this.decision != null)
 			switch (this.decision) {
 			case NEED_HUNGER:
-			case NEED_REST:
+				memoryType = MemoryType.FOOD;
 			case NEED_SOCIAL:
+				memoryType = MemoryType.FRIEND;
 			case NEED_FUN:
+				memoryType = MemoryType.FRIEND;
 				this.needs.setFulfilling(true);
 				break;
 			case DESIRE_HUNGER:
-			case DESIRE_REST:
+				memoryType = MemoryType.FOOD;
 			case DESIRE_SOCIAL:
+				memoryType = MemoryType.FRIEND;
 			case DESIRE_FUN:
+				memoryType = MemoryType.FRIEND;
 			case DESIRE_LOVE:
+				memoryType = MemoryType.LOVER;
 			case DESIRE_FIGHT:
+				memoryType = MemoryType.ENEMY;
 			case DESIRE_WORK:
+				memoryType = MemoryType.WORK;
 				this.desires.setFulfilling(true);
 				break;
 			default:
 				break;
 			}
+
+		// Save memory
+		this.memories.put(new Memory(memoryType, getX(), getY()));
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill::End");
 	}
