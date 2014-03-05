@@ -2,14 +2,6 @@ package com.mouglotte.map;
 
 public class Tile {
 
-	// Champ de vision
-	// Actuellement en pixel, à mettre en tiles
-	// private final int VISUAL_FIELD = 32;
-
-	/** Location */
-	private int x = 0;
-	private int y = 0;
-
 	/** Column and row in the tiles table */
 	private int i = 0;
 	private int j = 0;
@@ -17,20 +9,30 @@ public class Tile {
 	/**
 	 * Constructor
 	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
 	 * @param i
 	 *            Column index in the tiles table
 	 * @param j
 	 *            Row index in the tiles table
 	 */
-	public Tile(int x, int y, int i, int j) {
-		this.x = x;
-		this.y = y;
+	public Tile(int i, int j) {
+
 		this.i = i;
 		this.j = j;
+	}
+
+	/**
+	 * Create a tile from coordinates
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 * @return Tile
+	 */
+	public static Tile create(int x, int y) {
+		return new Tile(
+				(int) ((x - GameMap.offsetX) / GameMap.TILE_SIZE + GameMap.tileOffsetX),
+				(int) ((y - GameMap.offsetY) / GameMap.TILE_SIZE + GameMap.tileOffsetY));
 	}
 
 	/**
@@ -39,7 +41,7 @@ public class Tile {
 	 * @return x position
 	 */
 	public int getX() {
-		return (int) (this.x + GameMap.offsetX);
+		return (int) ((this.i - GameMap.tileOffsetX) * GameMap.TILE_SIZE + GameMap.offsetX);
 	}
 
 	/**
@@ -48,7 +50,7 @@ public class Tile {
 	 * @return y position
 	 */
 	public int getY() {
-		return (int) (this.y + GameMap.offsetY);
+		return (int) ((this.j - GameMap.tileOffsetY) * GameMap.TILE_SIZE + GameMap.offsetY);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class Tile {
 	 * @return x position of the center of the tile
 	 */
 	public int getCenterX() {
-		return this.x + GameMap.TILE_SIZE / 2;
+		return getX() + GameMap.TILE_SIZE / 2;
 	}
 
 	/**
@@ -84,7 +86,7 @@ public class Tile {
 	 * @return y position of the center of the tile
 	 */
 	public int getCenterY() {
-		return this.y + GameMap.TILE_SIZE / 2;
+		return getY() + GameMap.TILE_SIZE / 2;
 	}
 
 	/**
@@ -97,7 +99,7 @@ public class Tile {
 	 * @return True if the coordinates are in the tile
 	 */
 	public boolean contains(int x, int y) {
-		return x >= this.x && x <= this.x + GameMap.TILE_SIZE && y >= this.y
-				&& y <= this.y + GameMap.TILE_SIZE;
+		return x >= getX() && x <= getX() + GameMap.TILE_SIZE && y >= getY()
+				&& y <= getY() + GameMap.TILE_SIZE;
 	}
 }

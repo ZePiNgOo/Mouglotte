@@ -10,6 +10,8 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.tiled.TiledMap;
 
+import com.mouglotte.entities.Entity;
+import com.mouglotte.entities.Tree;
 import com.mouglotte.game.GameState;
 import com.mouglotte.specy.MemoryType;
 
@@ -37,12 +39,12 @@ public class GameMap implements TileBasedMap {
 
 	/** Offsets for scrolling */
 	public static float offsetX, offsetY;
-	public static int tileOffsetX, tileOffsetY;
+	public static float tileOffsetX, tileOffsetY;
 
 	/** Objects */
 	private int[][] objects;
 	/** Entities */
-	private Object[][] entities;
+	private Entity[][] entities;
 	/** Tiles visited by path finder */
 	private boolean[][] visited;
 	/** Tiles */
@@ -83,48 +85,24 @@ public class GameMap implements TileBasedMap {
 		// }
 		// }
 
-		// // Terrain
-		// terrain = new int[getWidthInTiles()][getHeightInTiles()];
-		// // Unités
-		// units = new int[getWidthInTiles()][getHeightInTiles()];
-		// // Visité
-		// visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 		// Objects
-		objects = new int[getWidthInTiles()][getHeightInTiles()];
+		this.objects = new int[getWidthInTiles()][getHeightInTiles()];
 		// Entities
-		entities = new Object[getWidthInTiles()][getHeightInTiles()];
+		this.entities = new Entity[getWidthInTiles()][getHeightInTiles()];
 		// Visited tiles by the path finder
-		visited = new boolean[getWidthInTiles()][getHeightInTiles()];
+		this.visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 		// Tiles
-		tiles = new Tile[getWidthInTiles()][getHeightInTiles()];
-		
+		this.tiles = new Tile[getWidthInTiles()][getHeightInTiles()];
+
 		// Instantiation of the path finder
 		this.finder = new AStarPathFinder(this, 500, true);
 
-		// addMouseListener(new MouseAdapter() {
-		// public void mousePressed(MouseEvent e) {
-		//
-		// if (SwingUtilities.isLeftMouseButton(e)) handleLeftClick(e);
-		// else if (SwingUtilities.isRightMouseButton(e)) handleRightClick(e);
-		// }
-		// });
-		// addMouseMotionListener(new MouseMotionListener() {
-		// public void mouseDragged(MouseEvent e) {
-		// }
-		//
-		// public void mouseMoved(MouseEvent e) {
-		// handleMouseMoved(e.getX(), e.getY());
-		// }
-		// });
-		// addWindowListener(new WindowAdapter() {
-		// public void windowClosing(WindowEvent e) {
-		// System.exit(0);
-		// }
-		// });
-
-		// setSize(600, 600);
-		// setResizable(false);
-		// setVisible(true);
+		// Trees
+		this.entities[5][5] = new Tree(this.game, 5, 5);
+		this.entities[7][8] = new Tree(this.game, 7, 8);
+		this.entities[8][8] = new Tree(this.game, 8, 8);
+		this.entities[9][8] = new Tree(this.game, 9, 8);
+		this.entities[8][9] = new Tree(this.game, 8, 9);
 	}
 
 	/**
@@ -171,8 +149,7 @@ public class GameMap implements TileBasedMap {
 	 * @return Row index of the tile
 	 */
 	public int getTileRow(int y) {
-		return (y - (int) GameMap.offsetY) / this.map.getTileHeight()
-				+ GameMap.tileOffsetY;
+		return (int) ((y - (int) GameMap.offsetY) / this.map.getTileHeight() + GameMap.tileOffsetY);
 	}
 
 	/**
@@ -183,14 +160,16 @@ public class GameMap implements TileBasedMap {
 	 * @return Column index of the tile
 	 */
 	public int getTileColumn(int x) {
-		return (x - (int) GameMap.offsetX) / this.map.getTileWidth()
-				+ GameMap.tileOffsetX;
+		return (int) ((x - (int) GameMap.offsetX) / this.map.getTileWidth() + GameMap.tileOffsetX);
 	}
 
 	/**
 	 * Get tile at the coordinates
-	 * @param x x position
-	 * @param y y position
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
 	 * @return Tile at these coordinates
 	 */
 	public Tile getTile(int x, int y) {
@@ -213,7 +192,7 @@ public class GameMap implements TileBasedMap {
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Initialize tiles visited by the path finer
 	 */
@@ -354,9 +333,11 @@ public class GameMap implements TileBasedMap {
 		// fluide
 		// - tileOffsetX et tileOffsetY permettent de décaler la première zone
 		// affichée
+		final int MOUSE_SCROLL = 1;
 
 		if ((container.getInput().isKeyDown(Input.KEY_RIGHT))
-				|| (container.getInput().getMouseX() >= container.getWidth() - 10)) {
+				|| (container.getInput().getMouseX() >= container.getWidth()
+						- MOUSE_SCROLL)) {
 			GameMap.offsetX -= delta / 3.0f;
 			if (GameMap.offsetX < 0
 					&& GameMap.tileOffsetX >= this.map.getWidth()
@@ -364,19 +345,20 @@ public class GameMap implements TileBasedMap {
 				GameMap.offsetX = 0;
 		}
 		if ((container.getInput().isKeyDown(Input.KEY_LEFT))
-				|| (container.getInput().getMouseX() <= 10)) {
+				|| (container.getInput().getMouseX() <= MOUSE_SCROLL)) {
 			GameMap.offsetX += delta / 3.0f;
 			if (GameMap.offsetX > 0 && GameMap.tileOffsetX <= 0)
 				GameMap.offsetX = 0;
 		}
 		if ((container.getInput().isKeyDown(Input.KEY_UP))
-				|| (container.getInput().getMouseY() <= 10)) {
+				|| (container.getInput().getMouseY() <= MOUSE_SCROLL)) {
 			GameMap.offsetY += delta / 3.0f;
 			if (GameMap.offsetY > 0 && GameMap.tileOffsetY <= 0)
 				GameMap.offsetY = 0;
 		}
 		if ((container.getInput().isKeyDown(Input.KEY_DOWN))
-				|| (container.getInput().getMouseY() >= container.getHeight() - 10)) {
+				|| (container.getInput().getMouseY() >= container.getHeight()
+						- MOUSE_SCROLL)) {
 			GameMap.offsetY -= delta / 3.0f;
 			if (GameMap.offsetY < 0
 					&& GameMap.tileOffsetY >= this.map.getHeight()
@@ -412,13 +394,14 @@ public class GameMap implements TileBasedMap {
 	 *            Graphics
 	 * @throws SlickException
 	 */
-	public void render(GUIContext container, Graphics g) throws SlickException {
+	public void render(GameContainer container, Graphics g)
+			throws SlickException {
 
 		// Render a part of the map
 		// render(x,y,sx,sy,width,height)
 		this.map.render((int) GameMap.offsetX, (int) GameMap.offsetY,
-				GameMap.tileOffsetX, GameMap.tileOffsetY, DISPLAYED_TILES,
-				DISPLAYED_TILES);
+				(int) GameMap.tileOffsetX, (int) GameMap.tileOffsetY,
+				DISPLAYED_TILES, DISPLAYED_TILES);
 		// - x : x position to render the first tile
 		// - y : y position to render the first tile
 		// - sx : column index of begining tile
@@ -428,37 +411,42 @@ public class GameMap implements TileBasedMap {
 
 		Color color = g.getColor();
 		g.setColor(Color.red);
-		g.drawString(GameMap.offsetX + "," + GameMap.offsetY + " / "
-				+ GameMap.tileOffsetX + "," + GameMap.tileOffsetY,
-				container.getWidth() / 2 + 10, container.getHeight() / 2);
-		g.drawString(container.getInput().getMouseX() + ","
-				+ container.getInput().getMouseY() + " / "
-				+ getTileColumn(container.getInput().getMouseX()) + ","
-				+ getTileRow(container.getInput().getMouseY()),
-				container.getWidth() / 2 + 10, container.getHeight() / 2 + 15);
+
+		g.drawString("Offset: " + GameMap.offsetX + "," + GameMap.offsetY
+				+ " / " + GameMap.tileOffsetX + "," + GameMap.tileOffsetY, 300,
+				10);
+		g.drawString("Mouse: " + container.getInput().getMouseX() + ","
+				+ container.getInput().getMouseY(), 300, 20);
+		Tile tile = Tile.create(container.getInput().getMouseX(), container
+				.getInput().getMouseY());
+		g.drawString("Tile:" + tile.getColumn() + "," + tile.getRow() + "/"
+				+ tile.getX() + "," + tile.getY(), 300, 30);
 
 		g.fillRect(container.getWidth() / 2, container.getHeight() / 2, 10, 10);
 		g.setColor(color);
 
-		// Translate everything rendered after this
-		// So things stays at the right place despite of scrolling
-		g.translate(GameMap.offsetX - GameMap.tileOffsetX * this.map.getTileWidth(),
-				GameMap.offsetY - GameMap.tileOffsetY * this.map.getTileHeight());
-
 		// Highlight mouse overed tile
 		highlightTile(container, g);
 
+		// Translate everything rendered after this
+		// So things stays at the right place despite of scrolling
+		g.translate(
+				GameMap.offsetX - GameMap.tileOffsetX * this.map.getTileWidth(),
+				GameMap.offsetY - GameMap.tileOffsetY
+						* this.map.getTileHeight());
+
 		// Render objects and entities
 		// Render line by line to respect z order
-		for (int i = GameMap.tileOffsetX; i < GameMap.tileOffsetX + DISPLAYED_TILES; i++)
-			for (int j = GameMap.tileOffsetY; j < GameMap.tileOffsetY
+		for (int i = (int) GameMap.tileOffsetX; i < GameMap.tileOffsetX
+				+ DISPLAYED_TILES; i++)
+			for (int j = (int) GameMap.tileOffsetY; j < GameMap.tileOffsetY
 					+ DISPLAYED_TILES; j++) {
 				// Render object first because an entity must be displayed over
 				// an object
 				// if (objects[i][j] != 0)
 				// g.fillRect((x1, y1, width, height);
-				// if (entities[i][j] != null)
-				// entities[i][j].render(container, g);
+				if (entities[i][j] != null)
+					entities[i][j].render(container, g);
 			}
 
 		// A appeler si on veut annuler le translate et donc ne plus prendre en
@@ -468,13 +456,18 @@ public class GameMap implements TileBasedMap {
 
 	/**
 	 * Highlight mouse overed tile
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
 	 */
-	private void highlightTile(GUIContext container, Graphics g) {
+	private void highlightTile(GameContainer container, Graphics g) {
 
-		int i = getTileColumn(container.getInput().getMouseX());
-		int j = getTileRow(container.getInput().getMouseY());
-		g.drawRect(i * this.map.getTileWidth(), j * this.map.getTileHeight(),
-				this.map.getTileWidth() - 1, this.map.getTileHeight() - 1);
+		Tile tile = Tile.create(container.getInput().getMouseX(), container
+				.getInput().getMouseY());
+		g.drawRect(tile.getX(), tile.getY(), this.map.getTileWidth(),
+				this.map.getTileHeight());
 	}
 
 	/**
@@ -492,19 +485,20 @@ public class GameMap implements TileBasedMap {
 	 *            Row index of the tile we're moving to
 	 * @return The path
 	 */
-	public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
+	// public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
+	//
+	// sx = getTileColumn(sx);
+	// sy = getTileRow(sy);
+	// tx = getTileColumn(tx);
+	// ty = getTileRow(ty);
+	//
+	// return this.finder.findPath(mover, sx, sy, tx, ty);
+	// }
 
-		// On convertit les x et y en position position dans les zones
-		// sx /= this.map.getTileWidth();
-		// sy /= this.map.getTileHeight();
-		// tx /= this.map.getTileWidth();
-		// ty /= this.map.getTileHeight();
-		sx = getTileColumn(sx);
-		sy = getTileRow(sy);
-		tx = getTileColumn(tx);
-		ty = getTileRow(ty);
+	public Path findPath(Tile from, Tile to) {
 
-		return this.finder.findPath(mover, sx, sy, tx, ty);
+		return this.finder.findPath(new UnitMover(0), from.getColumn(),
+				from.getRow(), to.getColumn(), to.getRow());
 	}
 
 	/**
@@ -525,9 +519,54 @@ public class GameMap implements TileBasedMap {
 		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
 		// cherche
 		// La recherche doit se faire dans le champ de vision autour du point
-		if (r.nextInt(10) == 0)
-			return new Tile(x, y, 0, 0);
-		else
-			return null;
+		// if (r.nextInt(10) == 0)
+		// return Tile.create(x, y);
+		// else
+		// return null;
+		return null;
+	}
+
+	/**
+	 * Convert to scrolled position
+	 * 
+	 * @param x
+	 *            x position to convert
+	 * @return Converted x position
+	 */
+	public static int convScrollX(int x) {
+		return (int) (x - GameMap.tileOffsetX * GameMap.TILE_SIZE + GameMap.offsetX);
+	}
+
+	/**
+	 * Convert to scrolled position
+	 * 
+	 * @param y
+	 *            position to convert
+	 * @return Converted y position
+	 */
+	public static int convScrollY(int y) {
+		return (int) (y - GameMap.tileOffsetY * GameMap.TILE_SIZE + GameMap.offsetY);
+	}
+
+	/**
+	 * Convert to not scrolled position
+	 * 
+	 * @param x
+	 *            x position to convert
+	 * @return Converted x position
+	 */
+	public static int convNoScrollX(int x) {
+		return (int) (x + GameMap.tileOffsetX * GameMap.TILE_SIZE - GameMap.offsetX);
+	}
+
+	/**
+	 * Convert to not scrolled position
+	 * 
+	 * @param y
+	 *            position to convert
+	 * @return Converted y position
+	 */
+	public static int convNoScrollY(int y) {
+		return (int) (y + GameMap.tileOffsetY * GameMap.TILE_SIZE - GameMap.offsetY);
 	}
 }

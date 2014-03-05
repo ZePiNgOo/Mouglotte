@@ -1,48 +1,61 @@
 package com.mouglotte.specy;
 
+import com.mouglotte.map.Tile;
+
 public class Memory {
 
-	// Type
+	/** Type */
 	private MemoryType type;
-	// Coordonnées
-	private int x;
-	private int y;
-	// Mouglotte
+	/** Position */
+	private Tile tile;
+	/** Mouglotte */
 	private Mouglotte mouglotte;
 	
-	// Constructeur à partir d'un lieu
-	public Memory(MemoryType type, int x, int y) {
+	/**
+	 * Constructor from a tile
+	 * @param type Type
+	 * @param tile Tile
+	 */
+	public Memory(MemoryType type, Tile tile) {
 		
 		this.type = type;
-		this.x = x;
-		this.y = y;
+		this.tile = tile;
 	}
 	
-	// Constructeur à partir d'un lieu et d'une mouglotte
-	public Memory(MemoryType type, int x, int y, Mouglotte mouglotte) {
+	/**
+	 * Constructor from a mouglotte located on a tile
+	 * @param type Type
+	 * @param tile Tile
+	 * @param mouglotte Mouglotte
+	 */
+	public Memory(MemoryType type, Tile tile, Mouglotte mouglotte) {
 
+		// The mouglotte was at this tile
 		this.type = type;
-		this.x = x;
-		this.y = y;
+		this.tile = tile;
 		this.mouglotte = mouglotte;
 	}
 
-	// Récupération du type
+	/**
+	 * Get type
+	 * @return Type
+	 */
 	public MemoryType getType() {
 		return this.type;
 	}
 
-	// Récupération des coordonnées X
-	public int getX() {
-		return this.x;
+	/**
+	 * Get tile
+	 * @return Tile
+	 */
+	public Tile getTile() {
+		return this.tile;
 	}
 
-	// Récupération des coordonnées Y
-	public int getY() {
-		return this.y;
-	}
-
-	// Récupération de la mouglotte
+	/**
+	 * Get mouglotte
+	 * @return Mouglotte
+	 */
 	public Mouglotte getMouglotte() {
 		return this.mouglotte;
 	}	

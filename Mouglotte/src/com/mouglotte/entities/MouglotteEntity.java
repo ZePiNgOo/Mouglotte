@@ -10,6 +10,7 @@ import com.mouglotte.game.GameState;
 import com.mouglotte.map.GameMap;
 import com.mouglotte.map.Path;
 import com.mouglotte.map.Path.Step;
+import com.mouglotte.map.Tile;
 import com.mouglotte.map.UnitMover;
 import com.mouglotte.specy.Mouglotte;
 import com.mouglotte.utilities.Debug;
@@ -44,6 +45,10 @@ public class MouglotteEntity extends Entity {
 		// Shape (TESTS)
 		this.shape = new Circle(this.x, this.y, 10);
 		this.halo = new Circle(this.x, this.y, 20);
+		
+		// TESTS
+		setLocation(100,100);
+		
 	}
 
 	@Override
@@ -131,49 +136,61 @@ public class MouglotteEntity extends Entity {
 	}
 
 	/**
-	 * Goto somewhere
+	 * Go to somewhere
 	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
+	 * @param tile
+	 *            Go to this tile
 	 */
-	public void goTo(int x, int y) {
+	public void goTo(Tile tile) {
 
-		Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::GoTo " + x + "," + y);
+		// goTo(tile.getCenterX(), tile.getCenterY());
+
+		Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::GoTo");
 
 		// If location is not on the map, do nothing
-		if (!this.game.getMap().contains(x, y))
+		// if (!this.game.getMap().contains(x, y))
+		// return;
+		if (tile == null)
 			return;
 
 		// Initialize visited tiles
 		this.game.getMap().clearVisited();
 
 		// Search path
-		Path path = this.game.getMap().findPath(new UnitMover(3), this.x,
-				this.y, x, y);
+		// Path path = this.game.getMap().findPath(new UnitMover(3), this.x,
+		// this.y, x, y);
+		Path path = this.game.getMap().findPath(this.getTile(), tile);
 		setPath(path);
 
 		if (path == null)
 			Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::GoTo:No path found");
+		else
+			Debug.log(
+					"MOUGLOTTE_ENTITY",
+					"MouglotteEntity::GoTo" + tile.getCenterX() + ","
+							+ tile.getCenterY());
 
 		Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::GoTo::End");
 	}
 
+	/**
+	 * Go to somewhere
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
+	 */
+//	public void goTo(int x, int y) {
+//
+//	}
+
 	@Override
 	public void move() {
 
-		Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move");
+		// Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move");
 
 		if (this.path != null) {
-
-			// Déplacement direct au centre de la zone
-			// setLocation(this.path.getStep(0).getX()
-			// * this.game.getMap().TILE_SIZE
-			// + this.game.getMap().TILE_SIZE / 2, this.path.getStep(0)
-			// .getY()
-			// * this.game.getMap().TILE_SIZE
-			// + this.game.getMap().TILE_SIZE / 2);
 
 			// Move to the center of the next tile
 			int destX = this.path.getStep(0).getX() * GameMap.TILE_SIZE
@@ -198,8 +215,8 @@ public class MouglotteEntity extends Entity {
 				// Step is done, delete
 				this.path.removeStep(0);
 
-				Debug.log("MOUGLOTTE_ENTITY",
-						"MouglotteEntity::Move:Path step done");
+				// Debug.log("MOUGLOTTE_ENTITY",
+				// "MouglotteEntity::Move:Path step done");
 			}
 
 			// No more step, path is done
@@ -207,12 +224,13 @@ public class MouglotteEntity extends Entity {
 
 				this.path = null;
 
-				Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move:Path done");
+				// Debug.log("MOUGLOTTE_ENTITY",
+				// "MouglotteEntity::Move:Path done");
 			}
 		} else
 			Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move:No path");
 
-		Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move::End");
+		// Debug.log("MOUGLOTTE_ENTITY", "MouglotteEntity::Move::End");
 	}
 
 	/**
@@ -276,6 +294,23 @@ public class MouglotteEntity extends Entity {
 		if (this.selected)
 			g.draw(this.halo);
 
+		// TEST
+		g.drawString(this.getX() + "," + this.getY(), this.shape.getX(),
+				this.shape.getY() + 20);
+
+		// TEST
+		int x = container.getInput().getMouseX();
+		int y = container.getInput().getMouseY();
+		g.drawString(x + "," + y + "->" + GameMap.convNoScrollX(x) + ","
+				+ GameMap.convNoScrollY(y), GameMap.convNoScrollX(x),
+				GameMap.convNoScrollY(y) - 10);
+
+		// TESTS
+		if (this.path != null)
+			for (int a = 0; a > this.path.getLength(); a++)
+				g.fillRect(this.path.getStep(a).getX(), this.path.getStep(a)
+						.getY(), 2, 2);
+
 		// Back to initial color
 		g.setColor(color);
 	}
@@ -285,6 +320,11 @@ public class MouglotteEntity extends Entity {
 
 		// Set mouse over
 		this.over = this.shape.contains(x, y);
+
+		// Search path
+//		Path path = this.game.getMap().findPath(new UnitMover(3), this.x,
+//				this.y, x, y);
+//		setPath(path);
 	}
 
 	@Override
@@ -305,8 +345,13 @@ public class MouglotteEntity extends Entity {
 		// If mouglotte is selected
 		if (this.selected) {
 
+			// Convert coordinates to scrolled coordinates
+			x = GameMap.convScrollX(x);
+			y = GameMap.convScrollY(y);
+			Tile tile = Tile.create(x, y);
+
 			// Go to clicked location
-			goTo(x, y);
+			goTo(tile);
 		}
 	}
 }

@@ -6,6 +6,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.geom.Vector2f;
 
 import com.mouglotte.game.GameState;
+import com.mouglotte.map.GameMap;
 import com.mouglotte.map.Tile;
 
 public abstract class Entity {
@@ -32,7 +33,7 @@ public abstract class Entity {
 	protected int lastX = 0;
 	protected int lastY = 0;
 	/** Direction */
-	protected Vector2f direction = new Vector2f(0,0);
+	protected Vector2f direction = new Vector2f(0, 0);
 	/** Tile */
 	protected Tile tile;
 
@@ -70,12 +71,13 @@ public abstract class Entity {
 		// New position
 		this.x = x;
 		this.y = y;
-		
+
 		// Direction
-		this.direction = new Vector2f(this.x - this.lastX,this.y - this.lastY);
+		this.direction = new Vector2f(this.x - this.lastX, this.y - this.lastY);
 
 		// Tile containing these coordinates
-		this.tile = this.game.getMap().getTile(x, y);
+		//this.tile = this.game.getMap().getTile(x, y);
+		this.tile = Tile.create(x, y);
 	}
 
 	/**
@@ -94,9 +96,9 @@ public abstract class Entity {
 		// x and y at the center of the tile
 		this.x = this.tile.getCenterX();
 		this.y = this.tile.getCenterY();
-		
+
 		// Direction
-		this.direction = new Vector2f(this.x - this.lastX,this.y - this.lastY);
+		this.direction = new Vector2f(this.x - this.lastX, this.y - this.lastY);
 	}
 
 	/**
@@ -107,7 +109,7 @@ public abstract class Entity {
 	public GameState getGame() {
 		return this.game;
 	}
-	
+
 	/**
 	 * Get age
 	 * 
@@ -137,12 +139,13 @@ public abstract class Entity {
 
 	/**
 	 * Get direction
+	 * 
 	 * @return Direction
 	 */
 	public Vector2f getDirection() {
 		return this.direction;
 	}
-	
+
 	/**
 	 * Get tile containing the entity
 	 * 
@@ -310,37 +313,53 @@ public abstract class Entity {
 	 *            Delta time since last call
 	 */
 	protected void handleInputs(GameContainer container, int delta) {
-		
+
+		// Convert coordinates to not scrolled coordinates
+		int x = GameMap.convNoScrollX(container.getInput().getMouseX());
+		int y = GameMap.convNoScrollY(container.getInput().getMouseY());
+		// A moving entity has to keep its real coordinates (non scrolled)
+		// because it's impossible to scroll the coordinates of every entity
+		// when the map is scrolled
+
 		// Mouse moved
-		mouseMoved(container.getInput().getMouseX(), container.getInput().getMouseY());
-		
+		mouseMoved(x, y);
+
 		// Mouse left clicked
 		if (container.getInput().isMousePressed(Input.MOUSE_LEFT_BUTTON))
-			mouseLeftClicked(container.getInput().getMouseX(), container.getInput().getMouseY());
-			
-			// Mouse right clicked
+			mouseLeftClicked(x, y);
+
+		// Mouse right clicked
 		if (container.getInput().isMousePressed(Input.MOUSE_RIGHT_BUTTON))
-			mouseRightClicked(container.getInput().getMouseX(), container.getInput().getMouseY());
+			mouseRightClicked(x, y);
 	}
-	
+
 	/**
 	 * Mouse moved
-	 * @param x x position
-	 * @param y y position
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
 	 */
 	protected abstract void mouseMoved(int x, int y);
 
 	/**
 	 * Mouse left clicked
-	 * @param x x position
-	 * @param y y position
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
 	 */
 	protected abstract void mouseLeftClicked(int x, int y);
 
 	/**
 	 * Mouse right clicked
-	 * @param x x position
-	 * @param y y position
+	 * 
+	 * @param x
+	 *            x position
+	 * @param y
+	 *            y position
 	 */
 	protected abstract void mouseRightClicked(int x, int y);
 
