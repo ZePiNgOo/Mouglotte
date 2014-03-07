@@ -1,29 +1,16 @@
 package com.mouglotte.specy;
 
-import java.util.Hashtable;
 import java.util.Random;
 
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.geom.Rectangle;
-import org.newdawn.slick.geom.Vector2f;
-
 import com.mouglotte.entities.EntityInterface;
 import com.mouglotte.entities.MouglotteEntity;
-import com.mouglotte.game.GameState;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.genetics.Karyotype;
-import com.mouglotte.graphics.MouglotteGraph;
-import com.mouglotte.graphics.MouglotteListener;
-import com.mouglotte.map.GameMap;
-import com.mouglotte.map.Path;
 import com.mouglotte.map.Tile;
-import com.mouglotte.map.UnitMover;
 import com.mouglotte.utilities.Debug;
-import com.mouglotte.utilities.MouglotteUtilities;
 
-public class Mouglotte implements EntityInterface {
+public class Mouglotte {
 
 	// Distance de promenade au hasard
 	private final int WALK_AROUND_DISTANCE = 1000;
@@ -58,12 +45,13 @@ public class Mouglotte implements EntityInterface {
 
 	// Action en cours
 	private boolean actionInProgress;
-	// Temps écoulé
-	private int pastTime = 0;
-	private int secondesR = 0;
-	private int minutes = 0;
-	private int hours = 0;
-	private int days = 0;
+
+	// // Temps écoulé
+	// private int pastTime = 0;
+	// private int secondesR = 0;
+	// private int minutes = 0;
+	// private int hours = 0;
+	// private int days = 0;
 
 	/**
 	 * Constructor
@@ -92,9 +80,6 @@ public class Mouglotte implements EntityInterface {
 		// Date de naissance
 		this.birthDate = System.currentTimeMillis();
 
-		// // Graphismes
-		// this.graphics = new MouglotteGraph(this, this.game);
-
 		// Initialisation des traits de caractères
 		initTraits();
 		// Initialisation des besoins
@@ -104,18 +89,6 @@ public class Mouglotte implements EntityInterface {
 	}
 
 	/**
-	 * Define current location
-	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
-	 */
-	// public void setLocation(int x, int y) {
-	// this.graphics.setLocation(x, y);
-	// }
-
-	/**
 	 * Get age
 	 * 
 	 * @return Age
@@ -123,24 +96,6 @@ public class Mouglotte implements EntityInterface {
 	public int getAge() {
 		return this.entity.getAge();
 	}
-
-	/**
-	 * Get x position
-	 * 
-	 * @return x position
-	 */
-	// public int getX() {
-	// return this.graphics.getX();
-	// }
-
-	/**
-	 * Get y position
-	 * 
-	 * @return y position
-	 */
-	// public int getY() {
-	// return this.graphics.getY();
-	// }
 
 	/**
 	 * Get decision type
@@ -249,15 +204,6 @@ public class Mouglotte implements EntityInterface {
 	public int getDesireWorkValue() {
 		return this.desires.get(DesireType.WORK).getValue();
 	}
-
-	/**
-	 * Is mouglotte selected
-	 * 
-	 * @return true if mouglotte is selected
-	 */
-	// public boolean isSelected() {
-	// return this.graphics.isSelected();
-	// }
 
 	// Naissance
 	// public static Mouglotte birth() {
@@ -379,83 +325,10 @@ public class Mouglotte implements EntityInterface {
 		return Genetics.getValue(name, this.karyotype);
 	}
 
-	/**
-	 * Update mouglotte
-	 * 
-	 * @param container
-	 *            Game container
-	 * @param delta
-	 *            Delta time since last call
-	 */
-	// public void update(GameContainer container, int delta) {
-	//
-	// Debug.log("MOUGLOTTE", "Mouglotte::Update");
-	//
-	// delta *= GameState.TIME_FACTOR;
-	//
-	// // Calcul du temps passé
-	// this.pastTime += delta;
-	//
-	// // It's mandatory tu put continueAction or walk here to have a smooth
-	// // movement
-	// continueAction();
-	//
-	// // Toutes les secondes réelles
-	// if (this.pastTime >= 1000) {
-	//
-	// // Une seconde réelle s'est écoulée
-	// this.secondesR++;
-	// this.pastTime -= 1000;
-	// // On effectue une action
-	// action();
-	// }
-	//
-	// // On fait un truc toutes les 3 secondes réelles
-	// // = minute mouglotte
-	// if (this.secondesR >= 3) {
-	//
-	// // Une minute mouglotte s'est écoulée
-	// this.minutes++;
-	// this.secondesR = 0;
-	// // Evénement lancé toutes les minutes
-	// eventMinute();
-	// }
-	//
-	// // Toutes les 3 minutes réelles
-	// // = heure mouglotte
-	// if (this.minutes >= 60) {
-	//
-	// // Une heure mouglotte s'est écoulée
-	// this.hours++;
-	// this.minutes = 0;
-	// // Evénement lancé toutes les heures
-	// eventHour();
-	// }
-	//
-	// // Toutes les heures réelles
-	// // = jour mouglotte
-	// if (this.hours >= 20) {
-	//
-	// // Un jour mouglotte s'est écoulé
-	// this.days++;
-	// this.hours = 0;
-	// // Evénement lancé tous les jours
-	// eventDay();
-	// }
-	//
-	// Debug.log("MOUGLOTTE", "Mouglotte::Update::End");
-	// }
-
-	@Override
-	public void update(GameContainer container, int delta) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void eventRealSecond() {
-		// TODO Auto-generated method stub
 
+		// Do or continue an action
+		action();
 	}
 
 	/**
@@ -496,6 +369,9 @@ public class Mouglotte implements EntityInterface {
 		// The need or the desire is chosen
 		decide();
 
+		// A new action begins
+		this.actionInProgress = false;
+
 		Debug.log("MOUGLOTTE", "Mouglotte::EventHour::End");
 	}
 
@@ -506,18 +382,6 @@ public class Mouglotte implements EntityInterface {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventDay");
 		Debug.log("MOUGLOTTE", "Mouglotte::EventDay::End");
-	}
-
-	@Override
-	public void eventMonth() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void eventSeason() {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**
@@ -542,10 +406,7 @@ public class Mouglotte implements EntityInterface {
 
 		// Ajouter la gestion des ordres et des solicitations extérieurs
 
-		// Une nouvelle action va commencer ensuite
-		this.actionInProgress = false;
-
-		// Je veux suivre un besoin
+		// Follow a need
 		if (this.needs.getCurrent().getValue() > this.desires.getCurrent()
 				.getValue()) {
 
@@ -568,7 +429,7 @@ public class Mouglotte implements EntityInterface {
 				break;
 			}
 
-			// Je veux suivre une envie
+			// Follow a desire
 		} else {
 
 			this.desires.setSearching(true);
@@ -617,11 +478,10 @@ public class Mouglotte implements EntityInterface {
 			return;
 		}
 
-		// Rechercher si l'action peut être conclue
-		// (nourriture à proximité,...)
-		actionFulfilled();
+		// Try to fullfill the action
+		tryToFulfill();
 
-		// Une action va à son terme sauf si un événement arrive
+		// If an action is in progress, continue until it's done
 		if (this.actionInProgress)
 			continueAction();
 		else
@@ -631,77 +491,64 @@ public class Mouglotte implements EntityInterface {
 	}
 
 	/**
-	 * Try to fulfill the current action
+	 * Try to fulfill the current action. If the action is fulfillable then
+	 * fulfill. If the action is fulfillable on a close tile then go to this
+	 * tile.
 	 */
-	private void actionFulfilled() {
+	private void tryToFulfill() {
 
-		Debug.log("MOUGLOTTE", "Mouglotte::ActionFulFilled");
+		Debug.log("MOUGLOTTE", "Mouglotte::tryToFulfill");
 
-		MemoryType memoryType = null;
-
-		// Qu'est ce que la mouglotte recherche ?
-		switch (this.decision) {
-		case NEED_HUNGER:
-		case DESIRE_HUNGER:
-			memoryType = MemoryType.FOOD;
-			break;
-		case NEED_SOCIAL:
-		case DESIRE_SOCIAL:
-			memoryType = MemoryType.FRIEND;
-			break;
-		case DESIRE_LOVE:
-			memoryType = MemoryType.LOVER;
-			break;
-		case DESIRE_FIGHT:
-			memoryType = MemoryType.ENEMY;
-			break;
-		case DESIRE_WORK:
-			memoryType = MemoryType.WORK;
-			break;
-		default:
-			break;
-		}
+		// If we're on the same tile don't try again
+		if (!this.entity.isOnANewTile())
+			return;
 
 		// Search near
-		Tile tile = this.entity.getGame().getMap()
-				.searchNear(memoryType, this.entity.getX(), this.entity.getY());
+		Tile tile = this.entity.searchNear(Memories
+				.getMemoryType(this.decision));
 
-		// La mouglotte a trouvé ce qu'elle cherche
+		// We've found what we're looking for
 		if (tile != null) {
 
-			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
-					+ " found");
+			Debug.log(
+					"MOUGLOTTE",
+					"Mouglotte::tryToFulfill:"
+							+ Memories.getMemoryType(this.decision) + " found");
 
 			// Destination is cancelled
-			this.entity.clearPath();
+			this.entity.stop();
 
-			// La mouglotte est au bon endroit
+			// If we're on the right tile
 			if (tile.contains(this.entity.getX(), this.entity.getY()))
-				// Accomplissons
+				// Fulfill
 				fulfill();
 
-			// La mouglotte est à côté de l'endroit
+			// If we're close to the tile
 			else
-				// Allons-y
+				// Let's go
 				this.entity.goTo(tile);
 
-			// La mouglotte n'a pas trouvé ce qu'elle cherche
+			// We've not found what we're looking for
 		} else {
 
-			Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:" + memoryType
-					+ " not found");
+			Debug.log(
+					"MOUGLOTTE",
+					"Mouglotte::tryToFulfill:"
+							+ Memories.getMemoryType(this.decision)
+							+ " not found");
 
-			// If mouglotte is at destination
-			if (this.entity.arrived()) {
-				// L'action est terminée, on n'a rien trouvé
-				// Une nouvelle action va être déclenchée
+			// If we're is at destination
+			if (this.entity.hasReachedTarget()) {
+				// Action is done, we've found nothing
+				// A new action will start
 				this.actionInProgress = false;
 
-				Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled:No path");
+				Debug.log("MOUGLOTTE",
+						"Mouglotte::tryToFulfill:Destination reached");
 			}
 		}
 
-		Debug.log("MOUGLOTTE", "Mouglotte::ActionFulfilled::End");
+		Debug.log("MOUGLOTTE", "Mouglotte::tryToFulfill::End");
 	}
 
 	/**
@@ -711,47 +558,25 @@ public class Mouglotte implements EntityInterface {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::NewAction");
 
-		MemoryType memoryType = null;
-		Memory memory = null;
-
-		// Action en cours
+		// Action in progress
 		this.actionInProgress = true;
 
-		// Recherche d'un souvenir concernant la décision en cours
-		if (this.decision != null)
-			switch (this.decision) {
-			case NEED_HUNGER:
-			case DESIRE_HUNGER:
-				memoryType = MemoryType.FOOD;
-				break;
-			case NEED_SOCIAL:
-			case DESIRE_SOCIAL:
-				memoryType = MemoryType.FRIEND;
-				break;
-			case DESIRE_LOVE:
-				memoryType = MemoryType.LOVER;
-				break;
-			case DESIRE_FIGHT:
-				memoryType = MemoryType.ENEMY;
-				break;
-			case DESIRE_WORK:
-				memoryType = MemoryType.WORK;
-				break;
-			default:
-				break;
-			}
+		// Get closest memory if exist
+		Memory memory = this.memories.getCloser(this.decision,
+				this.entity.getX(), this.entity.getY());
 
-		// Récupération du souvenir le plus proche
-		if (memoryType != null)
-			memory = this.memories.getCloser(memoryType, this.entity.getX(),
-					this.entity.getY());
+		// Memory found
+		if (memory != null) {
 
-		// Aller à l'endroit du souvenir
-		if (memory != null)
+			Debug.log("MOUGLOTTE", "Mouglotte::NewAction:Memory found");
+
+			// Go to memory place
 			this.entity.goTo(memory.getTile());
-		// Rien à faire
-		else
+
+			// Nothing to do
+		} else {
 			nothingToDo();
+		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::NewAction::End");
 	}
@@ -764,7 +589,7 @@ public class Mouglotte implements EntityInterface {
 		Debug.log("MOUGLOTTE", "Mouglotte::ContinueAction");
 
 		// Marcher
-		walk();
+		// walk();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::ContinueAction::End");
 	}
@@ -779,10 +604,10 @@ public class Mouglotte implements EntityInterface {
 
 		Random r = new Random();
 
-		// Une chance sur 2 de ne rien faire
+		// 50% chance to do nothing
 		if (r.nextBoolean() == true)
 			idle();
-		// Une chance sur 2 de se promener
+		// 50% chance to walk around
 		else
 			walkAround();
 
@@ -797,76 +622,9 @@ public class Mouglotte implements EntityInterface {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::WalkAround");
 
-		Random r = new Random();
-		int destX = 0, destY = 0;
-		Tile tile = null;
-
-		// Une chance sur 2 de continuer dans la même direction
-		if (r.nextBoolean() == true) {
-
-			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:Same direction");
-
-			// Current direction
-			Vector2f dir = this.entity.getDirection();
-
-			// La mouglotte marchait, on continue dans la même direction
-			// if (dir.getX() != 0)
-			// destX = (int) (this.entity.getX() + WALK_AROUND_DISTANCE
-			// * dir.getX() / Math.abs(dir.getX()));
-			// if (dir.getY() != 0)
-			// destY = (int) (this.entity.getY() + WALK_AROUND_DISTANCE
-			// * dir.getY() / Math.abs(dir.getY()));
-			int i = this.entity.getTile().getColumn();
-			if (dir.getX() != 0)
-				i = (int) (i + 5 * dir.getX() / Math.abs(dir.getX()));
-			if (i < 0)
-				i = 0;
-			if (i >= this.entity.getGame().getMap().getWidthInTiles())
-				i = this.entity.getGame().getMap().getWidthInTiles() - 1;
-			int j = this.entity.getTile().getRow();
-			if (dir.getY() != 0)
-				j = (int) (j + 5 * dir.getY() / Math.abs(dir.getY()));
-			if (j < 0)
-				j = 0;
-			if (j >= this.entity.getGame().getMap().getHeightInTiles())
-				j = this.entity.getGame().getMap().getHeightInTiles() - 1;
-			tile = new Tile(i, j);
-
-			// On va dans une direction au hasard
-			// (y compris la direction actuelle pour simplifier)
-		} else {
-
-			Debug.log("MOUGLOTTE", "Mouglotte::WalkAround:New direction");
-
-			// Find a random destination on the map
-			// Destination is on a circle of radius WALK_AROUND_DISTANCE
-			// while (!this.entity.getGame().getMap().contains(destX, destY)) {
-			//
-			// destX = r.nextInt(WALK_AROUND_DISTANCE);
-			// if (r.nextBoolean() == true)
-			// destY = -(destX - WALK_AROUND_DISTANCE);
-			// else
-			// destY = destX - WALK_AROUND_DISTANCE;
-			// }
-
-		}
-
-		// Aller à la destination trouvée
-		this.entity.goTo(tile);
+		this.entity.walkaround();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::WalkAround::End");
-	}
-
-	/**
-	 * Walk or continue walking
-	 */
-	private void walk() {
-
-		Debug.log("MOUGLOTTE", "Mouglotte::Walk");
-
-		this.entity.move();
-
-		Debug.log("MOUGLOTTE", "Mouglotte::Walk::End");
 	}
 
 	/**
@@ -875,6 +633,8 @@ public class Mouglotte implements EntityInterface {
 	private void idle() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle");
+
+		this.actionInProgress = false;
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle::End");
 	}

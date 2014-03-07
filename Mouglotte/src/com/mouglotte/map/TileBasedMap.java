@@ -1,5 +1,7 @@
 package com.mouglotte.map;
 
+import org.newdawn.slick.util.pathfinding.Mover;
+
 /**
  * The description for the data we're pathfinding over. This provides the contract
  * between the data being searched (i.e. the in game map) and the path finding

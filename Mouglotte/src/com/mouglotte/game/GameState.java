@@ -115,13 +115,13 @@ public class GameState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 
-		// deltaString = Integer.toString(minutes);
+		// Right panel
 		this.rightPanel.update(container, delta);
 
-		// Mise à jour de la carte
+		// Map
 		this.map.update(container, delta);
 
-		// Update mouglottes
+		// Mouglottes
 		for (final MouglotteEntity mouglotte : this.mouglottes){
 			mouglotte.update(container, delta);
 		}

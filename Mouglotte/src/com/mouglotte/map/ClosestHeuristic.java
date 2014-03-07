@@ -1,5 +1,7 @@
 package com.mouglotte.map;
 
+import org.newdawn.slick.util.pathfinding.Mover;
+
 /**
  * A heuristic that uses the tile that is closest to the target
  * as the next best tile.

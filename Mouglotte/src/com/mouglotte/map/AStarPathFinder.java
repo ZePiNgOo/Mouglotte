@@ -3,6 +3,8 @@ package com.mouglotte.map;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import org.newdawn.slick.util.pathfinding.Mover;
+
 /**
  * A path finder implementation that uses the AStar heuristic based algorithm
  * to determine a path. 

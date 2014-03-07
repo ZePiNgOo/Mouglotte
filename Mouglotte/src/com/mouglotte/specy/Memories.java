@@ -32,6 +32,22 @@ public class Memories {
 		return this.memories.get(type);
 	}
 
+	/**
+	 * Get closer memory according to a decision type
+	 * 
+	 * @param type
+	 *            Decision type
+	 * @param x
+	 *            current x position
+	 * @param y
+	 *            current y position
+	 * @return Closest memory
+	 */
+	public Memory getCloser(DecisionType decision, int x, int y) {
+
+		return getCloser(getMemoryType(decision), x, y);
+	}
+
 	// Récupération du souvenir le plus proche
 	public Memory getCloser(MemoryType type, int x, int y) {
 
@@ -60,6 +76,33 @@ public class Memories {
 		// Fin du parcours des souvenirs
 
 		return retMemory;
+	}
+
+	/**
+	 * Get memory type from decision type
+	 * 
+	 * @param decision
+	 *            Decision type
+	 * @return Memory type
+	 */
+	public static MemoryType getMemoryType(DecisionType decision) {
+
+		switch (decision) {
+		case NEED_HUNGER:
+		case DESIRE_HUNGER:
+			return MemoryType.FOOD;
+		case NEED_SOCIAL:
+		case DESIRE_SOCIAL:
+			return MemoryType.FRIEND;
+		case DESIRE_LOVE:
+			return MemoryType.LOVER;
+		case DESIRE_FIGHT:
+			return MemoryType.ENEMY;
+		case DESIRE_WORK:
+			return MemoryType.WORK;
+		default:
+			return null;
+		}
 	}
 
 	// Ajout d'un souvenir

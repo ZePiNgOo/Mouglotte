@@ -1,5 +1,7 @@
 package com.mouglotte.map;
 
+import org.newdawn.slick.util.pathfinding.Mover;
+
 /**
  * A description of an implementation that can find a path from one 
  * location on a tile map to another based on information provided

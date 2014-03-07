@@ -1,10 +1,20 @@
 package com.mouglotte.map;
 
+import java.util.LinkedList;
+
+import com.mouglotte.entities.Entity;
+
 public class Tile {
 
 	/** Column and row in the tiles table */
 	private int i = 0;
 	private int j = 0;
+
+	/** Blocked */
+	private boolean blocked = false;
+
+	/** List of entities in this tile */
+	private LinkedList<Entity> entities;
 
 	/**
 	 * Constructor
@@ -16,8 +26,12 @@ public class Tile {
 	 */
 	public Tile(int i, int j) {
 
+		// Column and row
 		this.i = i;
 		this.j = j;
+
+		// Entities in this tile
+		entities = new LinkedList<Entity>();
 	}
 
 	/**
@@ -90,6 +104,37 @@ public class Tile {
 	}
 
 	/**
+	 * Get entities in this tile
+	 * 
+	 * @return Entities in this tile
+	 */
+	@SuppressWarnings("unchecked")
+	public LinkedList<Entity> getEntities() {
+		return ((LinkedList<Entity>) this.entities.clone());
+	}
+
+	/**
+	 * Add an entity to this tile
+	 * 
+	 * @param entity
+	 *            Entity to add
+	 */
+	public void addEntity(Entity entity) {
+		if (!this.entities.contains(entity))
+			this.entities.add(entity);
+	}
+
+	/**
+	 * Remove an entity from this tile
+	 * 
+	 * @param entity
+	 *            Entity to remove
+	 */
+	public void removeEntity(Entity entity) {
+		this.entities.remove(entity);
+	}
+
+	/**
 	 * Are the coordinates in the tile ?
 	 * 
 	 * @param x
@@ -101,5 +146,14 @@ public class Tile {
 	public boolean contains(int x, int y) {
 		return x >= getX() && x <= getX() + GameMap.TILE_SIZE && y >= getY()
 				&& y <= getY() + GameMap.TILE_SIZE;
+	}
+
+	/**
+	 * Is the tile blocked ?
+	 * 
+	 * @return True if tile is blocked
+	 */
+	public boolean isBlocked() {
+		return this.blocked;
 	}
 }

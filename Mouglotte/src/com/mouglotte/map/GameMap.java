@@ -7,8 +7,8 @@ import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.gui.GUIContext;
 import org.newdawn.slick.tiled.TiledMap;
+import org.newdawn.slick.util.pathfinding.Mover;
 
 import com.mouglotte.entities.Entity;
 import com.mouglotte.entities.Tree;
@@ -71,20 +71,6 @@ public class GameMap implements TileBasedMap {
 		// Get tile size
 		GameMap.TILE_SIZE = this.map.getTileWidth();
 
-		// build a collision map based on tile properties in the TileD map
-		// this.blocked = new
-		// boolean[this.map.getWidth()][this.map.getHeight()];
-		// for (int x = 0; x < this.map.getWidth(); x++) {
-		// for (int y = 0; y < this.map.getHeight(); y++) {
-		// int tileID = this.map.getTileId(x, y, 0);
-		// String value = this.map.getTileProperty(tileID, "blocked",
-		// "false");
-		// if ("true".equals(value)) {
-		// this.blocked[x][y] = true;
-		// }
-		// }
-		// }
-
 		// Objects
 		this.objects = new int[getWidthInTiles()][getHeightInTiles()];
 		// Entities
@@ -93,6 +79,12 @@ public class GameMap implements TileBasedMap {
 		this.visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 		// Tiles
 		this.tiles = new Tile[getWidthInTiles()][getHeightInTiles()];
+
+		for (int i = 0; i < this.tiles.length; i++) {
+			for (int j = 0; j < this.tiles[0].length; j++) {
+				this.tiles[i][j] = new Tile(i, j);
+			}
+		}
 
 		// Instantiation of the path finder
 		this.finder = new AStarPathFinder(this, 500, true);
@@ -172,8 +164,31 @@ public class GameMap implements TileBasedMap {
 	 *            y position
 	 * @return Tile at these coordinates
 	 */
-	public Tile getTile(int x, int y) {
-		return this.tiles[getTileColumn(x)][getTileRow(y)];
+	public Tile getTileAtPosition(int x, int y) {
+		int i = getTileColumn(x);
+		int j = getTileRow(y);
+		if (i >= 0 && i <= getWidthInTiles() && j >= 0
+				&& j <= getHeightInTiles())
+			return this.tiles[i][j];
+		else
+			return null;
+	}
+
+	/**
+	 * Get tile
+	 * 
+	 * @param i
+	 *            Colum index
+	 * @param j
+	 *            Row index
+	 * @return Tile
+	 */
+	public Tile getTile(int i, int j) {
+		if (i >= 0 && i <= getWidthInTiles() && j >= 0
+				&& j <= getHeightInTiles())
+			return this.tiles[i][j];
+		else
+			return null;
 	}
 
 	/**
@@ -252,6 +267,9 @@ public class GameMap implements TileBasedMap {
 		if (entities[i][j] != null)
 			return true;
 
+		if (this.tiles[i][j].isBlocked())
+			return true;
+
 		// Else tile is not blocked
 		return false;
 	}
@@ -313,7 +331,7 @@ public class GameMap implements TileBasedMap {
 	public void update(GameContainer container, int delta)
 			throws SlickException {
 
-		// Calcul du scrolling de la carte
+		// Scroll map
 		scrolling(container, delta);
 	}
 
@@ -495,10 +513,9 @@ public class GameMap implements TileBasedMap {
 	// return this.finder.findPath(mover, sx, sy, tx, ty);
 	// }
 
-	public Path findPath(Tile from, Tile to) {
-
-		return this.finder.findPath(new UnitMover(0), from.getColumn(),
-				from.getRow(), to.getColumn(), to.getRow());
+	public Path findPath(Mover mover, Tile from, Tile to) {
+		return this.finder.findPath(mover, from.getColumn(), from.getRow(),
+				to.getColumn(), to.getRow());
 	}
 
 	/**
@@ -512,19 +529,19 @@ public class GameMap implements TileBasedMap {
 	 *            Row index of the tile to search from
 	 * @return A tile containing the searched thing
 	 */
-	public Tile searchNear(MemoryType type, int x, int y) {
-
-		Random r = new Random();
-
-		// Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
-		// cherche
-		// La recherche doit se faire dans le champ de vision autour du point
-		// if (r.nextInt(10) == 0)
-		// return Tile.create(x, y);
-		// else
-		// return null;
-		return null;
-	}
+	// public Tile searchNear(MemoryType type, int x, int y) {
+	//
+	// Random r = new Random();
+	//
+	// // Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
+	// // cherche
+	// // La recherche doit se faire dans le champ de vision autour du point
+	// // if (r.nextInt(10) == 0)
+	// // return Tile.create(x, y);
+	// // else
+	// // return null;
+	// return null;
+	// }
 
 	/**
 	 * Convert to scrolled position

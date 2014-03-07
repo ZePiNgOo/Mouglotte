@@ -30,10 +30,6 @@ public abstract class Entity {
 	/** Location */
 	protected int x = 0;
 	protected int y = 0;
-	protected int lastX = 0;
-	protected int lastY = 0;
-	/** Direction */
-	protected Vector2f direction = new Vector2f(0, 0);
 	/** Tile */
 	protected Tile tile;
 
@@ -65,19 +61,12 @@ public abstract class Entity {
 	 */
 	public void setLocation(int x, int y) {
 
-		// Last position
-		this.lastX = this.x;
-		this.lastY = this.y;
 		// New position
 		this.x = x;
 		this.y = y;
 
-		// Direction
-		this.direction = new Vector2f(this.x - this.lastX, this.y - this.lastY);
-
 		// Tile containing these coordinates
-		//this.tile = this.game.getMap().getTile(x, y);
-		this.tile = Tile.create(x, y);
+		this.tile = this.game.getMap().getTileAtPosition(x, y);
 	}
 
 	/**
@@ -90,15 +79,9 @@ public abstract class Entity {
 
 		this.tile = tile;
 
-		// Last position
-		this.lastX = this.x;
-		this.lastY = this.y;
 		// x and y at the center of the tile
 		this.x = this.tile.getCenterX();
 		this.y = this.tile.getCenterY();
-
-		// Direction
-		this.direction = new Vector2f(this.x - this.lastX, this.y - this.lastY);
 	}
 
 	/**
@@ -138,15 +121,6 @@ public abstract class Entity {
 	}
 
 	/**
-	 * Get direction
-	 * 
-	 * @return Direction
-	 */
-	public Vector2f getDirection() {
-		return this.direction;
-	}
-
-	/**
 	 * Get tile containing the entity
 	 * 
 	 * @return Tile containing the entity
@@ -176,9 +150,6 @@ public abstract class Entity {
 
 		// Passed time
 		this.passedTime += delta;
-
-		// Move (if entity has to move)
-		move();
 
 		// Every real second
 		if (this.passedTime >= 1000) {
@@ -298,11 +269,6 @@ public abstract class Entity {
 		// Happy birthday
 		this.age++;
 	}
-
-	/**
-	 * Move
-	 */
-	protected abstract void move();
 
 	/**
 	 * Handle inputs
