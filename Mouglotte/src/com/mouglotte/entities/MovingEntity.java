@@ -252,6 +252,9 @@ public abstract class MovingEntity extends Entity implements Mover {
 
 		// Eventually remove entity from last tile (only if on a new tile)
 		this.tile.removeEntity(this);
+		
+		// TESTS
+		delta = 33;
 
 		// If the entity has reached its target
 		if (hasReachedTarget()) {
@@ -286,28 +289,24 @@ public abstract class MovingEntity extends Entity implements Mover {
 				boolean theRelativeTileIsBlocked = false;
 
 				// Basic delta and direction establishment
-				// Vector deltaVector = Vector.getVectorFromComponents(
-				// (float) (this.vector.getMagnitude() * Math
-				// .cos(getDirection())) * (delta / 1000.0f),
-				// (float) (this.vector.getMagnitude() * Math
-				// .sin(getDirection())) * (delta / 1000.0f));
 				Vector deltaVector = Vector.getVectorFromComponents(
 						(float) (this.vector.getMagnitude() * Math
-								.cos(getDirection())), (float) (this.vector
-								.getMagnitude() * Math.sin(getDirection())));
+								.cos(getDirection())) * (delta / 1000.0f),
+						(float) (this.vector.getMagnitude() * Math
+								.sin(getDirection())) * (delta / 1000.0f));
 
-				for (ObstacleSensor s : this.sensors) {
-					entitySensed = s.relativePointSensesEntity(this.map);
-					theRelativeTileIsBlocked = s
-							.relativeTileIsBlocked(this.map);
-					if (theRelativeTileIsBlocked || (entitySensed != null)) {
-						this.vector.setDirection(this.vector.getDirection()
-								+ (s.turnRate * (delta / 1000.0f)));
-						speedMultiplier = s.speedMultiplier;
-						collisionSteeringUsed = true;
-						break;
-					}
-				}
+//				for (ObstacleSensor s : this.sensors) {
+//					entitySensed = s.relativePointSensesEntity(this.map);
+//					theRelativeTileIsBlocked = s
+//							.relativeTileIsBlocked(this.map);
+//					if (theRelativeTileIsBlocked || (entitySensed != null)) {
+//						this.vector.setDirection(this.vector.getDirection()
+//								+ (s.turnRate * (delta / 1000.0f)));
+//						speedMultiplier = s.speedMultiplier;
+//						collisionSteeringUsed = true;
+//						break;
+//					}
+//				}
 
 				// Target steering - only done if collision steering was not
 				// used
