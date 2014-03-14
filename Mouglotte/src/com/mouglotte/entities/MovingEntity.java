@@ -104,7 +104,9 @@ public abstract class MovingEntity extends Entity implements Mover {
 		this.targetY = y;
 
 		// Tile containing these coordinates
-		this.targetTile = this.game.getMap().getTileAtPosition(x, y);
+		// x,y are the real coordinates, not scrolled
+		this.targetTile = this.map.getTileAtPosition(
+				GameMap.convScrollX(x), GameMap.convScrollY(y));
 	}
 
 	/**
@@ -235,7 +237,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	}
 
 	@Override
-	public void update(GameContainer container, int delta) {
+	public void update(GameContainer container, long delta) {
 
 		// Move entity
 		move(delta);
@@ -248,13 +250,13 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * 
 	 * @param delta
 	 */
-	protected void move(int delta) {
+	protected void move(long delta) {
 
 		// Eventually remove entity from last tile (only if on a new tile)
 		this.tile.removeEntity(this);
-		
+
 		// TESTS
-		delta = 33;
+		delta = 17;
 
 		// If the entity has reached its target
 		if (hasReachedTarget()) {
@@ -269,8 +271,6 @@ public abstract class MovingEntity extends Entity implements Mover {
 				if (this.pathIndex >= this.path.getLength()) {
 					stop();
 				} else {
-					// headToward(this.path.getX(this.pathIndex),
-					// this.path.getY(this.pathIndex));
 					headToward(this.map.getTile(this.path.getX(this.pathIndex),
 							this.path.getY(this.pathIndex)));
 				}
@@ -295,18 +295,18 @@ public abstract class MovingEntity extends Entity implements Mover {
 						(float) (this.vector.getMagnitude() * Math
 								.sin(getDirection())) * (delta / 1000.0f));
 
-//				for (ObstacleSensor s : this.sensors) {
-//					entitySensed = s.relativePointSensesEntity(this.map);
-//					theRelativeTileIsBlocked = s
-//							.relativeTileIsBlocked(this.map);
-//					if (theRelativeTileIsBlocked || (entitySensed != null)) {
-//						this.vector.setDirection(this.vector.getDirection()
-//								+ (s.turnRate * (delta / 1000.0f)));
-//						speedMultiplier = s.speedMultiplier;
-//						collisionSteeringUsed = true;
-//						break;
-//					}
-//				}
+				// for (ObstacleSensor s : this.sensors) {
+				// entitySensed = s.relativePointSensesEntity(this.map);
+				// theRelativeTileIsBlocked = s
+				// .relativeTileIsBlocked(this.map);
+				// if (theRelativeTileIsBlocked || (entitySensed != null)) {
+				// this.vector.setDirection(this.vector.getDirection()
+				// + (s.turnRate * (delta / 1000.0f)));
+				// speedMultiplier = s.speedMultiplier;
+				// collisionSteeringUsed = true;
+				// break;
+				// }
+				// }
 
 				// Target steering - only done if collision steering was not
 				// used
@@ -332,13 +332,25 @@ public abstract class MovingEntity extends Entity implements Mover {
 				}
 
 				// Set entity location to the new location
-				int newX = (int) (this.x + deltaVector.getXComponent());
-				int newY = (int) (this.y + deltaVector.getYComponent());
-				if (newX != this.x && newY != this.y) {
-					Debug.log("MOVING", "MovingEntity::Move:Moving to " + newX
-							+ "," + newY);
-					setLocation(newX, newY);
-				}
+				// int newX = (int) (this.x + deltaVector.getXComponent()
+				// * speedMultiplier);
+				// int newY = (int) (this.y + deltaVector.getYComponent()
+				// * speedMultiplier);
+				// if (newX != this.x || newY != this.y) {
+				// Debug.log("MOVING", "MovingEntity::Move:Moving to " + newX
+				// + "," + newY);
+				// setLocation(newX, newY);
+				// }
+
+				int newX = this.x;
+				int newY = this.y;
+				int diffX = this.targetX - this.x;
+				int diffY = this.targetY - this.y;
+				if (diffX != 0)
+					newX += diffX / Math.abs(diffX);
+				if (diffY != 0)
+					newY += diffY / Math.abs(diffY);
+				setLocation(newX, newY);
 
 				// lastTileMapBlock = getCoordinatesOfCurrentBlock();
 			}
@@ -457,7 +469,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	// }
 
 	public boolean hasReachedTarget() {
-		return (distanceToPoint(this.targetX, this.targetY) <= STOP_DISTANCE);
+		return (distanceToTarget() <= STOP_DISTANCE);
 	}
 
 	/**
@@ -479,7 +491,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * @return Distance
 	 */
 	protected float distanceToPoint(int x, int y) {
-		return (float) Math.hypot(this.x - x, this.y - y);
+		return (float) Math.hypot(x - this.x, y - this.y);
 	}
 
 	/**
@@ -506,7 +518,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 		this.map.clearVisited();
 
 		// Search path
-		Path path = this.map.findPath(this, this.getTile(), tile);
+		Path path = this.map.findPath(this, this.tile, tile);
 
 		// Set path
 		headAlongPath(path);
@@ -554,24 +566,6 @@ public abstract class MovingEntity extends Entity implements Mover {
 								.getCenterX(),
 						this.map.getTile(this.path.getX(a), this.path.getY(a))
 								.getCenterY(), 2, 2);
-	}
-
-	@Override
-	protected void mouseMoved(int x, int y) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void mouseLeftClicked(int x, int y) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void mouseRightClicked(int x, int y) {
-		// TODO Auto-generated method stub
-
 	}
 
 	/**

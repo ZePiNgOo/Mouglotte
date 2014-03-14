@@ -1,7 +1,5 @@
 package com.mouglotte.map;
 
-import java.util.Random;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -11,9 +9,9 @@ import org.newdawn.slick.tiled.TiledMap;
 import org.newdawn.slick.util.pathfinding.Mover;
 
 import com.mouglotte.entities.Entity;
+import com.mouglotte.entities.Mushroom;
 import com.mouglotte.entities.Tree;
 import com.mouglotte.game.GameState;
-import com.mouglotte.specy.MemoryType;
 
 /**
  * Map for the game.
@@ -79,22 +77,8 @@ public class GameMap implements TileBasedMap {
 		this.visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 		// Tiles
 		this.tiles = new Tile[getWidthInTiles()][getHeightInTiles()];
-
-		for (int i = 0; i < this.tiles.length; i++) {
-			for (int j = 0; j < this.tiles[0].length; j++) {
-				this.tiles[i][j] = new Tile(i, j);
-			}
-		}
-
 		// Instantiation of the path finder
 		this.finder = new AStarPathFinder(this, 500, true);
-
-		// Trees
-		this.entities[5][5] = new Tree(this.game, 5, 5);
-		this.entities[7][8] = new Tree(this.game, 7, 8);
-		this.entities[8][8] = new Tree(this.game, 8, 8);
-		this.entities[9][8] = new Tree(this.game, 9, 8);
-		this.entities[8][9] = new Tree(this.game, 8, 9);
 	}
 
 	/**
@@ -189,6 +173,32 @@ public class GameMap implements TileBasedMap {
 			return this.tiles[i][j];
 		else
 			return null;
+	}
+
+	/**
+	 * Init map
+	 */
+	public void init() {
+
+		// Create tiles
+		for (int i = 0; i < this.tiles.length; i++) {
+			for (int j = 0; j < this.tiles[0].length; j++) {
+				this.tiles[i][j] = new Tile(i, j);
+			}
+		}
+
+		// Trees
+		this.entities[5][5] = new Tree(this.game, 5, 5);
+		this.entities[7][8] = new Tree(this.game, 7, 8);
+		this.entities[8][8] = new Tree(this.game, 8, 8);
+		this.entities[9][8] = new Tree(this.game, 9, 8);
+		this.entities[8][9] = new Tree(this.game, 8, 9);
+		
+		// Mushrooms
+		this.entities[2][3] = new Mushroom(this.game,2,3,100);
+		this.entities[11][5] = new Mushroom(this.game,11,5,100);
+		this.entities[6][13] = new Mushroom(this.game,6,13,100);
+
 	}
 
 	/**
@@ -385,21 +395,21 @@ public class GameMap implements TileBasedMap {
 		}
 
 		// Smooth
-		if (GameMap.offsetX < -64) {
+		if (GameMap.offsetX < -GameMap.TILE_SIZE) {
 			GameMap.tileOffsetX++;
 			GameMap.offsetX = 0;
 		}
 		if (GameMap.offsetX > 0) {
 			GameMap.tileOffsetX--;
-			GameMap.offsetX = -64;
+			GameMap.offsetX = -GameMap.TILE_SIZE;
 		}
-		if (GameMap.offsetY < -64) {
+		if (GameMap.offsetY < -GameMap.TILE_SIZE) {
 			GameMap.tileOffsetY++;
 			GameMap.offsetY = 0;
 		}
 		if (GameMap.offsetY > 0) {
 			GameMap.tileOffsetY--;
-			GameMap.offsetY = -64;
+			GameMap.offsetY = -GameMap.TILE_SIZE;
 		}
 	}
 
@@ -430,21 +440,30 @@ public class GameMap implements TileBasedMap {
 		Color color = g.getColor();
 		g.setColor(Color.red);
 
+		// Offset du scrolling
 		g.drawString("Offset: " + GameMap.offsetX + "," + GameMap.offsetY
 				+ " / " + GameMap.tileOffsetX + "," + GameMap.tileOffsetY, 300,
 				10);
-		g.drawString("Mouse: " + container.getInput().getMouseX() + ","
-				+ container.getInput().getMouseY(), 300, 20);
-		Tile tile = Tile.create(container.getInput().getMouseX(), container
-				.getInput().getMouseY());
-		g.drawString("Tile:" + tile.getColumn() + "," + tile.getRow() + "/"
-				+ tile.getX() + "," + tile.getY(), 300, 30);
 
+		// Position de la souris
+		g.drawString("Mouse: " + container.getInput().getMouseX() + ","
+				+ container.getInput().getMouseY() + "/"
+				+ convScrollX(container.getInput().getMouseX()) + ","
+				+ convScrollY(container.getInput().getMouseY()), 300, 25);
+
+		// Tile en cours
+		Tile tile = getTileAtPosition(container.getInput().getMouseX(),
+				container.getInput().getMouseY());
+		g.drawString("Tile:" + tile.getColumn() + "," + tile.getRow() + "/"
+				+ tile.getX() + "," + tile.getY(), 300, 40);
+
+		// Rectangle rouge au milieu de l'écran
 		g.fillRect(container.getWidth() / 2, container.getHeight() / 2, 10, 10);
-		g.setColor(color);
 
 		// Highlight mouse overed tile
 		highlightTile(container, g);
+
+		g.setColor(color);
 
 		// Translate everything rendered after this
 		// So things stays at the right place despite of scrolling
@@ -455,16 +474,17 @@ public class GameMap implements TileBasedMap {
 
 		// Render objects and entities
 		// Render line by line to respect z order
-		for (int i = (int) GameMap.tileOffsetX; i < GameMap.tileOffsetX
+		for (int i = (int) GameMap.tileOffsetX - 1; i <= GameMap.tileOffsetX
 				+ DISPLAYED_TILES; i++)
-			for (int j = (int) GameMap.tileOffsetY; j < GameMap.tileOffsetY
+			for (int j = (int) GameMap.tileOffsetY - 1; j <= GameMap.tileOffsetY
 					+ DISPLAYED_TILES; j++) {
 				// Render object first because an entity must be displayed over
 				// an object
 				// if (objects[i][j] != 0)
 				// g.fillRect((x1, y1, width, height);
-				if (entities[i][j] != null)
-					entities[i][j].render(container, g);
+				if (i >= 0 && j >= 0)
+					if (entities[i][j] != null)
+						entities[i][j].render(container, g);
 			}
 
 		// A appeler si on veut annuler le translate et donc ne plus prendre en
@@ -482,10 +502,14 @@ public class GameMap implements TileBasedMap {
 	 */
 	private void highlightTile(GameContainer container, Graphics g) {
 
-		Tile tile = Tile.create(container.getInput().getMouseX(), container
-				.getInput().getMouseY());
-		g.drawRect(tile.getX(), tile.getY(), this.map.getTileWidth(),
-				this.map.getTileHeight());
+		Tile tile = getTileAtPosition(container.getInput().getMouseX(),
+				container.getInput().getMouseY());
+
+		g.drawRect(convScrollX(tile.getX()), convScrollY(tile.getY()),
+				this.map.getTileWidth(), this.map.getTileHeight());
+		g.drawString(convScrollX(tile.getX()) + "," + convScrollY(tile.getY()),
+				convScrollX(tile.getX()) + GameMap.TILE_SIZE + 2,
+				convScrollY(tile.getY()) + GameMap.TILE_SIZE + 2);
 	}
 
 	/**
@@ -552,6 +576,8 @@ public class GameMap implements TileBasedMap {
 	 */
 	public static int convScrollX(int x) {
 		return (int) (x - GameMap.tileOffsetX * GameMap.TILE_SIZE + GameMap.offsetX);
+		// return (int) (x + GameMap.tileOffsetX * GameMap.TILE_SIZE -
+		// GameMap.offsetX);
 	}
 
 	/**
@@ -563,6 +589,8 @@ public class GameMap implements TileBasedMap {
 	 */
 	public static int convScrollY(int y) {
 		return (int) (y - GameMap.tileOffsetY * GameMap.TILE_SIZE + GameMap.offsetY);
+		// return (int) (y + GameMap.tileOffsetY * GameMap.TILE_SIZE -
+		// GameMap.offsetY);
 	}
 
 	/**
@@ -574,6 +602,8 @@ public class GameMap implements TileBasedMap {
 	 */
 	public static int convNoScrollX(int x) {
 		return (int) (x + GameMap.tileOffsetX * GameMap.TILE_SIZE - GameMap.offsetX);
+		// return (int) (x - GameMap.tileOffsetX * GameMap.TILE_SIZE +
+		// GameMap.offsetX);
 	}
 
 	/**
@@ -585,5 +615,7 @@ public class GameMap implements TileBasedMap {
 	 */
 	public static int convNoScrollY(int y) {
 		return (int) (y + GameMap.tileOffsetY * GameMap.TILE_SIZE - GameMap.offsetY);
+		// return (int) (y - GameMap.tileOffsetY * GameMap.TILE_SIZE +
+		// GameMap.offsetY);
 	}
 }

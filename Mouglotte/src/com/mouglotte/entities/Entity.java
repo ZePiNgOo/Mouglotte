@@ -66,7 +66,9 @@ public abstract class Entity {
 		this.y = y;
 
 		// Tile containing these coordinates
-		this.tile = this.game.getMap().getTileAtPosition(x, y);
+		// x,y are the real coordinates, not scrolled
+		this.tile = this.game.getMap().getTileAtPosition(
+				GameMap.convScrollX(x), GameMap.convScrollY(y));
 	}
 
 	/**
@@ -146,7 +148,7 @@ public abstract class Entity {
 	 * @param delta
 	 *            Delta time since last call
 	 */
-	public void update(GameContainer container, int delta) {
+	public void update(GameContainer container, long delta) {
 
 		// Passed time
 		this.passedTime += delta;
@@ -278,11 +280,13 @@ public abstract class Entity {
 	 * @param delta
 	 *            Delta time since last call
 	 */
-	protected void handleInputs(GameContainer container, int delta) {
+	protected void handleInputs(GameContainer container, long delta) {
 
 		// Convert coordinates to not scrolled coordinates
-		int x = GameMap.convNoScrollX(container.getInput().getMouseX());
-		int y = GameMap.convNoScrollY(container.getInput().getMouseY());
+		int x = container.getInput().getMouseX();
+		int y = container.getInput().getMouseY();
+		// x = GameMap.convNoScrollX(container.getInput().getMouseX());
+		// y = GameMap.convNoScrollY(container.getInput().getMouseY());
 		// A moving entity has to keep its real coordinates (non scrolled)
 		// because it's impossible to scroll the coordinates of every entity
 		// when the map is scrolled
@@ -295,8 +299,13 @@ public abstract class Entity {
 			mouseLeftClicked(x, y);
 
 		// Mouse right clicked
-		if (container.getInput().isMousePressed(Input.MOUSE_RIGHT_BUTTON))
+		if (container.getInput().isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
+			// x = container.getInput().getMouseX();
+			// y = container.getInput().getMouseY();
+			// x = GameMap.convNoScrollX(container.getInput().getMouseX());
+			// y = GameMap.convNoScrollY(container.getInput().getMouseY());
 			mouseRightClicked(x, y);
+		}
 	}
 
 	/**

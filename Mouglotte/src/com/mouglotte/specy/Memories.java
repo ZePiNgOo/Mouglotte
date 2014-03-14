@@ -1,21 +1,28 @@
 package com.mouglotte.specy;
 
-import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.mouglotte.entities.Entity;
+import com.mouglotte.map.Tile;
 import com.mouglotte.utilities.MouglotteUtilities;
 
 public class Memories {
 
-	// Liste des souvenirs
+	/** Memories list */
 	private LinkedHashMap<MemoryType, Memory> memories;
+	/** Current memory */
+	private Memory current;
 
-	// Constructeur
+	/**
+	 * Constructor
+	 * 
+	 * @param maxMemories
+	 */
 	public Memories(final int maxMemories) {
 
-		// Initialisation de la liste des souvenirs avec une limite du nombre
+		// Initialize list with a maximum number of memories
 		this.memories = new LinkedHashMap<MemoryType, Memory>(maxMemories) {
 
 			private static final long serialVersionUID = 1L;
@@ -27,86 +34,198 @@ public class Memories {
 		};
 	}
 
-	// Récupération d'un souvenir
-	public Memory get(MemoryType type) {
-		return this.memories.get(type);
+	/**
+	 * Set current memory
+	 * 
+	 * @param current
+	 *            Current memory
+	 */
+	public void setCurrent(Memory current) {
+		this.current = current;
 	}
 
 	/**
-	 * Get closer memory according to a decision type
+	 * Get a memory of a type with an entity
+	 * 
+	 * @param type
+	 *            Memory type
+	 * @param entity
+	 *            Entity
+	 * @return Memory
+	 */
+	public Memory get(MemoryType type, Entity entity) {
+
+		// Read through memories
+		for (final Entry<MemoryType, Memory> memory : this.memories.entrySet()) {
+
+			// Wanted memory type and entity
+			if (memory.getValue().getType() == type
+					&& memory.getValue().getEntity() == entity) {
+				return memory.getValue();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Get current memory
+	 * 
+	 * @return Current memory
+	 */
+	public Memory getCurrent() {
+		return this.current;
+	}
+
+	/**
+	 * Get the closest memory according to a decision type
 	 * 
 	 * @param type
 	 *            Decision type
-	 * @param x
-	 *            current x position
-	 * @param y
-	 *            current y position
+	 * @param tile
+	 *            The closest to this tile
+	 * @param excludeCurrent
+	 *            True to exclude the current memory
 	 * @return Closest memory
 	 */
-	public Memory getCloser(DecisionType decision, int x, int y) {
+	public Memory getClosest(DecisionType decision, Tile tile,
+			boolean excludeCurrent) {
 
-		return getCloser(getMemoryType(decision), x, y);
+		return getClosest(MemoryType.getMemoryType(decision), tile,
+				excludeCurrent);
 	}
 
-	// Récupération du souvenir le plus proche
-	public Memory getCloser(MemoryType type, int x, int y) {
+	/**
+	 * Get the closest memory according to a memory type
+	 * 
+	 * @param type
+	 *            Memory type
+	 * @param tile
+	 *            The closest to this tile
+	 * @param excludeCurrent
+	 *            True to exclude the current memory
+	 * @return Closest memory
+	 */
+	public Memory getClosest(MemoryType type, Tile tile, boolean excludeCurrent) {
 
 		Memory retMemory = null;
-		int distance;
-		int minDistance = 0;
+		double points;
+		double maxPoints = 0;
 
-		// Parcours de tous les souvenirs
+		// Read through memories
 		for (final Entry<MemoryType, Memory> memory : this.memories.entrySet()) {
 
-			// Si le souvenir est du type souhaité
+			// If the current memory is not included in the search
+			if (memory.getValue() == this.current && excludeCurrent)
+				continue;
+
+			// Wanted memory type
 			if (memory.getValue().getType() == type) {
 
-				// Calcul de la distance
-				distance = MouglotteUtilities.distance(x, y, memory.getValue()
-						.getTile().getCenterX(), memory.getValue().getTile()
-						.getCenterY());
+				// Calculate points
+				// Points of the memory - distance
+				points = memory.getValue().getPoints()
+						- MouglotteUtilities.distance(tile, memory.getValue()
+								.getTile());
 
-				// S'il s'agit de la distance la plus courte
-				if (distance < minDistance || minDistance == 0) {
-					minDistance = distance;
+				// Minimum distance
+				if (points >= maxPoints || maxPoints == 0) {
+					maxPoints = points;
 					retMemory = memory.getValue();
 				}
 			}
 		}
-		// Fin du parcours des souvenirs
 
 		return retMemory;
 	}
 
 	/**
-	 * Get memory type from decision type
+	 * Is there a current memory ?
 	 * 
-	 * @param decision
-	 *            Decision type
-	 * @return Memory type
+	 * @return True if there is a current memory
 	 */
-	public static MemoryType getMemoryType(DecisionType decision) {
-
-		switch (decision) {
-		case NEED_HUNGER:
-		case DESIRE_HUNGER:
-			return MemoryType.FOOD;
-		case NEED_SOCIAL:
-		case DESIRE_SOCIAL:
-			return MemoryType.FRIEND;
-		case DESIRE_LOVE:
-			return MemoryType.LOVER;
-		case DESIRE_FIGHT:
-			return MemoryType.ENEMY;
-		case DESIRE_WORK:
-			return MemoryType.WORK;
-		default:
-			return null;
-		}
+	public boolean hasCurrent() {
+		return this.current != null;
 	}
 
-	// Ajout d'un souvenir
+	/**
+	 * Add a memory
+	 * 
+	 * @param memory
+	 *            Memory to add
+	 */
 	public void put(Memory memory) {
-		this.memories.put(memory.getType(), memory);
+
+		// Add only if the memory doesn't already exist
+		if (!exists(memory))
+			this.memories.put(memory.getType(), memory);
+	}
+
+	/**
+	 * Remove a memory
+	 * 
+	 * @param memory
+	 *            Memory to remove
+	 */
+	public void remove(Memory memory) {
+		this.memories.remove(memory);
+	}
+
+	/**
+	 * Refresh memory
+	 */
+	public void refresh() {
+		this.current = null;
+	}
+
+	/**
+	 * Check if the memory already exists
+	 * 
+	 * @param memory
+	 *            Memory to check
+	 * @return True if the memory already exists
+	 */
+	private boolean exists(Memory memory) {
+
+		// Read through memories
+		for (final Entry<MemoryType, Memory> m : this.memories.entrySet()) {
+
+			// If the entity of the memory already exists for the same type
+			if (m.getValue().getType() == memory.getType()
+					&& m.getValue().getEntity() == memory.getEntity())
+				return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Reward points to current memory
+	 * 
+	 * @param points
+	 *            Points to reward
+	 */
+	public void rewardCurrent(int points) {
+		if (this.current != null)
+			this.current.reward(points);
+	}
+
+	/**
+	 * Penalize points to current memory
+	 * 
+	 * @param points
+	 *            Points to penalize
+	 */
+	public void penalizeCurrent(int points) {
+
+		if (this.current != null) {
+
+			this.current.penalize(points);
+
+			// If there is no more points then delete current
+			if (!this.current.hasPoints()) {
+				remove(this.current);
+				this.current = null;
+			}
+		}
 	}
 }

@@ -7,9 +7,8 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 import com.mouglotte.game.GameState;
-import com.mouglotte.map.Tile;
 
-public class Tree extends Entity {
+public class Tree extends WorkingEntity {
 
 	/** Shape (TEST) */
 	private Shape shape;
@@ -26,14 +25,15 @@ public class Tree extends Entity {
 	 */
 	public Tree(GameState game, int i, int j) {
 
-		super(game);
+		// Working entity of type WOODCUTING
+		super(game, WorkType.WOODCUTING);
 
 		// Set tile
-		this.tile = new Tile(i,j);
-		
+		this.tile = this.game.getMap().getTile(i, j);
+
 		// Set location
 		setLocation(this.tile);
-		
+
 		// Shape (TESTS)
 		// this.x and this.y indicate the center of the tile
 		this.shape = new Rectangle(this.x - 25, this.y - 140, 50, 150);

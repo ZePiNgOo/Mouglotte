@@ -23,4 +23,31 @@ public enum MemoryType {
 			return "???";
 		}
 	}
+	
+	/**
+	 * Get memory type from decision type
+	 * 
+	 * @param decision
+	 *            Decision type
+	 * @return Memory type
+	 */
+	public static MemoryType getMemoryType(DecisionType decision) {
+
+		switch (decision) {
+		case NEED_HUNGER:
+		case DESIRE_HUNGER:
+			return MemoryType.FOOD;
+		case NEED_SOCIAL:
+		case DESIRE_SOCIAL:
+			return MemoryType.FRIEND;
+		case DESIRE_LOVE:
+			return MemoryType.LOVER;
+		case DESIRE_FIGHT:
+			return MemoryType.ENEMY;
+		case DESIRE_WORK:
+			return MemoryType.WORK;
+		default:
+			return null;
+		}
+	}
 }

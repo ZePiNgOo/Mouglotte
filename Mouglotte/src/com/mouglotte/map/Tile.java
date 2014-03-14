@@ -1,8 +1,12 @@
 package com.mouglotte.map;
 
 import java.util.LinkedList;
+import java.util.Map.Entry;
 
 import com.mouglotte.entities.Entity;
+import com.mouglotte.specy.Desire;
+import com.mouglotte.specy.DesireType;
+import com.mouglotte.specy.Mouglotte;
 
 public class Tile {
 
@@ -55,7 +59,9 @@ public class Tile {
 	 * @return x position
 	 */
 	public int getX() {
-		return (int) ((this.i - GameMap.tileOffsetX) * GameMap.TILE_SIZE + GameMap.offsetX);
+		// return (int) ((this.i - GameMap.tileOffsetX) * GameMap.TILE_SIZE +
+		// GameMap.offsetX);
+		return this.i * GameMap.TILE_SIZE;
 	}
 
 	/**
@@ -64,7 +70,9 @@ public class Tile {
 	 * @return y position
 	 */
 	public int getY() {
-		return (int) ((this.j - GameMap.tileOffsetY) * GameMap.TILE_SIZE + GameMap.offsetY);
+		// return (int) ((this.j - GameMap.tileOffsetY) * GameMap.TILE_SIZE +
+		// GameMap.offsetY);
+		return this.j * GameMap.TILE_SIZE;
 	}
 
 	/**
@@ -111,6 +119,79 @@ public class Tile {
 	@SuppressWarnings("unchecked")
 	public LinkedList<Entity> getEntities() {
 		return ((LinkedList<Entity>) this.entities.clone());
+	}
+
+	/**
+	 * Get a food entity on the tile
+	 * 
+	 * @return Food entity
+	 */
+	public Entity getFood() {
+
+		for (Entity entity : this.entities) {
+			// if (entity == FoodEntity)
+			// return entity;
+		}
+		return null;
+	}
+
+	/**
+	 * Get a mouglotte friend entity on the tile
+	 * 
+	 * @return Mouglotte friend entity
+	 */
+	public Entity getFriend(Mouglotte current) {
+
+		for (Entity entity : this.entities) {
+			// if (entity == MouglotteEntity)
+			// if (entity.isFriend(current)
+			// return entity;
+		}
+		return null;
+	}
+
+	/**
+	 * Get a mouglotte lover entity on the tile
+	 * 
+	 * @return Mouglotte lover entity
+	 */
+	public Entity getLover(Mouglotte current) {
+
+		for (Entity entity : this.entities) {
+			// if (entity == MouglotteEntity)
+			// if (entity.isLover(current)
+			// return entity;
+		}
+		return null;
+	}
+
+	/**
+	 * Get a mouglotte enemy entity on the tile
+	 * 
+	 * @return Mouglotte enemy entity
+	 */
+	public Entity getEnemy(Mouglotte current) {
+
+		for (Entity entity : this.entities) {
+			// if (entity == MouglotteEntity)
+			// if (entity.isEnemy(current)
+			// return entity;
+		}
+		return null;
+	}
+
+	/**
+	 * Get a working entity on the tile
+	 * 
+	 * @return Working entity
+	 */
+	public Entity getWork() {
+
+		for (Entity entity : this.entities) {
+			// if (entity == WorkingEntity)
+			// return entity;
+		}
+		return null;
 	}
 
 	/**

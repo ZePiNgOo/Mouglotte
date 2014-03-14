@@ -1,7 +1,5 @@
 package com.mouglotte.entities;
 
-import java.util.Random;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -38,36 +36,12 @@ public class MouglotteEntity extends MovingEntity {
 		// Referenced mouglotte
 		this.mouglotte = new Mouglotte(this);
 
+		// TESTS
+		setLocation(this.map.getTile(2, 2));
+
 		// Shape (TESTS)
 		this.shape = new Circle(this.x, this.y, 10);
 		this.halo = new Circle(this.x, this.y, 20);
-
-		// TESTS
-		setLocation(100, 100);
-
-	}
-
-	@Override
-	public void setLocation(int x, int y) {
-
-		super.setLocation(x, y);
-
-		// Move shape
-		if (this.shape != null) {
-
-			this.shape.setX(this.x - this.shape.getWidth() / 2);
-			this.shape.setY(this.y - this.shape.getHeight() / 2);
-
-			// Set mouse over
-			this.over = this.shape.contains(x, y);
-		}
-
-		// Move selection halo
-		if (this.halo != null && this.selected) {
-
-			this.halo.setX(this.x - this.halo.getWidth() / 2);
-			this.halo.setY(this.y - this.halo.getHeight() / 2);
-		}
 	}
 
 	/**
@@ -77,6 +51,26 @@ public class MouglotteEntity extends MovingEntity {
 	 */
 	public Mouglotte getMouglotte() {
 		return this.mouglotte;
+	}
+
+	@Override
+	public void update(GameContainer container, long delta) {
+
+		super.update(container, delta);
+
+		// Move shape
+		if (this.shape != null) {
+
+			this.shape.setX(this.x - this.shape.getWidth() / 2);
+			this.shape.setY(this.y - this.shape.getHeight() / 2);
+		}
+
+		// Move selection halo
+		if (this.halo != null && this.selected) {
+
+			this.halo.setX(this.x - this.halo.getWidth() / 2);
+			this.halo.setY(this.y - this.halo.getHeight() / 2);
+		}
 	}
 
 	@Override
@@ -186,13 +180,83 @@ public class MouglotteEntity extends MovingEntity {
 	 */
 	public Tile searchNear(MemoryType type) {
 
+		Tile neighbor = null;
+		Entity actWith = null;
+
+		// Starts with current tile
+		switch (type) {
+		case FOOD:
+			actWith = this.tile.getFood();
+		case FRIEND:
+			actWith = this.tile.getFriend(this.mouglotte);
+		case LOVER:
+			actWith = this.tile.getLover(this.mouglotte);
+		case ENEMY:
+			actWith = this.tile.getEnemy(this.mouglotte);
+		case WORK:
+			actWith = this.tile.getWork();
+
+			// Something to act with has been found
+			if (actWith != null) {
+
+				// The mouglotte will act with this
+				this.mouglotte.actWith(actWith);
+				// It has been found on the tile
+				return this.tile;
+			}
+			break;
+		default:
+			break;
+		}
+
+		// Search through neighbors
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+
+				// Not a neighbor, its the current tile
+				if ((i == 0) && (j == 0)) {
+					continue;
+				}
+				
+				// Get neighbor tile
+				neighbor = this.map.getTile(this.tile.getColumn() + i,
+						this.tile.getRow() + j);
+
+				switch (type) {
+				case FOOD:
+					actWith = neighbor.getFood();
+				case FRIEND:
+					actWith = neighbor.getFriend(this.mouglotte);
+				case LOVER:
+					actWith = neighbor.getLover(this.mouglotte);
+				case ENEMY:
+					actWith = neighbor.getEnemy(this.mouglotte);
+				case WORK:
+					actWith = neighbor.getWork();
+
+					// Something to act with has been found
+					if (actWith != null) {
+
+						// The mouglotte will act with this
+						this.mouglotte.actWith(actWith);
+						// It has been found on the tile
+						return neighbor;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		}
+
+		// Nothing found
 		return null;
 	}
 
 	@Override
 	public void render(GameContainer container, Graphics g) {
 
-		super.render(container, g);
+		// super.render(container, g);
 
 		Color color = g.getColor();
 
@@ -210,11 +274,13 @@ public class MouglotteEntity extends MovingEntity {
 		if (this.selected)
 			g.draw(this.halo);
 
-		// TEST
-		g.drawString(this.getX() + "," + this.getY(), this.shape.getX(),
+		// TEST : x,y/tile
+		g.drawString(
+				this.getX() + "," + this.getY() + "/" + this.tile.getColumn()
+						+ "," + this.tile.getRow(), this.shape.getX(),
 				this.shape.getY() + 20);
 
-		// TEST
+		// TEST : position de la souris
 		int x = container.getInput().getMouseX();
 		int y = container.getInput().getMouseY();
 		g.drawString(x + "," + y + "->" + GameMap.convNoScrollX(x) + ","
@@ -229,17 +295,22 @@ public class MouglotteEntity extends MovingEntity {
 	protected void mouseMoved(int x, int y) {
 
 		// Set mouse over
-		this.over = this.shape.contains(x, y);
+		this.over = this.shape.contains(GameMap.convNoScrollX(x),
+				GameMap.convNoScrollY(y));
+
+		// Il faut faire un petit idle
 	}
 
 	@Override
 	protected void mouseLeftClicked(int x, int y) {
 
-		// If mouse is in the shap
-		if (this.shape.contains(x, y))
+		// If mouse is in the shape
+		if (this.over)
 			this.selected = true;
 		else
 			this.selected = false;
+
+		// Il faut faire un petit idle
 
 		// Mais il faut aussi déselectionner ce qui l'était
 	}
@@ -251,9 +322,9 @@ public class MouglotteEntity extends MovingEntity {
 		if (this.selected) {
 
 			// Convert coordinates to scrolled coordinates
-			x = GameMap.convScrollX(x);
-			y = GameMap.convScrollY(y);
-			Tile tile = Tile.create(x, y);
+			// x = GameMap.convScrollX(x);
+			// y = GameMap.convScrollY(y);
+			Tile tile = this.map.getTileAtPosition(x, y);
 
 			// Go to clicked location
 			goTo(tile);

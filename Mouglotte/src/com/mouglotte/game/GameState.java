@@ -94,11 +94,15 @@ public class GameState extends BasicGameState {
 		// Create right panel
 		this.rightPanel = new RightPanel(this);
 
+		// Init map
+		this.map.init();
+
 		// Pour les tests
 		this.mouglottes = new ArrayList<MouglotteEntity>();
 		this.mouglottes.add(new MouglotteEntity(this));
 //		this.mouglottes.add(new Mouglotte(this));
 //		this.mouglottes.add(new Mouglotte(this));
+		
 	}
 
 	/**
