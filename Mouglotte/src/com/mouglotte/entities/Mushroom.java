@@ -29,15 +29,9 @@ public class Mushroom extends FoodEntity {
 	 * @param amount
 	 *            Amount of food
 	 */
-	public Mushroom(GameState game, int i, int j, int amount) {
+	public Mushroom(GameState game, int i, int j) {
 
-		super(game, amount);
-
-		// Set tile
-		this.tile = this.game.getMap().getTile(i, j);
-
-		// Set location
-		setLocation(this.tile);
+		super(game, j, j);
 
 		// Set image
 		try {
@@ -82,6 +76,36 @@ public class Mushroom extends FoodEntity {
 	protected void eventSeason() {
 		// Nothing
 		// Eventually die/born ?
+	}
+	
+	@Override
+	protected void eventYear() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	protected void eventHealthChanged(int oldHealth, int newHealth) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void eventLevelChanged(int oldLevel, int newLevel) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void calculateHealth() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void calculateLevel() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override

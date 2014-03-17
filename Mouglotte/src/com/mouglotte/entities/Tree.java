@@ -70,6 +70,12 @@ public class Tree extends WorkingEntity {
 		// Nothing
 		// Eventually blossom/loose leaves ?
 	}
+	
+	@Override
+	protected void eventYear() {
+		// Nothing
+		// Eventually dies ?
+	}
 
 	@Override
 	protected void mouseMoved(int x, int y) {
@@ -100,5 +106,4 @@ public class Tree extends WorkingEntity {
 		// Back to initial color
 		g.setColor(color);
 	}
-
 }

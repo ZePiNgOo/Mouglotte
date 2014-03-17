@@ -82,6 +82,14 @@ public class GameMap implements TileBasedMap {
 	}
 
 	/**
+	 * Get game
+	 * @return Game
+	 */
+	public GameState getGame() {
+		return this.game;
+	}
+	
+	/**
 	 * Get map width in pixels
 	 * 
 	 * @return Map width in pixels

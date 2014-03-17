@@ -3,13 +3,13 @@ package com.mouglotte.entities;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.geom.Vector2f;
 
 import com.mouglotte.game.GameState;
 import com.mouglotte.map.GameMap;
 import com.mouglotte.map.Tile;
+import com.mouglotte.utilities.TimeDependent;
 
-public abstract class Entity {
+public abstract class Entity extends TimeDependent{
 
 	/** Game */
 	protected GameState game;
@@ -17,15 +17,15 @@ public abstract class Entity {
 	/** Age */
 	protected int age;
 
-	/** Time passed */
-	protected int passedTime = 0;
-	protected int secondesR = 0;
-	protected int minutes = 0;
-	protected int hours = 0;
-	protected int days = 0;
-	protected int months = 0;
-	protected int seasons = 0;
-	protected int years = 0;
+//	/** Time passed */
+//	protected int passedTime = 0;
+//	protected int secondesR = 0;
+//	protected int minutes = 0;
+//	protected int hours = 0;
+//	protected int days = 0;
+//	protected int months = 0;
+//	protected int seasons = 0;
+//	protected int years = 0;
 
 	/** Location */
 	protected int x = 0;
@@ -140,137 +140,132 @@ public abstract class Entity {
 		return this.selected;
 	}
 
-	/**
-	 * Update entity
-	 * 
-	 * @param container
-	 *            Game container
-	 * @param delta
-	 *            Delta time since last call
-	 */
+	@Override
 	public void update(GameContainer container, long delta) {
 
-		// Passed time
-		this.passedTime += delta;
-
-		// Every real second
-		if (this.passedTime >= 1000) {
-
-			// One real second has passed
-			this.secondesR++;
-			this.passedTime -= 1000;
-			// Event every real second
-			eventRealSecond();
-		}
-
-		// Every 3 real seconds
-		// = mouglotte minute
-		if (this.secondesR >= 3) {
-
-			// One mouglotte minute has passed
-			this.minutes++;
-			this.secondesR = 0;
-			// Event every mouglotte minute
-			eventMinute();
-		}
-
-		// Every 3 real minutes
-		// = mouglotte hour
-		if (this.minutes >= 60) {
-
-			// One mouglotte hour has passed
-			this.hours++;
-			this.minutes = 0;
-			// Event every mouglotte hour
-			eventHour();
-		}
-
-		// Every real hour
-		// = mouglotte day
-		if (this.hours >= 20) {
-
-			// One mouglotte day has passed
-			this.days++;
-			this.hours = 0;
-			// Event every mouglotte day
-			eventDay();
-		}
-
-		// Every 12 real hours
-		// = mouglotte month
-		if (this.days >= 12) {
-
-			// One mouglotte month has passed
-			this.months++;
-			this.days = 0;
-			// Event every mouglotte month
-			eventMonth();
-		}
-
-		// Every 24 real hours
-		// = mouglotte season
-		if (this.months >= 2) {
-
-			// One mouglotte season has passed
-			this.seasons++;
-			this.months = 0;
-			// Event every mouglotte season
-			eventSeason();
-		}
-
-		// Every 3 real days
-		// = mouglotte year
-		if (this.seasons >= 3) {
-
-			// One mouglotte year has passed
-			this.years++;
-			this.seasons = 0;
-			// Event every mouglotte year
-			eventYear();
-		}
+//		// Passed time
+//		this.passedTime += delta;
+//
+//		// Every real second
+//		if (this.passedTime >= 1000) {
+//
+//			// One real second has passed
+//			this.secondesR++;
+//			this.passedTime -= 1000;
+//			// Event every real second
+//			eventRealSecond();
+//		}
+//
+//		// Every 3 real seconds
+//		// = mouglotte minute
+//		if (this.secondesR >= 3) {
+//
+//			// One mouglotte minute has passed
+//			this.minutes++;
+//			this.secondesR = 0;
+//			// Event every mouglotte minute
+//			eventMinute();
+//		}
+//
+//		// Every 3 real minutes
+//		// = mouglotte hour
+//		if (this.minutes >= 60) {
+//
+//			// One mouglotte hour has passed
+//			this.hours++;
+//			this.minutes = 0;
+//			// Event every mouglotte hour
+//			eventHour();
+//		}
+//
+//		// Every real hour
+//		// = mouglotte day
+//		if (this.hours >= 20) {
+//
+//			// One mouglotte day has passed
+//			this.days++;
+//			this.hours = 0;
+//			// Event every mouglotte day
+//			eventDay();
+//		}
+//
+//		// Every 12 real hours
+//		// = mouglotte month
+//		if (this.days >= 12) {
+//
+//			// One mouglotte month has passed
+//			this.months++;
+//			this.days = 0;
+//			// Event every mouglotte month
+//			eventMonth();
+//		}
+//
+//		// Every 24 real hours
+//		// = mouglotte season
+//		if (this.months >= 2) {
+//
+//			// One mouglotte season has passed
+//			this.seasons++;
+//			this.months = 0;
+//			// Event every mouglotte season
+//			eventSeason();
+//		}
+//
+//		// Every 3 real days
+//		// = mouglotte year
+//		if (this.seasons >= 3) {
+//
+//			// One mouglotte year has passed
+//			this.years++;
+//			this.seasons = 0;
+//			// Event every mouglotte year
+//			eventYear();
+//		}
+		
+		super.update(container, delta);
 
 		// Handle inputs
 		handleInputs(container, delta);
 	}
 
-	/**
-	 * Event called every real second
-	 */
-	protected abstract void eventRealSecond();
-
-	/**
-	 * Event called every mouglotte minute
-	 */
-	protected abstract void eventMinute();
-
-	/**
-	 * Event called every mouglotte hour
-	 */
-	protected abstract void eventHour();
-
-	/**
-	 * Event called every mouglotte day
-	 */
-	protected abstract void eventDay();
-
-	/**
-	 * Event called every mouglotte month
-	 */
-	protected abstract void eventMonth();
-
-	/**
-	 * Event called every mouglotte season
-	 */
-	protected abstract void eventSeason();
-
-	/**
-	 * Event called every mouglotte year
-	 */
-	public void eventYear() {
-
-		// Happy birthday
-		this.age++;
-	}
+//	/**
+//	 * Event called every real second
+//	 */
+//	protected abstract void eventRealSecond();
+//
+//	/**
+//	 * Event called every mouglotte minute
+//	 */
+//	protected abstract void eventMinute();
+//
+//	/**
+//	 * Event called every mouglotte hour
+//	 */
+//	protected abstract void eventHour();
+//
+//	/**
+//	 * Event called every mouglotte day
+//	 */
+//	protected abstract void eventDay();
+//
+//	/**
+//	 * Event called every mouglotte month
+//	 */
+//	protected abstract void eventMonth();
+//
+//	/**
+//	 * Event called every mouglotte season
+//	 */
+//	protected abstract void eventSeason();
+//
+//	/**
+//	 * Event called every mouglotte year
+//	 */
+//	public void eventYear() {
+//
+//		// Happy birthday
+//		this.age++;
+//	}
 
 	/**
 	 * Handle inputs

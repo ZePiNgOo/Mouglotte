@@ -22,7 +22,7 @@ public abstract class TimeDependent {
 	 * @param delta
 	 *            Delta time since last call
 	 */
-	public void update(GameContainer container, int delta) {
+	public void update(GameContainer container, long delta) {
 
 		// Passed time
 		this.passedTime += delta;

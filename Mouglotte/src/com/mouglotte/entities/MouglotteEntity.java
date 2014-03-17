@@ -106,7 +106,8 @@ public class MouglotteEntity extends MovingEntity {
 	@Override
 	public void eventYear() {
 
-		super.eventYear();
+		// Happy birthday
+		this.age++;
 
 		this.mouglotte.eventYear();
 	}
