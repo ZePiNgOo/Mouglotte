@@ -4,7 +4,8 @@ import java.util.Random;
 
 import com.mouglotte.entities.BeanTree;
 import com.mouglotte.entities.Mushroom;
-import com.mouglotte.utilities.TimeDependent;
+import com.mouglotte.time.TimeDependent;
+import com.mouglotte.utilities.Debug;
 
 public class Spawner extends TimeDependent {
 
@@ -32,44 +33,44 @@ public class Spawner extends TimeDependent {
 	}
 
 	@Override
-	protected void eventRealSecond() {
+	public void eventRealSecond() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void eventMinute() {
+	public void eventMinute() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void eventHour() {
+	public void eventHour() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void eventDay() {
+	public void eventDay() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void eventMonth() {
+	public void eventMonth() {
 
 		// Spawn food entities
 		spawnFoodEntities();
 	}
 
 	@Override
-	protected void eventSeason() {
+	public void eventSeason() {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	protected void eventYear() {
+	public void eventYear() {
 		// TODO Auto-generated method stub
 
 	}
@@ -78,6 +79,8 @@ public class Spawner extends TimeDependent {
 	 * Spawn food entities
 	 */
 	private void spawnFoodEntities() {
+
+		Debug.log("SPAWNER", "Spawner::SpawnFood");
 
 		int spawned = 0;
 		int i, j;
@@ -94,14 +97,16 @@ public class Spawner extends TimeDependent {
 				foodProba = this.r.nextInt(BEANTREE_PROBA + MUSHROOM_PROBA);
 
 				if (foodProba < BEANTREE_PROBA) {
-					this.map.getTile(i, j).addEntity(
-							new BeanTree(this.map.getGame(), i, j));
+					new BeanTree(this.map.getGame(), this.map.getTile(i, j));
 				} else if (foodProba < BEANTREE_PROBA + MUSHROOM_PROBA) {
-					this.map.getTile(i, j).addEntity(
-							new Mushroom(this.map.getGame(), i, j));
+					new Mushroom(this.map.getGame(), this.map.getTile(i, j));
 				}
 				spawned++;
+				Debug.log("SPAWNER", "Spawner::SpawnFood:Food spawn on " + i
+						+ "," + j);
 			}
 		}
+
+		Debug.log("SPAWNER", "Spawner::SpawnFood::End");
 	}
 }

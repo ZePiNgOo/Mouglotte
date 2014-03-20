@@ -1,18 +1,18 @@
-package com.mouglotte.utilities;
+package com.mouglotte.time;
 
 import org.newdawn.slick.GameContainer;
 
-public abstract class TimeDependent {
+public abstract class TimeDependent implements TimeListener {
 
 	/** Time passed */
-	int passedTime = 0;
-	int secondesR = 0;
-	int minutes = 0;
-	int hours = 0;
-	int days = 0;
-	int months = 0;
-	int seasons = 0;
-	int years = 0;
+	protected int passedTime = 0;
+	protected int secondesR = 0;
+	protected int minutes = 0;
+	protected int hours = 0;
+	protected int days = 0;
+	protected int months = 0;
+	protected int seasons = 0;
+	protected int years = 0;
 	
 	/**
 	 * Update
@@ -102,44 +102,5 @@ public abstract class TimeDependent {
 			// Event every mouglotte year
 			eventYear();
 		}
-
-		// A AJOUTER DANS ENTITY UNIQUEMENT
-		// Handle inputs
-//		handleInputs(container, delta);
 	}
-	
-	/**
-	 * Event called every real second
-	 */
-	protected abstract void eventRealSecond();
-
-	/**
-	 * Event called every mouglotte minute
-	 */
-	protected abstract void eventMinute();
-
-	/**
-	 * Event called every mouglotte hour
-	 */
-	protected abstract void eventHour();
-
-	/**
-	 * Event called every mouglotte day
-	 */
-	protected abstract void eventDay();
-
-	/**
-	 * Event called every mouglotte month
-	 */
-	protected abstract void eventMonth();
-
-	/**
-	 * Event called every mouglotte season
-	 */
-	protected abstract void eventSeason();
-
-	/**
-	 * Event called every mouglotte year
-	 */
-	protected abstract void eventYear();
 }

@@ -1,9 +1,13 @@
 package com.mouglotte.map;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
+import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 import org.newdawn.slick.util.pathfinding.Mover;
@@ -39,10 +43,10 @@ public class GameMap implements TileBasedMap {
 	public static float offsetX, offsetY;
 	public static float tileOffsetX, tileOffsetY;
 
-	/** Objects */
-	private int[][] objects;
-	/** Entities */
-	private Entity[][] entities;
+	// /** Objects */
+	// private int[][] objects;
+	// /** Entities */
+	// private Entity[][] entities;
 	/** Tiles visited by path finder */
 	private boolean[][] visited;
 	/** Tiles */
@@ -69,10 +73,10 @@ public class GameMap implements TileBasedMap {
 		// Get tile size
 		GameMap.TILE_SIZE = this.map.getTileWidth();
 
-		// Objects
-		this.objects = new int[getWidthInTiles()][getHeightInTiles()];
-		// Entities
-		this.entities = new Entity[getWidthInTiles()][getHeightInTiles()];
+		// // Objects
+		// this.objects = new int[getWidthInTiles()][getHeightInTiles()];
+		// // Entities
+		// this.entities = new Entity[getWidthInTiles()][getHeightInTiles()];
 		// Visited tiles by the path finder
 		this.visited = new boolean[getWidthInTiles()][getHeightInTiles()];
 		// Tiles
@@ -83,12 +87,13 @@ public class GameMap implements TileBasedMap {
 
 	/**
 	 * Get game
+	 * 
 	 * @return Game
 	 */
 	public GameState getGame() {
 		return this.game;
 	}
-	
+
 	/**
 	 * Get map width in pixels
 	 * 
@@ -196,17 +201,21 @@ public class GameMap implements TileBasedMap {
 		}
 
 		// Trees
-		this.entities[5][5] = new Tree(this.game, 5, 5);
-		this.entities[7][8] = new Tree(this.game, 7, 8);
-		this.entities[8][8] = new Tree(this.game, 8, 8);
-		this.entities[9][8] = new Tree(this.game, 9, 8);
-		this.entities[8][9] = new Tree(this.game, 8, 9);
-		
-		// Mushrooms
-		this.entities[2][3] = new Mushroom(this.game,2,3,100);
-		this.entities[11][5] = new Mushroom(this.game,11,5,100);
-		this.entities[6][13] = new Mushroom(this.game,6,13,100);
+		// this.entities[5][5] = new Tree(this.game, 5, 5);
+		// this.entities[7][8] = new Tree(this.game, 7, 8);
+		// this.entities[8][8] = new Tree(this.game, 8, 8);
+		// this.entities[9][8] = new Tree(this.game, 9, 8);
+		// this.entities[8][9] = new Tree(this.game, 8, 9);
+		new Tree(this.game, getTile(5, 5));
+		new Tree(this.game, getTile(7, 8));
+		new Tree(this.game, getTile(8, 8));
+		new Tree(this.game, getTile(8, 9));
+		new Tree(this.game, getTile(9, 8));
 
+		// Mushrooms
+		new Mushroom(this.game, getTile(2, 3));
+		new Mushroom(this.game, getTile(6, 13));
+		new Mushroom(this.game, getTile(11, 5));
 	}
 
 	/**
@@ -277,13 +286,13 @@ public class GameMap implements TileBasedMap {
 	 */
 	public boolean blocked(Mover mover, int i, int j) {
 
-		// Blocking objects
-		if (objects[i][j] == WATER || objects[i][j] == TREES)
-			return true;
-
-		// Blocking entities
-		if (entities[i][j] != null)
-			return true;
+		// // Blocking objects
+		// if (objects[i][j] == WATER || objects[i][j] == TREES)
+		// return true;
+		//
+		// // Blocking entities
+		// if (entities[i][j] != null)
+		// return true;
 
 		if (this.tiles[i][j].isBlocked())
 			return true;
@@ -346,8 +355,13 @@ public class GameMap implements TileBasedMap {
 	 *            Delta time since last call
 	 * @throws SlickException
 	 */
-	public void update(GameContainer container, int delta)
+	public void update(GameContainer container, long delta)
 			throws SlickException {
+
+		for (int i = 0; i < getWidthInTiles(); i++)
+			for (int j = 0; j < getHeightInTiles(); j++) {
+				getTile(i, j).update(container, delta);
+			}
 
 		// Scroll map
 		scrolling(container, delta);
@@ -362,7 +376,7 @@ public class GameMap implements TileBasedMap {
 	 * @param delta
 	 *            Delta between last call
 	 */
-	private void scrolling(GameContainer container, int delta) {
+	private void scrolling(GameContainer container, long delta) {
 
 		// Le scrolling répond aux touches et à la souris
 		// - offsetX et offsetY permettent de décaler la fenêtre de manière plus
@@ -491,8 +505,9 @@ public class GameMap implements TileBasedMap {
 				// if (objects[i][j] != 0)
 				// g.fillRect((x1, y1, width, height);
 				if (i >= 0 && j >= 0)
-					if (entities[i][j] != null)
-						entities[i][j].render(container, g);
+					getTile(i, j).render(container, g);
+				// if (entities[i][j] != null)
+				// entities[i][j].render(container, g);
 			}
 
 		// A appeler si on veut annuler le translate et donc ne plus prendre en
@@ -525,55 +540,16 @@ public class GameMap implements TileBasedMap {
 	 * 
 	 * @param mover
 	 *            Moving entity
-	 * @param si
-	 *            Column index of the tile we're moving from
-	 * @param sj
-	 *            Row index of the tile we're moving from
-	 * @param ti
-	 *            Column index of the tile we're moving to
-	 * @param tj
-	 *            Row index of the tile we're moving to
+	 * @param from
+	 *            From tile
+	 * @param to
+	 *            To tile
 	 * @return The path
 	 */
-	// public Path findPath(Mover mover, int sx, int sy, int tx, int ty) {
-	//
-	// sx = getTileColumn(sx);
-	// sy = getTileRow(sy);
-	// tx = getTileColumn(tx);
-	// ty = getTileRow(ty);
-	//
-	// return this.finder.findPath(mover, sx, sy, tx, ty);
-	// }
-
 	public Path findPath(Mover mover, Tile from, Tile to) {
 		return this.finder.findPath(mover, from.getColumn(), from.getRow(),
 				to.getColumn(), to.getRow());
 	}
-
-	/**
-	 * Search for something next to a position
-	 * 
-	 * @param type
-	 *            Type of the thing searched
-	 * @param i
-	 *            Column index of the tile to search from
-	 * @param j
-	 *            Row index of the tile to search from
-	 * @return A tile containing the searched thing
-	 */
-	// public Tile searchNear(MemoryType type, int x, int y) {
-	//
-	// Random r = new Random();
-	//
-	// // Pour les tests, pour le moment une chance sur 10 de trouver ce qu'on
-	// // cherche
-	// // La recherche doit se faire dans le champ de vision autour du point
-	// // if (r.nextInt(10) == 0)
-	// // return Tile.create(x, y);
-	// // else
-	// // return null;
-	// return null;
-	// }
 
 	/**
 	 * Convert to scrolled position
@@ -626,4 +602,138 @@ public class GameMap implements TileBasedMap {
 		// return (int) (y - GameMap.tileOffsetY * GameMap.TILE_SIZE +
 		// GameMap.offsetY);
 	}
+
+	/**
+	 * Mouse moved event
+	 * 
+	 * @param oldx
+	 *            Old x position of the mouse
+	 * @param oldy
+	 *            Old y position of the mouse
+	 * @param newx
+	 *            Current x position of the mouse
+	 * @param newy
+	 *            Current y position of the mouse
+	 */
+//	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+//
+////		// Current tile where the mouse is
+////		Tile tile = getTileAtPosition(newx, newy);
+////
+////		// Get all the tiles around the mouse
+////		for (int i = tile.getColumn() - 1; i <= tile.getColumn() + 1; i++) {
+////			for (int j = tile.getRow() - 1; j <= tile.getRow() + 1; j++) {
+////
+////				// Tile is on the map
+////				if ((i >= 0) && (i < getWidthInTiles()) && (j >= 0)
+////						&& (i < getHeightInTiles())) {
+////
+////					// Read through entities on the tile
+////					for (Entity entity : tile.getEntities()) {
+////						if (entity.contains(newx, newy)) {
+////							entity.setMouseOver(true);
+////							return;
+////						}
+////					}
+////				}
+////			}
+////		}
+//	}
+
+	/**
+	 * Mouse clicked event
+	 * 
+	 * @param button
+	 *            Button clicked
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
+//	public void mouseClicked(int button, int x, int y, int clickCount) {
+//
+////		// Mouse clicked on map
+////		if (this.map.contains(x, y)) {
+////
+////			this.map.mouseClicked(x, y, clickcount);
+////			if (button == 0)
+////				this.map.mouseLeftClicked(x, y, clickCount);
+////			else if (button == 1)
+////				this.map.mouseRightClicked(x, y);
+////		}
+////		// Mouse clicked on right panel
+////		// else if (this.rightPanel.contains(x,y)) {
+////		//
+////		// }
+//	}
+
+	/**
+	 * Mouse left-clicked event
+	 * 
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
+//	public void mouseLeftClicked(int x, int y, int clickCount) {
+//
+//	}
+
+	/**
+	 * Mouse right-clicked event
+	 * 
+	 * @param x
+	 *            x position of the mouse
+	 * @param y
+	 *            y position of the mouse
+	 * @param clickCount
+	 *            Number of clicks
+	 */
+//	public void mouseRightClicked(int x, int y) {
+//
+//		// S'il y a une unité ici
+//		// if (this.map.getUnit(x, y) != 0) {
+//
+//		// Ici on va gérer des actions : SOCIAL, LOVE, FIGHT
+//
+//		// S'il n'y a pas d'unité ici
+//		// } else {
+//
+//		// Si une unité est sélectionnée
+//		// if (this.mouglotte.isSelected()) {
+//		//
+//		// // Réinitialisation des zones visitées
+//		// this.map.clearVisited();
+//		//
+//		// // Recherche du chemin
+//		// this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
+//		// this.mouglotte.getX(), this.mouglotte.getY(), x, y));
+//		// // path = finder.findPath(
+//		// // new UnitMover(map.getUnit(selectedx, selectedy)),
+//		// // selectedx, selectedy, x, y);
+//		//
+//		// // Si le chemin est trouvé
+//		// // if (this.mouglotte.hasPath()) {
+//		//
+//		// // Déplacement de l'unité
+//		// // int unit = map.getUnit(selectedx, selectedy);
+//		// // map.setUnit(selectedx, selectedy, 0);
+//		// // map.setUnit(x, y, unit);
+//		// // selectedx = x;
+//		// // selectedy = y;
+//		// // // Réinitialisation du dernier chemin recherché
+//		// // lastFindX = -1;
+//		//
+//		// // Déplacement instantané
+//		// // this.mouglotte.setLocation(x, y);
+//		//
+//		// // Réinitialisation du chemin
+//		// // this.map.clearPath();
+//		// // }
+//		// }
+//	}
 }

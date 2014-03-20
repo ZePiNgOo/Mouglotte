@@ -40,6 +40,9 @@ public enum MemoryType {
 		case NEED_SOCIAL:
 		case DESIRE_SOCIAL:
 			return MemoryType.FRIEND;
+		case NEED_FUN:
+		case DESIRE_FUN:
+			return MemoryType.FRIEND;
 		case DESIRE_LOVE:
 			return MemoryType.LOVER;
 		case DESIRE_FIGHT:

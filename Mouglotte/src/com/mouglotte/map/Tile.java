@@ -3,7 +3,14 @@ package com.mouglotte.map;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+import org.newdawn.slick.SlickException;
+
 import com.mouglotte.entities.Entity;
+import com.mouglotte.entities.FoodEntity;
+import com.mouglotte.entities.MouglotteEntity;
+import com.mouglotte.entities.WorkingEntity;
 import com.mouglotte.specy.Desire;
 import com.mouglotte.specy.DesireType;
 import com.mouglotte.specy.Mouglotte;
@@ -14,8 +21,8 @@ public class Tile {
 	private int i = 0;
 	private int j = 0;
 
-	/** Blocked */
-	private boolean blocked = false;
+	// /** Blocked */
+	// private boolean blocked = false;
 
 	/** List of entities in this tile */
 	private LinkedList<Entity> entities;
@@ -116,9 +123,10 @@ public class Tile {
 	 * 
 	 * @return Entities in this tile
 	 */
-	@SuppressWarnings("unchecked")
+	// @SuppressWarnings("unchecked")
 	public LinkedList<Entity> getEntities() {
-		return ((LinkedList<Entity>) this.entities.clone());
+		// return ((LinkedList<Entity>) this.entities.clone());
+		return this.entities;
 	}
 
 	/**
@@ -129,8 +137,8 @@ public class Tile {
 	public Entity getFood() {
 
 		for (Entity entity : this.entities) {
-			// if (entity == FoodEntity)
-			// return entity;
+			if (entity instanceof FoodEntity)
+				return entity;
 		}
 		return null;
 	}
@@ -143,9 +151,9 @@ public class Tile {
 	public Entity getFriend(Mouglotte current) {
 
 		for (Entity entity : this.entities) {
-			// if (entity == MouglotteEntity)
-			// if (entity.isFriend(current)
-			// return entity;
+			if (entity instanceof MouglotteEntity)
+				if (((MouglotteEntity) entity).getMouglotte().isFriend(current))
+					return entity;
 		}
 		return null;
 	}
@@ -158,9 +166,9 @@ public class Tile {
 	public Entity getLover(Mouglotte current) {
 
 		for (Entity entity : this.entities) {
-			// if (entity == MouglotteEntity)
-			// if (entity.isLover(current)
-			// return entity;
+			if (entity instanceof MouglotteEntity)
+				if (((MouglotteEntity) entity).getMouglotte().isLover(current))
+					return entity;
 		}
 		return null;
 	}
@@ -173,9 +181,9 @@ public class Tile {
 	public Entity getEnemy(Mouglotte current) {
 
 		for (Entity entity : this.entities) {
-			// if (entity == MouglotteEntity)
-			// if (entity.isEnemy(current)
-			// return entity;
+			if (entity instanceof MouglotteEntity)
+				if (((MouglotteEntity) entity).getMouglotte().isEnemy(current))
+					return entity;
 		}
 		return null;
 	}
@@ -188,10 +196,29 @@ public class Tile {
 	public Entity getWork() {
 
 		for (Entity entity : this.entities) {
-			// if (entity == WorkingEntity)
-			// return entity;
+			if (entity instanceof WorkingEntity)
+				return entity;
 		}
 		return null;
+	}
+
+	/**
+	 * Update tile
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param delta
+	 *            Delta time since last call
+	 * @throws SlickException
+	 */
+	public void update(GameContainer container, long delta)
+			throws SlickException {
+
+		// Attention on update aussi les mouglottes
+		// Update entities
+		for (Entity entity : this.entities) {
+			entity.update(container, delta);
+		}
 	}
 
 	/**
@@ -235,6 +262,26 @@ public class Tile {
 	 * @return True if tile is blocked
 	 */
 	public boolean isBlocked() {
-		return this.blocked;
+
+		return this.entities.size() > 0;
+	}
+
+	/**
+	 * Render tile
+	 * 
+	 * @param container
+	 *            Game container
+	 * @param g
+	 *            Graphics
+	 * @throws SlickException
+	 */
+	public void render(GameContainer container, Graphics g)
+			throws SlickException {
+
+		// Attention on update aussi les mouglottes
+		// Update entities
+		for (Entity entity : this.entities) {
+			entity.render(container, g);
+		}
 	}
 }

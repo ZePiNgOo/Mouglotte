@@ -93,51 +93,47 @@ public class Needs {
 		this.needs.put(need.getType(), need);
 	}
 	
-	// Evénement exécuté toutes les minutes
-	public void eventMinute() {
+	/**
+	 * Fulfill current need
+	 */
+	public void fulfill() {
 		
-		// Mise à jour du besoin courant s'il est en train de s'accomplir
+		// Fulfill current need if it has to be
 		if (this.current != null && this.fulfilling) {
+			
 			this.current.fulfill();
+			
+			// If the need is completely fulfilled
+			if (this.current.getValue() <= 0)
+				this.setFulfilling(false);
 		}
 	}
 	
-	// Evénement exécuté toutes les heures
-	public void eventHour() {
-		
-		// Augmentation des besoins
-		// Parcours de tous les besoins
-		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
 
-			// Augmentation du besoin
-			// Sauf le besoin courant s'il est en train de s'accomplir
-			//if (!this.fulfilling || !need.getValue().equals(this.current)) {
-				need.getValue().raise();
-			//}
+	/**
+	 * Decide current need
+	 */
+	public void decide() {
+	
+		// Read through all needs
+		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
+			// Increase need
+				need.getValue().increase();
 		}
-		// Fin du parcours des besoins
 		
-		// Les besoins augmentent constamment, donc le besoin actuel le reste
-		// S'il est en train de s'accomplir il peut se faire dépasser
+		// Needs always increase, so current need stays the same
+		// If it is fulfilling then it can be exceeded by another one
 		
-		// S'il n'y a pas de besoin
-		// Si le besoin est en train de s'accomplir
+		// If the is no current need
+		// Or if the current need is fulfilling
 		if ((this.current == null) || 
 				this.fulfilling) {
 			
-			// Décision du besoin le plus pressant
-			decide();
+			// Set current need
+			setCurrent();
+			// Initialization
+			this.searching = false;
+			this.fulfilling = false;
 		}
-		
-	}
-	
-	// Décision du besoin le plus pressant
-	public void decide() {
-	
-		// Définition du besoin le plus pressant
-		setCurrent();
-		// Réinitialisation
-		this.searching = false;
-		this.fulfilling = false;
 	}
 }

@@ -2,10 +2,10 @@ package com.mouglotte.game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
@@ -13,9 +13,9 @@ import org.newdawn.slick.state.StateBasedGame;
 import com.mouglotte.entities.MouglotteEntity;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.map.GameMap;
-import com.mouglotte.specy.Desire;
-import com.mouglotte.specy.DesireType;
+import com.mouglotte.map.Spawner;
 import com.mouglotte.specy.Mouglotte;
+import com.mouglotte.time.TimeKeeper;
 import com.mouglotte.ui.RightPanel;
 
 public class GameState extends BasicGameState {
@@ -23,24 +23,21 @@ public class GameState extends BasicGameState {
 	// Pour les tests
 	public static final int TIME_FACTOR = 3;
 
-	// ID de l'état
+	/** State ID */
 	private static final EnumGameState ID = EnumGameState.GAME;
 
-	// private int sensX = 1, sensY = 1;
-	// private int x, y;
-
-	// Panneau du bas
-	// private BottomPanel bottomPanel;
-	// Panneau de droite
+	/** Panel on the right */
 	private RightPanel rightPanel;
-	// Conteneur
+	/** Game container */
 	private GameContainer container;
-	// Carte
+	/** Time keeper */
+	private TimeKeeper timeKeeper;
+	/** Game map */
 	private GameMap map;
+	/** Spawner */
+	private Spawner spawner;
 
 	private List<MouglotteEntity> mouglottes;
-
-	private String deltaString = "";
 
 	/**
 	 * Get game state ID
@@ -59,6 +56,20 @@ public class GameState extends BasicGameState {
 	 */
 	public GameContainer getContainer() {
 		return this.container;
+	}
+	
+	/**
+	 * Get selected mouglotte
+	 * 
+	 * @return Selected mouglotte
+	 */
+	public Mouglotte getSelectedMouglotte() {
+
+		for (final MouglotteEntity mouglotte : this.mouglottes) {
+			if (mouglotte.isSelected())
+				return mouglotte.getMouglotte();
+		}
+		return null;
 	}
 
 	/**
@@ -89,20 +100,22 @@ public class GameState extends BasicGameState {
 		// Initialize genetics
 		Genetics.initialize();
 
-		// Create map
-		this.map = new GameMap(this);
 		// Create right panel
 		this.rightPanel = new RightPanel(this);
-
+		// Create time keeper
+		this.timeKeeper = new TimeKeeper();
+		// Create map
+		this.map = new GameMap(this);
+		// Create spawner
+		this.spawner = new Spawner(this.map);
+		
 		// Init map
 		this.map.init();
 
 		// Pour les tests
 		this.mouglottes = new ArrayList<MouglotteEntity>();
-		this.mouglottes.add(new MouglotteEntity(this));
-//		this.mouglottes.add(new Mouglotte(this));
-//		this.mouglottes.add(new Mouglotte(this));
-		
+		this.mouglottes.add(new MouglotteEntity(this, this.map.getTile(2, 2)));
+//		this.mouglottes.add(new MouglotteEntity(this, this.map.getTile(4, 4)));
 	}
 
 	/**
@@ -119,16 +132,19 @@ public class GameState extends BasicGameState {
 	public void update(GameContainer container, StateBasedGame game, int delta)
 			throws SlickException {
 
+		// Time keeper
+		this.timeKeeper.update(container, delta);
 		// Right panel
 		this.rightPanel.update(container, delta);
-
 		// Map
 		this.map.update(container, delta);
+		// Spawner
+		this.spawner.update(container, delta);
 
-		// Mouglottes
-		for (final MouglotteEntity mouglotte : this.mouglottes){
-			mouglotte.update(container, delta);
-		}
+		// // Mouglottes
+		// for (final MouglotteEntity mouglotte : this.mouglottes){
+		// mouglotte.update(container, delta);
+		// }
 	}
 
 	/**
@@ -160,12 +176,12 @@ public class GameState extends BasicGameState {
 		this.map.render(container, g);
 
 		// Render mouglottes
-		for (final MouglotteEntity mouglotte : this.mouglottes){
+		for (final MouglotteEntity mouglotte : this.mouglottes) {
 			mouglotte.render(container, g);
 		}
 		// this.mouglotte2.render(container, g);
 
-		g.drawString(this.deltaString, 300, 10);
+		g.drawString(this.timeKeeper.getTime(), 300, 10);
 	}
 
 	/**
@@ -180,82 +196,89 @@ public class GameState extends BasicGameState {
 	 * @param clickCount
 	 *            Number of clicks
 	 */
-	@Override
-	public void mouseClicked(int button, int x, int y, int clickCount) {
+//	@Override
+//	public void mouseClicked(int button, int x, int y, int clickCount) {
+//
+////		// Mouse clicked on map
+////		if (this.map.contains(x, y)) {
+////
+////			this.map.mouseClicked(button, x, y, clickCount);
+////		}
+////		// Mouse clicked on right panel
+////		// else if (this.rightPanel.contains(x,y)) {
+////		//
+////		// }
+//
+//	}
 
-		if (button == 0)
-			mouseLeftClicked(x, y, clickCount);
-		else if (button == 1)
-			mouseRightClicked(x, y);
-	}
-
-	/**
-	 * Mouse left-clicked event
-	 * 
-	 * @param x
-	 *            x position of the mouse
-	 * @param y
-	 *            y position of the mouse
-	 * @param clickCount
-	 *            Number of clicks
-	 */
-	public void mouseLeftClicked(int x, int y, int clickCount) {
-
-	}
-
-	/**
-	 * Mouse right-clicked event
-	 * 
-	 * @param x
-	 *            x position of the mouse
-	 * @param y
-	 *            y position of the mouse
-	 * @param clickCount
-	 *            Number of clicks
-	 */
-	public void mouseRightClicked(int x, int y) {
-
-		// S'il y a une unité ici
-		// if (this.map.getUnit(x, y) != 0) {
-
-		// Ici on va gérer des actions : SOCIAL, LOVE, FIGHT
-
-		// S'il n'y a pas d'unité ici
-		// } else {
-
-		// Si une unité est sélectionnée
-		// if (this.mouglotte.isSelected()) {
-		//
-		// // Réinitialisation des zones visitées
-		// this.map.clearVisited();
-		//
-		// // Recherche du chemin
-		// this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
-		// this.mouglotte.getX(), this.mouglotte.getY(), x, y));
-		// // path = finder.findPath(
-		// // new UnitMover(map.getUnit(selectedx, selectedy)),
-		// // selectedx, selectedy, x, y);
-		//
-		// // Si le chemin est trouvé
-		// // if (this.mouglotte.hasPath()) {
-		//
-		// // Déplacement de l'unité
-		// // int unit = map.getUnit(selectedx, selectedy);
-		// // map.setUnit(selectedx, selectedy, 0);
-		// // map.setUnit(x, y, unit);
-		// // selectedx = x;
-		// // selectedy = y;
-		// // // Réinitialisation du dernier chemin recherché
-		// // lastFindX = -1;
-		//
-		// // Déplacement instantané
-		// // this.mouglotte.setLocation(x, y);
-		//
-		// // Réinitialisation du chemin
-		// // this.map.clearPath();
-		// // }
-		// }
-	}
+	// /**
+	// * Mouse left-clicked event
+	// *
+	// * @param x
+	// * x position of the mouse
+	// * @param y
+	// * y position of the mouse
+	// * @param clickCount
+	// * Number of clicks
+	// */
+	// public void mouseLeftClicked(int x, int y, int clickCount) {
+	//
+	//
+	// }
+	//
+	// /**
+	// * Mouse right-clicked event
+	// *
+	// * @param x
+	// * x position of the mouse
+	// * @param y
+	// * y position of the mouse
+	// * @param clickCount
+	// * Number of clicks
+	// */
+	// public void mouseRightClicked(int x, int y) {
+	//
+	// // S'il y a une unité ici
+	// // if (this.map.getUnit(x, y) != 0) {
+	//
+	// // Ici on va gérer des actions : SOCIAL, LOVE, FIGHT
+	//
+	// // S'il n'y a pas d'unité ici
+	// // } else {
+	//
+	// // Si une unité est sélectionnée
+	// // if (this.mouglotte.isSelected()) {
+	// //
+	// // // Réinitialisation des zones visitées
+	// // this.map.clearVisited();
+	// //
+	// // // Recherche du chemin
+	// // this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
+	// // this.mouglotte.getX(), this.mouglotte.getY(), x, y));
+	// // // path = finder.findPath(
+	// // // new UnitMover(map.getUnit(selectedx, selectedy)),
+	// // // selectedx, selectedy, x, y);
+	// //
+	// // // Si le chemin est trouvé
+	// // // if (this.mouglotte.hasPath()) {
+	// //
+	// // // Déplacement de l'unité
+	// // // int unit = map.getUnit(selectedx, selectedy);
+	// // // map.setUnit(selectedx, selectedy, 0);
+	// // // map.setUnit(x, y, unit);
+	// // // selectedx = x;
+	// // // selectedy = y;
+	// // // // Réinitialisation du dernier chemin recherché
+	// // // lastFindX = -1;
+	// //
+	// // // Déplacement instantané
+	// // // this.mouglotte.setLocation(x, y);
+	// //
+	// // // Réinitialisation du chemin
+	// // // this.map.clearPath();
+	// // // }
+	// // }
+	// }
 
 	/**
 	 * Mouse moved event
@@ -269,21 +292,17 @@ public class GameState extends BasicGameState {
 	 * @param newy
 	 *            Current y position of the mouse
 	 */
-	@Override
-	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-
-	}
-
-	/**
-	 * Get selected mouglotte
-	 * 
-	 * @return Selected mouglotte
-	 */
-	public Mouglotte getSelectedMouglotte() {
-		
-		for (final MouglotteEntity mouglotte : this.mouglottes){
-			if (mouglotte.isSelected()) return mouglotte.getMouglotte();
-		}
-		return null;
-	}
+//	@Override
+//	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+//
+////		// Mouse clicked on map
+////		if (this.map.contains(newx, newy)) {
+////
+////			this.map.mouseMoved(oldx, oldy, newx, newy);
+////		}
+////		// Mouse clicked on right panel
+////		// else if (this.rightPanel.contains(x,y)) {
+////		//
+////		// }
+//	}
 }

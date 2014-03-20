@@ -64,7 +64,7 @@ public class Need {
 	}
 	
 	// Augmentation du besoin
-	public void raise() {
+	public void increase() {
 
 		// Bébé
 		if (this.needs.getMouglotte().getAge() < 1)

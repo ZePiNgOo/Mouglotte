@@ -1,26 +1,19 @@
-package com.mouglotte.entities;
+package com.mouglotte.time;
 
 import org.newdawn.slick.GameContainer;
 
-public interface EntityInterface {
+public interface TimeListener {
 
 	/**
-	 * Get age
-	 * 
-	 * @return Age
-	 */
-	public int getAge();
-	
-	/**
-	 * Update entity
+	 * Update
 	 * 
 	 * @param container
 	 *            Game container
 	 * @param delta
 	 *            Delta time since last call
 	 */
-	public void update(GameContainer container, int delta);
-
+	public void update(GameContainer container, long delta);
+	
 	/**
 	 * Event called every real second
 	 */

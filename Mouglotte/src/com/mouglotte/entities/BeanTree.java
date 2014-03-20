@@ -2,7 +2,9 @@ package com.mouglotte.entities;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+
 import com.mouglotte.game.GameState;
+import com.mouglotte.map.Tile;
 
 public class BeanTree extends FoodEntity {
 
@@ -11,16 +13,12 @@ public class BeanTree extends FoodEntity {
 	 * 
 	 * @param game
 	 *            Game
-	 * @param i
-	 *            Column index
-	 * @param j
-	 *            Row index
-	 * @param amount
-	 *            Amount of food
+	 * @param tile
+	 *            Tile
 	 */
-	public BeanTree(GameState game, int i, int j) {
+	public BeanTree(GameState game, Tile tile) {
 
-		super(game, j, j);
+		super(game, tile);
 
 		// // Set image
 		// try {
@@ -37,59 +35,36 @@ public class BeanTree extends FoodEntity {
 		// Begins at the first growth level
 		this.level = 1;
 	}
-
+	
 	@Override
-	protected void eventRealSecond() {
+	public boolean contains(int x, int y) {
 		// TODO Auto-generated method stub
-
+		return false;
 	}
 
 	@Override
-	protected void eventMinute() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void eventHour() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void eventDay() {
+	public void eventDay() {
 
 		// Calculate health
 		calculateHealth();
-
-		// Calculate growth level
-		calculateLevel();
-	}
-
-	@Override
-	protected void eventMonth() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void eventSeason() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	protected void eventYear() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	protected void eventHealthChanged(int oldHealth, int newHealth) {
 
 		// Modification de l'image
+
+		// If health is empty
+		if (newHealth <= 0) {
+
+			// Le beantree doit mourir
+			
+			return;
+		}
 		
-		
+		// Calculate health surplus
+		calculateHealthSurplus();
+
 		// Calculate food amount
 		calculateFood(oldHealth, newHealth);
 	}
@@ -99,6 +74,12 @@ public class BeanTree extends FoodEntity {
 
 		// Modification de l'image ou du spritesheet
 	}
+	
+	@Override
+	protected void eventFoodChanged(int oldFood, int newFood) {
+		// TODO Auto-generated method stub
+
+	}
 
 	@Override
 	protected void calculateHealth() {
@@ -106,41 +87,50 @@ public class BeanTree extends FoodEntity {
 		// Save current health
 		int health = this.health;
 		// Define the probability of having a gain or a loss
-		int lossLevel = 5;
+		int lossLevel = MAX_LEVEL + MAX_AGE;
 		// Is it a gain or a loss
 		int gainOrLoss = this.random.nextInt(lossLevel);
-		// Value of health gain or loss
-		int update = this.random.nextInt(CURRENT_HEALTH_CHANGE);
 
 		// The higher the level is, the harder to grow it is
-		switch (this.level) {
-		case 0:
-			break;
-		case 1:
-			lossLevel = lossLevel - 1;
-			break;
-		case 2:
-			lossLevel = lossLevel - 2;
-			break;
-		case 3:
-			lossLevel = lossLevel - 3;
-			break;
-		case 4:
-			lossLevel = lossLevel - 4;
-			break;
-		case 5:
-			lossLevel = lossLevel - 5;
-			break;
+		lossLevel -= this.level + this.age;
+
+		// Gain health
+		if (gainOrLoss <= lossLevel) {
+
+			addHealth(this.random
+					.nextInt(MAX_AGE - this.age > 0 ? CURRENT_HEALTH_CHANGE
+							* (MAX_AGE - this.age) : 0));
+		}
+		// Loose health
+		else {
+			removeHealth(this.random.nextInt(CURRENT_HEALTH_CHANGE * this.age));
 		}
 
-		// Gain or loose health
-		if (gainOrLoss <= lossLevel)
-			addHealth(update);
-		else
-			removeHealth(update);
-
 		// Health changed
-		eventHealthChanged(health, this.health);
+		if (health != this.health)
+			eventHealthChanged(health, this.health);
+	}
+
+	@Override
+	protected void calculateHealthSurplus() {
+
+		// Calculate health surplus
+		this.healthSurplus += this.health - LEVEL_MEDIUM_HEALTH;
+
+		// If health surplus is full
+		if (this.healthSurplus >= MAX_HEALTH) {
+
+			// Change level (will raise)
+			calculateLevel();
+			this.healthSurplus = LEVEL_MEDIUM_HEALTH;
+		}
+		// If health surplus is empty
+		else if (this.healthSurplus <= MAX_HEALTH) {
+
+			// Change level (will decrease)
+			calculateLevel();
+			this.healthSurplus = LEVEL_MEDIUM_HEALTH;
+		}
 	}
 
 	@Override
@@ -149,25 +139,21 @@ public class BeanTree extends FoodEntity {
 		// Save current level
 		int level = this.level;
 
-		// Calculate level depending on health
-		if (this.health <= LEVEL_1_HEALTH)
-			this.level = 0;
-		else if (this.health < LEVEL_2_HEALTH)
-			this.level = 1;
-		else if (this.health < LEVEL_3_HEALTH)
-			this.level = 2;
-		else if (this.health < LEVEL_4_HEALTH)
-			this.level = 3;
-		else if (this.health < LEVEL_5_HEALTH)
-			this.level = 4;
-		else
-			this.level = 5;
+		// Change level depending on health surplus
+		if (this.healthSurplus >= MAX_HEALTH)
+			this.level++;
+		else if (this.healthSurplus <= 0)
+			this.level--;
 
-		// If level has changed
-		if (this.level != level) {
-			// Level changed
+		// Maximum and minimum level
+		if (this.level > MAX_LEVEL)
+			this.level = MAX_LEVEL;
+		if (this.level < 0)
+			this.level = 0;
+
+		// Level changed
+		if (this.level != level)
 			eventLevelChanged(level, this.level);
-		}
 	}
 
 	@Override
@@ -186,12 +172,13 @@ public class BeanTree extends FoodEntity {
 	}
 
 	@Override
-	protected void mouseMoved(int x, int y) {
+	public void render(GameContainer container, Graphics g) {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
+//	protected void mouseLeftClicked(int x, int y, int clickCount) {
 	protected void mouseLeftClicked(int x, int y) {
 		// TODO Auto-generated method stub
 
@@ -202,16 +189,12 @@ public class BeanTree extends FoodEntity {
 		// TODO Auto-generated method stub
 
 	}
-
+	
 	@Override
-	public void render(GameContainer container, Graphics g) {
+//	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+	public void mouseMoved(int x, int y) {
 		// TODO Auto-generated method stub
 
 	}
 
-	@Override
-	protected void eventFoodChanged(int oldFood, int newFood) {
-		// TODO Auto-generated method stub
-
-	}
 }

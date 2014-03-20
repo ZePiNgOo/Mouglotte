@@ -3,6 +3,7 @@ package com.mouglotte.entities;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Input;
 import org.newdawn.slick.geom.Circle;
 import org.newdawn.slick.geom.Shape;
 
@@ -21,23 +22,27 @@ public class MouglotteEntity extends MovingEntity {
 	private Shape shape;
 	private Shape halo;
 
+	private int numero;
+
 	/**
 	 * Constructor
 	 * 
 	 * @param game
 	 *            Game
-	 * @param mouglotte
-	 *            Mouglotte
+	 * @param tile
+	 *            Tile
 	 */
-	public MouglotteEntity(GameState game) {
+	public MouglotteEntity(GameState game, Tile tile) {
 
-		super(game);
+		super(game, tile);
 
 		// Referenced mouglotte
 		this.mouglotte = new Mouglotte(this);
 
 		// TESTS
-		setLocation(this.map.getTile(2, 2));
+		// setLocation(this.map.getTile(2, 2));
+		this.numero = tile.getColumn();
+		this.selected = true;
 
 		// Shape (TESTS)
 		this.shape = new Circle(this.x, this.y, 10);
@@ -51,6 +56,13 @@ public class MouglotteEntity extends MovingEntity {
 	 */
 	public Mouglotte getMouglotte() {
 		return this.mouglotte;
+	}
+
+	@Override
+	public boolean contains(int x, int y) {
+
+		return this.shape.contains(GameMap.convNoScrollX(x),
+				GameMap.convNoScrollY(y));
 	}
 
 	@Override
@@ -74,32 +86,32 @@ public class MouglotteEntity extends MovingEntity {
 	}
 
 	@Override
-	protected void eventRealSecond() {
+	public void eventRealSecond() {
 		this.mouglotte.eventRealSecond();
 	}
 
 	@Override
-	protected void eventMinute() {
+	public void eventMinute() {
 		this.mouglotte.eventMinute();
 	}
 
 	@Override
-	protected void eventHour() {
+	public void eventHour() {
 		this.mouglotte.eventHour();
 	}
 
 	@Override
-	protected void eventDay() {
+	public void eventDay() {
 		this.mouglotte.eventDay();
 	}
 
 	@Override
-	protected void eventMonth() {
+	public void eventMonth() {
 		// Nothing
 	}
 
 	@Override
-	protected void eventSeason() {
+	public void eventSeason() {
 		// Nothing
 	}
 
@@ -181,71 +193,85 @@ public class MouglotteEntity extends MovingEntity {
 	 */
 	public Tile searchNear(MemoryType type) {
 
-		Tile neighbor = null;
+		// If nothing searched, then you got it
+		if (type == null)
+			return this.tile;
+
+		Tile retTile = this.tile;
 		Entity actWith = null;
 
 		// Starts with current tile
 		switch (type) {
 		case FOOD:
-			actWith = this.tile.getFood();
+			actWith = retTile.getFood();
+			break;
 		case FRIEND:
-			actWith = this.tile.getFriend(this.mouglotte);
+			actWith = retTile.getFriend(this.mouglotte);
+			break;
 		case LOVER:
-			actWith = this.tile.getLover(this.mouglotte);
+			actWith = retTile.getLover(this.mouglotte);
+			break;
 		case ENEMY:
-			actWith = this.tile.getEnemy(this.mouglotte);
+			actWith = retTile.getEnemy(this.mouglotte);
+			break;
 		case WORK:
-			actWith = this.tile.getWork();
-
-			// Something to act with has been found
-			if (actWith != null) {
-
-				// The mouglotte will act with this
-				this.mouglotte.actWith(actWith);
-				// It has been found on the tile
-				return this.tile;
-			}
+			actWith = retTile.getWork();
 			break;
 		default:
 			break;
+		}
+
+		// Something to act with has been found
+		if (actWith != null) {
+
+			// The mouglotte will act with this
+			this.mouglotte.actWith(actWith);
+			// It has been found on the tile
+			return retTile;
 		}
 
 		// Search through neighbors
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
 
-				// Not a neighbor, its the current tile
+				// Not a neighbor, it's the current tile
 				if ((i == 0) && (j == 0)) {
 					continue;
 				}
-				
+
 				// Get neighbor tile
-				neighbor = this.map.getTile(this.tile.getColumn() + i,
+				retTile = this.map.getTile(this.tile.getColumn() + i,
 						this.tile.getRow() + j);
 
-				switch (type) {
-				case FOOD:
-					actWith = neighbor.getFood();
-				case FRIEND:
-					actWith = neighbor.getFriend(this.mouglotte);
-				case LOVER:
-					actWith = neighbor.getLover(this.mouglotte);
-				case ENEMY:
-					actWith = neighbor.getEnemy(this.mouglotte);
-				case WORK:
-					actWith = neighbor.getWork();
-
-					// Something to act with has been found
-					if (actWith != null) {
-
-						// The mouglotte will act with this
-						this.mouglotte.actWith(actWith);
-						// It has been found on the tile
-						return neighbor;
+				if (retTile != null) {
+					switch (type) {
+					case FOOD:
+						actWith = retTile.getFood();
+						break;
+					case FRIEND:
+						actWith = retTile.getFriend(this.mouglotte);
+						break;
+					case LOVER:
+						actWith = retTile.getLover(this.mouglotte);
+						break;
+					case ENEMY:
+						actWith = retTile.getEnemy(this.mouglotte);
+						break;
+					case WORK:
+						actWith = retTile.getWork();
+						break;
+					default:
+						break;
 					}
-					break;
-				default:
-					break;
+				}
+
+				// Something to act with has been found
+				if (actWith != null) {
+
+					// The mouglotte will act with this
+					this.mouglotte.actWith(actWith);
+					// It has been found on the tile
+					return retTile;
 				}
 			}
 		}
@@ -293,17 +319,27 @@ public class MouglotteEntity extends MovingEntity {
 	}
 
 	@Override
-	protected void mouseMoved(int x, int y) {
+	// public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+	//
+	// // Set mouse over
+	// this.over = contains(GameMap.convNoScrollX(newx),
+	// GameMap.convNoScrollY(newy));
+	//
+	// // Il faut faire un petit idle
+	// }
+	public void mouseMoved(int x, int y) {
 
 		// Set mouse over
-		this.over = this.shape.contains(GameMap.convNoScrollX(x),
-				GameMap.convNoScrollY(y));
+		this.over = contains(GameMap.convNoScrollX(x), GameMap.convNoScrollY(y));
 
 		// Il faut faire un petit idle
 	}
 
 	@Override
+	// protected void mouseLeftClicked(int x, int y, int clickCount) {
 	protected void mouseLeftClicked(int x, int y) {
+
+		int num = this.numero;
 
 		// If mouse is in the shape
 		if (this.over)
@@ -318,6 +354,8 @@ public class MouglotteEntity extends MovingEntity {
 
 	@Override
 	protected void mouseRightClicked(int x, int y) {
+
+		int num = this.numero;
 
 		// If mouglotte is selected
 		if (this.selected) {

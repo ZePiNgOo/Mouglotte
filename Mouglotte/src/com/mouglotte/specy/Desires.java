@@ -140,42 +140,44 @@ public class Desires {
 		this.desires.put(desire.getType(), desire);
 	}
 
-	// Evénement exécuté toutes les minutes
-	public void eventMinute() {
+	/**
+	 * Fulfill current desire
+	 */
+	public void fulfill() {
 		
-		// Mise à jour de l'envie courante si elle est en train de s'accomplir
+		// Fulfill current desire if it has to be
 		if (this.current != null && this.fulfilling) {
+
 			this.current.fulfill();
+			
+			// If the need is completely fulfilled
+			if (this.current.getValue() <= 0)
+				this.setFulfilling(false);
 		}
 	}
 	
-	// Evénement exécuté toutes les heures
-	public void eventHour() {
+	/**
+	 * Decide current desire
+	 */
+	public void decide() {
 		
-		// Mise à jour du temps passé à chercher à accomplir l'envie
+		// Update searching time
 		if (this.searching) this.searchingTime++;
 		
-		// S'il n'y a pas d'envie
-		// Si le temps maximum de recherche de l'envie est dépassé
-		// Si l'envie est en train de s'accomplir
+		// If they're is no desire
+		// If searching time has been too long
+		// If desire is fulfilling
 		if ((this.current == null) || 
 				(this.searching && this.searchingTime > MAX_SEARCHING_TIME) ||
 				this.fulfilling) {
 			
-			// Décision de l'envie la plus pressante
-			decide();
+			// Define current desire
+			setCurrent();
+			// Initialization
+			this.searchingTime = 0;
+			this.searching = false;
+			this.fulfilling = false;
 		}
-	}
-	
-	// Décision de l'envie la plus pressante
-	public void decide() {
-			
-		// Définition de l'envie la plus pressante
-		setCurrent();
-		// Réinitialisation
-		this.searchingTime = 0;
-		this.searching = false;
-		this.fulfilling = false;
 	}
 	
 	// Mise à jour de la liste des envies précédentes

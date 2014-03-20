@@ -2,7 +2,12 @@ package com.mouglotte.entities;
 
 import java.util.Random;
 
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Graphics;
+
 import com.mouglotte.game.GameState;
+import com.mouglotte.map.GameMap;
+import com.mouglotte.map.Tile;
 
 public abstract class FoodEntity extends Entity {
 
@@ -10,24 +15,29 @@ public abstract class FoodEntity extends Entity {
 	protected final static int MAX_HEALTH = 1000;
 	/** Current health change (gain or loss) */
 	protected static int CURRENT_HEALTH_CHANGE = 10;
-	protected static int CURRENT_HEALTH_CHANGE_RANDOM = 1;
 	/** Levels (value of minimum health for each level) */
-	protected static int LEVEL_1_HEALTH = 0;
-	protected static int LEVEL_2_HEALTH = 100;
-	protected static int LEVEL_3_HEALTH = 200;
-	protected static int LEVEL_4_HEALTH = 300;
-	protected static int LEVEL_5_HEALTH = 400;
+	protected static int LEVEL_1 = 1;
+	protected static int LEVEL_2 = 2;
+	protected static int LEVEL_3 = 3;
+	protected static int LEVEL_4 = 4;
+	protected static int LEVEL_5 = 5;
+	protected static int MAX_LEVEL = LEVEL_5;
+	protected static int LEVEL_MEDIUM_HEALTH = 500;
+	/** Maximum age */
+	protected static int MAX_AGE = 10;
 	/** Maximum food amount */
 	protected static int MAX_FOOD = 1000;
-	/** Consume amount */
-	public static int CONSUME_AMOUNT = 100;
+	/** Consume amount (by minute) */
+	public static int CONSUME_AMOUNT = 5;
 
 	/** Heath */
 	protected int health;
 	/** Growth level */
 	protected int level;
+	/** Health surplus (needed to gain a level) */
+	protected int healthSurplus;
 	/** Food amount */
-	protected int food = 0;
+	protected int food;
 
 	/** Random */
 	protected Random random = new Random();
@@ -37,22 +47,18 @@ public abstract class FoodEntity extends Entity {
 	 * 
 	 * @param game
 	 *            Game
-	 * @param i
-	 *            Column index
-	 * @param j
-	 *            Row index
-	 * @param amount
-	 *            Food amount
+	 * @param tile
+	 *            Tile
 	 */
-	public FoodEntity(GameState game, int i, int j) {
+	public FoodEntity(GameState game, Tile tile) {
 
-		super(game);
+		super(game, tile);
 
-		// Set tile
-		this.tile = this.game.getMap().getTile(i, j);
-
-		// Set location
-		setLocation(this.tile);
+		// Level
+		this.level = LEVEL_1;
+		// Health
+		this.health = LEVEL_MEDIUM_HEALTH;
+		this.healthSurplus = LEVEL_MEDIUM_HEALTH;
 	}
 
 	/**
@@ -96,7 +102,7 @@ public abstract class FoodEntity extends Entity {
 		if (this.health < 0)
 			this.health = 0;
 	}
-	
+
 	/**
 	 * Add food to the entity
 	 * 
@@ -115,20 +121,50 @@ public abstract class FoodEntity extends Entity {
 	 * @param food
 	 *            Food to remove
 	 */
-	protected void removeFood(int food) {
+	public void removeFood(int food) {
 		this.food -= food;
 		if (this.food < 0)
 			this.food = 0;
 	}
 
 	@Override
-	protected void eventMonth() {
+	public void eventRealSecond() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventMinute() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventHour() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventDay() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventYear() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void eventMonth() {
 		// Nothing
 		// Eventually giving fruits ?
 	}
 
 	@Override
-	protected void eventSeason() {
+	public void eventSeason() {
 		// Nothing
 		// Eventually blossom/loose leaves ?
 	}
@@ -169,6 +205,12 @@ public abstract class FoodEntity extends Entity {
 	protected abstract void calculateHealth();
 
 	/**
+	 * Calculate health surplus
+	 * 
+	 */
+	protected abstract void calculateHealthSurplus();
+
+	/**
 	 * Calculate level
 	 */
 	protected abstract void calculateLevel();
@@ -183,15 +225,44 @@ public abstract class FoodEntity extends Entity {
 	 */
 	protected abstract void calculateFood(int oldHealth, int newHealth);
 
+	/**
+	 * Entity dies
+	 */
+	protected void die() {
+		// Entity is removed from its tile
+		this.getTile().removeEntity(this);
+	}
+
 	@Override
+	public void render(GameContainer container, Graphics g) {
+
+		g.drawString(Integer.toString(this.food), this.x + GameMap.TILE_SIZE
+				/ 2, this.y + GameMap.TILE_SIZE / 2);
+	}
+
+	@Override
+	// protected void mouseLeftClicked(int x, int y, int clickCount) {
 	protected void mouseLeftClicked(int x, int y) {
 
-		// If mouse is on the entity
+		// If mouse is on the mushroom
 		if (this.over)
 			this.selected = true;
 		else
 			this.selected = false;
 
 		// Mais il faut aussi déselectionner ce qui l'était
+	}
+
+	@Override
+	protected void mouseRightClicked(int x, int y) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	// public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+	public void mouseMoved(int x, int y) {
+		// TODO Auto-generated method stub
+
 	}
 }

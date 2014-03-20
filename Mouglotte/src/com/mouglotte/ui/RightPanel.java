@@ -18,10 +18,6 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	/** Game */
 	private GameState game;
 
-	/** First time displayed */
-	private boolean firstTime = true;
-	private boolean mouglotteFirstTime = true;
-
 	/** Needs progress bar */
 	private Bar barNeedHunger;
 	private Bar barNeedRest;
@@ -193,21 +189,17 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 		g.translate(GameMap.DISPLAYED_TILES * GameMap.TILE_SIZE + 1, 0);
 
 		// Draw only the first time
-		if (this.firstTime) {
 
-			// Display panel border
-			g.setColor(Color.red);
-			g.drawRect(0, 0, Game.SCREEN_WIDTH - GameMap.TILE_SIZE
-					* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
-
-			this.firstTime = false;
-		}
+		// Display panel border
+		g.setColor(Color.red);
+		g.drawRect(0, 0, Game.SCREEN_WIDTH - GameMap.TILE_SIZE
+				* GameMap.DISPLAYED_TILES - 2, Game.SCREEN_HEIGHT - 1);
 
 		// Get selected mouglotte
 		Mouglotte mouglotte = this.game.getSelectedMouglotte();
 
 		if (mouglotte != null)
-			renderForMouglotte(container,g,mouglotte);
+			renderForMouglotte(container, g, mouglotte);
 
 		// Initialize graphics position
 		g.resetTransform();
@@ -226,14 +218,8 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	private void renderForMouglotte(GameContainer container, Graphics g,
 			Mouglotte mouglotte) {
 
-		// Draw only the first time
-		if (this.mouglotteFirstTime) {
-		
-			g.drawString("Mouglotte", 2, 2);
-			
-			this.mouglotteFirstTime = false;
-		}
-		
+		g.drawString("Mouglotte", 2, 2);
+
 		// Render needs and desires values
 		try {
 			this.barNeedHunger.render(container, g);

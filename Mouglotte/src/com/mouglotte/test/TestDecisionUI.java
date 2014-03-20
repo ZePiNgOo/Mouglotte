@@ -204,8 +204,8 @@ public class TestDecisionUI extends JFrame implements ActionListener {
 
 	private void testEventMinute(int minutes) {
 
-		this.needs.eventMinute();
-		this.desires.eventMinute();
+		this.needs.fulfill();
+		this.desires.fulfill();
 
 		this.txtTimer.setText(Integer.toString(minutes));
 		displayCurrent();
@@ -213,8 +213,8 @@ public class TestDecisionUI extends JFrame implements ActionListener {
 
 	private void testEventHour() {
 
-		this.needs.eventHour();
-		this.desires.eventHour();
+		this.needs.decide();
+		this.desires.decide();
 
 		if (this.needs.getCurrent().getValue() > this.desires.getCurrent()
 				.getValue()) {

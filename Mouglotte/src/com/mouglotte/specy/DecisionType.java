@@ -60,6 +60,28 @@ public enum DecisionType {
 	}
 
 	/**
+	 * Is this a desire decision ?
+	 * 
+	 * @return True if the decision is a desire
+	 */
+	public boolean isDesire() {
+		return this == DESIRE_HUNGER || this == DESIRE_REST
+				|| this == DESIRE_SOCIAL || this == DESIRE_FUN
+				|| this == DESIRE_LOVE || this == DESIRE_FIGHT
+				|| this == DESIRE_WORK;
+	}
+
+	/**
+	 * Is this a desire decision ?
+	 * 
+	 * @return True if the decision is a need
+	 */
+	public boolean isNeed() {
+		return this == NEED_HUNGER || this == NEED_REST || this == NEED_SOCIAL
+				|| this == NEED_FUN;
+	}
+
+	/**
 	 * Is this a eating decision ?
 	 * 
 	 * @return True if the decision is to eat

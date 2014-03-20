@@ -49,10 +49,12 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * 
 	 * @param game
 	 *            Game
+	 * @param tile
+	 *            Tile
 	 */
-	public MovingEntity(GameState game) {
+	public MovingEntity(GameState game, Tile tile) {
 
-		super(game);
+		super(game, tile);
 
 		// Map
 		this.map = this.game.getMap();
@@ -73,6 +75,10 @@ public abstract class MovingEntity extends Entity implements Mover {
 		if (this.lastTile != this.tile)
 			this.lastTile = this.tile;
 
+		// Old tile
+		if (this.lastTile != null)
+			this.lastTile.removeEntity(this);
+
 		// New location
 		super.setLocation(x, y);
 	}
@@ -85,6 +91,10 @@ public abstract class MovingEntity extends Entity implements Mover {
 		this.lastY = this.y;
 		if (this.lastTile != this.tile)
 			this.lastTile = this.tile;
+
+		// Old tile
+		if (this.lastTile != null)
+			this.lastTile.removeEntity(this);
 
 		// New location
 		super.setLocation(tile);
@@ -105,8 +115,8 @@ public abstract class MovingEntity extends Entity implements Mover {
 
 		// Tile containing these coordinates
 		// x,y are the real coordinates, not scrolled
-		this.targetTile = this.map.getTileAtPosition(
-				GameMap.convScrollX(x), GameMap.convScrollY(y));
+		this.targetTile = this.map.getTileAtPosition(GameMap.convScrollX(x),
+				GameMap.convScrollY(y));
 	}
 
 	/**
@@ -252,16 +262,17 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 */
 	protected void move(long delta) {
 
-		// Eventually remove entity from last tile (only if on a new tile)
-		this.tile.removeEntity(this);
-
+//		if (this.targetX == 0 && this.targetY == 0)
+		if (this.targetTile == null)
+			return;
+		
 		// TESTS
 		delta = 17;
 
 		// If the entity has reached its target
 		if (hasReachedTarget()) {
 
-			Debug.log("MOVING", "MovingEntity::Move:Target reached");
+			//Debug.log("MOVING", "MovingEntity::Move:Target reached");
 
 			// If the entity is still on a path
 			if (isOnAPath()) {
@@ -279,7 +290,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 			// If the entity hasn't reached its target
 		} else {
 
-			if (isOnAPath()) {
+//			if (isOnAPath()) {
 				// Debug.log("MOVING", "MovingEntity::Move:Target not reached");
 
 				boolean collisionSteeringUsed = false;
@@ -353,51 +364,9 @@ public abstract class MovingEntity extends Entity implements Mover {
 				setLocation(newX, newY);
 
 				// lastTileMapBlock = getCoordinatesOfCurrentBlock();
-			}
+//			}
 		}
-
-		// Register entity in the new tile
-		this.tile.addEntity(this);
-
-		// if (this.path != null) {
-		//
-		// // Move to the center of the next tile
-		// int destX = this.path.getStep(0).getX() * GameMap.TILE_SIZE
-		// + GameMap.TILE_SIZE / 2;
-		// int destY = this.path.getStep(0).getY() * GameMap.TILE_SIZE
-		// + GameMap.TILE_SIZE / 2;
-		//
-		// // Move one pixel to this location
-		// int dirX = destX - this.x;
-		// if (dirX != 0)
-		// dirX = dirX * 1 / Math.abs(dirX);
-		// int dirY = destY - this.y;
-		// if (dirY != 0)
-		// dirY = dirY * 1 / Math.abs(dirY);
-		//
-		// // Set location
-		// setLocation(this.x + dirX, this.y + dirY);
-		//
-		// // Arrived at destination
-		// if (hasReachedTarget(this.path.getStep(0))) {
-		//
-		// // Step is done, delete
-		// this.path.removeStep(0);
-		// }
-		//
-		// // No more step, path is done
-		// if (this.path.getLength() == 0) {
-		// this.path = null;
-		// }
-		// }
 	}
-
-	/**
-	 * Cancel path
-	 */
-	// protected void clearPath() {
-	// this.path = null;
-	// }
 
 	/**
 	 * Send entity to a location
@@ -407,7 +376,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * @param y
 	 *            y position
 	 */
-	protected void headToward(int x, int y) {
+	public void headToward(int x, int y) {
 		setTargetLocation(x, y);
 	}
 
@@ -417,7 +386,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * @param tile
 	 *            Tile
 	 */
-	protected void headToward(Tile tile) {
+	public void headToward(Tile tile) {
 		setTargetLocation(tile);
 	}
 
@@ -499,7 +468,7 @@ public abstract class MovingEntity extends Entity implements Mover {
 	 * 
 	 * @return True if the entity is on a path
 	 */
-	protected boolean isOnAPath() {
+	public boolean isOnAPath() {
 		return (this.path != null);
 	}
 
@@ -528,8 +497,8 @@ public abstract class MovingEntity extends Entity implements Mover {
 		else
 			Debug.log(
 					"MOVING_ENTITY",
-					"MovingEntity::GoTo " + tile.getCenterX() + ","
-							+ tile.getCenterY());
+					"MovingEntity::GoTo " + tile.getColumn() + ","
+							+ tile.getRow());
 	}
 
 	/**

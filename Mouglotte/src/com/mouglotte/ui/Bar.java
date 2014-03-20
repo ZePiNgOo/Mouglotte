@@ -19,7 +19,7 @@ public class Bar extends AbstractComponent {
 	public static final Color COLOR_LINE = Color.red;
 	public static final Color COLOR_BACKGROUND = Color.black;
 	public static final Color COLOR_FOREGROUND = Color.green;
-	
+
 	/** Position */
 	int x = 0, y = 0;
 	/** Width and height */
@@ -79,7 +79,7 @@ public class Bar extends AbstractComponent {
 		// Define progress size
 		double interval = this.max - this.min;
 		double progress = (value - this.min) / interval;
-		progress = progress * (this.width - 2); 
+		progress = progress * (this.width - 2);
 		this.progress = (int) progress;
 
 		// Update foreground color
@@ -155,11 +155,12 @@ public class Bar extends AbstractComponent {
 	public int getY() {
 		return this.y;
 	}
-	
+
 	/**
 	 * Highlight bar
 	 * 
-	 * @param highlight True to highlight
+	 * @param highlight
+	 *            True to highlight
 	 */
 	public void highlight(boolean highlight) {
 		if (highlight)
@@ -185,5 +186,8 @@ public class Bar extends AbstractComponent {
 		// Progress
 		g.setColor(this.foreground);
 		g.fillRect(this.x + 1, this.y + 1, this.progress, this.height - 2);
+		// Text
+		g.setColor(Color.white);
+		g.drawString(this.text, this.x + this.width / 2, this.y + 2);
 	}
 }
