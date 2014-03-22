@@ -504,7 +504,8 @@ public class GameMap implements TileBasedMap {
 				// an object
 				// if (objects[i][j] != 0)
 				// g.fillRect((x1, y1, width, height);
-				if (i >= 0 && j >= 0)
+				if (i >= 0 && j >= 0 && i < getWidthInTiles()
+						&& i < getHeightInTiles())
 					getTile(i, j).render(container, g);
 				// if (entities[i][j] != null)
 				// entities[i][j].render(container, g);
@@ -615,30 +616,30 @@ public class GameMap implements TileBasedMap {
 	 * @param newy
 	 *            Current y position of the mouse
 	 */
-//	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
-//
-////		// Current tile where the mouse is
-////		Tile tile = getTileAtPosition(newx, newy);
-////
-////		// Get all the tiles around the mouse
-////		for (int i = tile.getColumn() - 1; i <= tile.getColumn() + 1; i++) {
-////			for (int j = tile.getRow() - 1; j <= tile.getRow() + 1; j++) {
-////
-////				// Tile is on the map
-////				if ((i >= 0) && (i < getWidthInTiles()) && (j >= 0)
-////						&& (i < getHeightInTiles())) {
-////
-////					// Read through entities on the tile
-////					for (Entity entity : tile.getEntities()) {
-////						if (entity.contains(newx, newy)) {
-////							entity.setMouseOver(true);
-////							return;
-////						}
-////					}
-////				}
-////			}
-////		}
-//	}
+	// public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+	//
+	// // // Current tile where the mouse is
+	// // Tile tile = getTileAtPosition(newx, newy);
+	// //
+	// // // Get all the tiles around the mouse
+	// // for (int i = tile.getColumn() - 1; i <= tile.getColumn() + 1; i++) {
+	// // for (int j = tile.getRow() - 1; j <= tile.getRow() + 1; j++) {
+	// //
+	// // // Tile is on the map
+	// // if ((i >= 0) && (i < getWidthInTiles()) && (j >= 0)
+	// // && (i < getHeightInTiles())) {
+	// //
+	// // // Read through entities on the tile
+	// // for (Entity entity : tile.getEntities()) {
+	// // if (entity.contains(newx, newy)) {
+	// // entity.setMouseOver(true);
+	// // return;
+	// // }
+	// // }
+	// // }
+	// // }
+	// // }
+	// }
 
 	/**
 	 * Mouse clicked event
@@ -652,22 +653,22 @@ public class GameMap implements TileBasedMap {
 	 * @param clickCount
 	 *            Number of clicks
 	 */
-//	public void mouseClicked(int button, int x, int y, int clickCount) {
-//
-////		// Mouse clicked on map
-////		if (this.map.contains(x, y)) {
-////
-////			this.map.mouseClicked(x, y, clickcount);
-////			if (button == 0)
-////				this.map.mouseLeftClicked(x, y, clickCount);
-////			else if (button == 1)
-////				this.map.mouseRightClicked(x, y);
-////		}
-////		// Mouse clicked on right panel
-////		// else if (this.rightPanel.contains(x,y)) {
-////		//
-////		// }
-//	}
+	// public void mouseClicked(int button, int x, int y, int clickCount) {
+	//
+	// // // Mouse clicked on map
+	// // if (this.map.contains(x, y)) {
+	// //
+	// // this.map.mouseClicked(x, y, clickcount);
+	// // if (button == 0)
+	// // this.map.mouseLeftClicked(x, y, clickCount);
+	// // else if (button == 1)
+	// // this.map.mouseRightClicked(x, y);
+	// // }
+	// // // Mouse clicked on right panel
+	// // // else if (this.rightPanel.contains(x,y)) {
+	// // //
+	// // // }
+	// }
 
 	/**
 	 * Mouse left-clicked event
@@ -679,9 +680,9 @@ public class GameMap implements TileBasedMap {
 	 * @param clickCount
 	 *            Number of clicks
 	 */
-//	public void mouseLeftClicked(int x, int y, int clickCount) {
-//
-//	}
+	// public void mouseLeftClicked(int x, int y, int clickCount) {
+	//
+	// }
 
 	/**
 	 * Mouse right-clicked event
@@ -693,47 +694,47 @@ public class GameMap implements TileBasedMap {
 	 * @param clickCount
 	 *            Number of clicks
 	 */
-//	public void mouseRightClicked(int x, int y) {
-//
-//		// S'il y a une unité ici
-//		// if (this.map.getUnit(x, y) != 0) {
-//
-//		// Ici on va gérer des actions : SOCIAL, LOVE, FIGHT
-//
-//		// S'il n'y a pas d'unité ici
-//		// } else {
-//
-//		// Si une unité est sélectionnée
-//		// if (this.mouglotte.isSelected()) {
-//		//
-//		// // Réinitialisation des zones visitées
-//		// this.map.clearVisited();
-//		//
-//		// // Recherche du chemin
-//		// this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
-//		// this.mouglotte.getX(), this.mouglotte.getY(), x, y));
-//		// // path = finder.findPath(
-//		// // new UnitMover(map.getUnit(selectedx, selectedy)),
-//		// // selectedx, selectedy, x, y);
-//		//
-//		// // Si le chemin est trouvé
-//		// // if (this.mouglotte.hasPath()) {
-//		//
-//		// // Déplacement de l'unité
-//		// // int unit = map.getUnit(selectedx, selectedy);
-//		// // map.setUnit(selectedx, selectedy, 0);
-//		// // map.setUnit(x, y, unit);
-//		// // selectedx = x;
-//		// // selectedy = y;
-//		// // // Réinitialisation du dernier chemin recherché
-//		// // lastFindX = -1;
-//		//
-//		// // Déplacement instantané
-//		// // this.mouglotte.setLocation(x, y);
-//		//
-//		// // Réinitialisation du chemin
-//		// // this.map.clearPath();
-//		// // }
-//		// }
-//	}
+	// public void mouseRightClicked(int x, int y) {
+	//
+	// // S'il y a une unité ici
+	// // if (this.map.getUnit(x, y) != 0) {
+	//
+	// // Ici on va gérer des actions : SOCIAL, LOVE, FIGHT
+	//
+	// // S'il n'y a pas d'unité ici
+	// // } else {
+	//
+	// // Si une unité est sélectionnée
+	// // if (this.mouglotte.isSelected()) {
+	// //
+	// // // Réinitialisation des zones visitées
+	// // this.map.clearVisited();
+	// //
+	// // // Recherche du chemin
+	// // this.mouglotte.setPath(this.map.findPath(new UnitMover(3),
+	// // this.mouglotte.getX(), this.mouglotte.getY(), x, y));
+	// // // path = finder.findPath(
+	// // // new UnitMover(map.getUnit(selectedx, selectedy)),
+	// // // selectedx, selectedy, x, y);
+	// //
+	// // // Si le chemin est trouvé
+	// // // if (this.mouglotte.hasPath()) {
+	// //
+	// // // Déplacement de l'unité
+	// // // int unit = map.getUnit(selectedx, selectedy);
+	// // // map.setUnit(selectedx, selectedy, 0);
+	// // // map.setUnit(x, y, unit);
+	// // // selectedx = x;
+	// // // selectedy = y;
+	// // // // Réinitialisation du dernier chemin recherché
+	// // // lastFindX = -1;
+	// //
+	// // // Déplacement instantané
+	// // // this.mouglotte.setLocation(x, y);
+	// //
+	// // // Réinitialisation du chemin
+	// // // this.map.clearPath();
+	// // // }
+	// // }
+	// }
 }

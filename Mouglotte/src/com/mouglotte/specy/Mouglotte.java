@@ -5,6 +5,8 @@ import java.util.Random;
 import com.mouglotte.entities.Entity;
 import com.mouglotte.entities.FoodEntity;
 import com.mouglotte.entities.MouglotteEntity;
+import com.mouglotte.entities.Relation;
+import com.mouglotte.entities.Relations;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.genetics.Karyotype;
 import com.mouglotte.map.Tile;
@@ -24,6 +26,8 @@ public class Mouglotte {
 	private Memories memories;
 	/** Traits */
 	private Traits traits;
+	/** Skills */
+	private Skills skills;
 	/** Needs */
 	private Needs needs;
 	/** Desires */
@@ -42,38 +46,39 @@ public class Mouglotte {
 	/**
 	 * Constructor
 	 * 
-	 * @param game
-	 *            GameState
+	 * @param entity
+	 *            Entity
 	 */
-
 	public Mouglotte(MouglotteEntity entity) {
 
-		// // Jeu
-		// this.game = game;
 		// Entity
 		this.entity = entity;
-		// Caryotype
+		// Karyotype
 		this.karyotype = new Karyotype();
-		// Mémoire
-		this.memories = new Memories(getGeneValue("ZE"));
-		// Traits de caractère
+		// Memory
+		this.memories = new Memories(this);
+		// Traits
 		this.traits = new Traits(this);
-		// Besoins
+		// Skills
+		this.skills = new Skills(this);
+		// Needs
 		this.needs = new Needs(this);
-		// Envies
+		// Desires
 		this.desires = new Desires(this);
 
 		// Decision
 		this.decision = DecisionType.NEED_HUNGER;
 
-		// Date de naissance
+		// Birth date
 		this.birthDate = System.currentTimeMillis();
 
-		// Initialisation des traits de caractères
+		// Initialize traits
 		initTraits();
-		// Initialisation des besoins
+		// Initialize skills
+		initSkills();
+		// Initialize needs
 		initNeeds();
-		// Initialisation des envies
+		// Initialize desires
 		initDesires();
 	}
 
@@ -149,6 +154,15 @@ public class Mouglotte {
 	 */
 	public DecisionType getDecision() {
 		return this.decision;
+	}
+
+	/**
+	 * Get entity
+	 * 
+	 * @return Entity
+	 */
+	public MouglotteEntity getEntity() {
+		return this.entity;
 	}
 
 	/**
@@ -306,6 +320,13 @@ public class Mouglotte {
 	}
 
 	/**
+	 * Initialization of the skills
+	 */
+	private void initSkills() {
+
+	}
+
+	/**
 	 * Initialization of the needs
 	 */
 	private void initNeeds() {
@@ -399,7 +420,7 @@ public class Mouglotte {
 	 * 
 	 * @return Gene value
 	 */
-	private int getGeneValue(String name) {
+	public int getGeneValue(String name) {
 		return Genetics.getValue(name, this.karyotype);
 	}
 
@@ -531,10 +552,10 @@ public class Mouglotte {
 
 			// Starting to search
 			setSearching(true);
-			
+
 			// Search memory
 			searchMemory(false);
-			
+
 		} else
 			Debug.log("MOUGLOTTE", "Mouglotte::Decide:Finishing current action");
 
@@ -619,7 +640,7 @@ public class Mouglotte {
 
 				// If we're not at destination
 			} else {
-				
+
 				// If we're not on a path, then nothing to do
 				if (!this.entity.isOnAPath())
 					nothingToDo();
@@ -705,6 +726,9 @@ public class Mouglotte {
 		Debug.log("MOUGLOTTE", "Mouglotte::Fulfill::End");
 	}
 
+	/**
+	 * Eat
+	 */
 	private void eat() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Eat");
@@ -714,27 +738,8 @@ public class Mouglotte {
 		// Beginning to eat
 		if (this.action != ActionType.EATING) {
 
-			if (food != null) {
-
-				// If the food entity has food
-				if (food.hasFood()) {
-
-					// Reward current memory
-					this.memories.rewardCurrent(Memory.REWARD_POINTS);
-
-					// If the food entity hasn't more food
-				} else {
-
-					// Low reward current memory
-					this.memories.rewardCurrent(Memory.REWARD_LOW_POINTS);
-				}
-
-				// Save memory
-				// If there's a current memory then it's no use to save it
-				if (!this.memories.hasCurrent())
-					this.memories.put(new Memory(MemoryType
-							.getMemoryType(this.decision), this.actWith));
-			}
+			// Reward for food memory
+			this.memories.rewardFood(food);
 		}
 
 		// Change action (or go on)
@@ -761,6 +766,9 @@ public class Mouglotte {
 		Debug.log("MOUGLOTTE", "Mouglotte::Eat::End");
 	}
 
+	/**
+	 * Rest
+	 */
 	private void rest() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Rest");
@@ -771,6 +779,9 @@ public class Mouglotte {
 
 		// Change action (or go on)
 		this.action = ActionType.RESTING;
+
+		// Gérer les réveils intempestifs, si quelqu'un approche
+		// On peut imaginer un random ou un gene "sommeil léger"
 
 		// Gestion de l'animation (dans MouglotteEntity)
 
@@ -784,131 +795,39 @@ public class Mouglotte {
 		Debug.log("MOUGLOTTE", "Mouglotte::Rest::End");
 	}
 
+	/**
+	 * Talk
+	 */
 	private void talk() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Talk");
 
-		MouglotteEntity mouglotte = (MouglotteEntity) this.actWith;
+		MouglotteEntity other = (MouglotteEntity) this.actWith;
 
 		// Beginning to talk
 		if (this.action != ActionType.TALKING) {
 
-			if (mouglotte != null) {
-
-				// Check if the entity wants to talk with me
-				boolean wantsToTalk = mouglotte.getMouglotte()
-						.wantsToTalk(this);
-
-				// If a memory was followed
-				if (this.memories.getCurrent() != null) {
-
-					// If the entity we're talking with was the one in the
-					// memory
-					if (this.memories.getCurrent().getEntity() == mouglotte) {
-
-						// Reward current memory
-						if (wantsToTalk)
-							this.memories.rewardCurrent(Memory.REWARD_POINTS);
-						else
-							this.memories
-									.penalizeCurrent(Memory.PENALIZE_LOW_POINTS);
-
-						// Update location of the memory
-						this.memories.getCurrent().setTile(mouglotte.getTile());
-
-						// If the entity we're talking with was not the one in
-						// the memory
-					} else {
-
-						// Try to get the same memory type with this entity
-						Memory memory = this.memories.get(this.memories
-								.getCurrent().getType(), mouglotte);
-
-						// A memory exists with the same type and this entity
-						if (memory != null) {
-
-							// Reward the memory
-							if (wantsToTalk)
-								memory.reward(Memory.REWARD_POINTS);
-							else
-								memory.penalize(Memory.PENALIZE_LOW_POINTS);
-
-							// Update location of the memory
-							memory.setTile(mouglotte.getTile());
-
-							// No memory exists with the same type and this
-							// entity
-						} else {
-
-							// Save memory
-							if (wantsToTalk) {
-								memory = new Memory(
-										MemoryType.getMemoryType(this.decision),
-										this.entity);
-								memory.setPoints(Memory.REWARD_POINTS);
-								this.memories.put(memory);
-							}
-						}
-
-					}
-					// If no memory was followed
-				} else {
-
-					// Try to get the same memory type with this entity
-					Memory memory = this.memories.get(
-							MemoryType.getMemoryType(this.decision), mouglotte);
-
-					// A memory exists with the same type and this entity
-					if (memory != null) {
-
-						// Reward the memory
-						if (wantsToTalk)
-							memory.reward(Memory.REWARD_POINTS);
-						else
-							memory.penalize(Memory.PENALIZE_LOW_POINTS);
-
-						// Update location of the memory
-						memory.setTile(mouglotte.getTile());
-
-						// No memory exists with the same type and this entity
-					} else {
-
-						// Save memory
-						if (wantsToTalk) {
-							memory = new Memory(
-									MemoryType.getMemoryType(this.decision),
-									this.entity);
-							memory.setPoints(Memory.REWARD_POINTS);
-							this.memories.put(memory);
-						}
-					}
-				}
-			}
+			// Reward for social memory
+			this.memories.rewardSocial(other);
 		}
 
 		// Change action (or go on)
 		this.action = ActionType.TALKING;
 
-		// Gestion de l'animation (dans MouglotteEntity)
-		//
-		if (mouglotte != null) {
-			if (mouglotte.getMouglotte().wantsToTalk(this)) {
+		// If the other mouglotte wants to talk
+		if (other != null && other.getMouglotte().wantsToTalk(this)) {
 
-			}
+			// Talk with the other one
+			talkWith(other.getMouglotte());
+
+			// Gestion de l'animation (dans MouglotteEntity)
+
 		}
-
 		// If the other entity doesn't want to talk anymore
-		if (mouglotte != null) {
+		else {
 
-			if (!mouglotte.getMouglotte().wantsToTalk(this)) {
-				// The action has to end (nobody to talk with)
-			}
-
-			if (!mouglotte.getMouglotte().getDecision().isSocial()) {
-
-				// The action has to end (nobody to talk with)
-				this.action = null;
-			}
+			// The action has to end (nobody to talk with)
+			this.action = null;
 		}
 
 		// If the decision has changed
@@ -921,6 +840,9 @@ public class Mouglotte {
 		Debug.log("MOUGLOTTE", "Mouglotte::Talk::End");
 	}
 
+	/**
+	 * Play
+	 */
 	private void play() {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Play");
@@ -1005,12 +927,163 @@ public class Mouglotte {
 	/**
 	 * Check if the mouglotte wants to talk with another one
 	 * 
-	 * @param with
+	 * @param other
 	 *            Mouglotte to talk with
 	 * @return True if the mouglotte wants to talk
 	 */
-	public boolean wantsToTalk(Mouglotte with) {
+	public boolean wantsToTalk(Mouglotte other) {
 
-		return false;
+		// Get relation between me and other mouglotte
+		Relation relation = Relations.get(this.entity, other.getEntity());
+
+		// If the relation is bad
+		if (relation != null && relation.isBad()) {
+			return false;
+		}
+
+		// Vérifier si la mouglotte n'est pas en train de faire quelque chose de
+		// plus important
+		// Le motif de refus n'influence pas le penalize du souvenir, par contre
+		// il influencera le degré d'amitié
+
+		return true;
+	}
+
+	/**
+	 * Talk to another mouglotte
+	 * 
+	 * @param other
+	 *            Mouglotte to talk with
+	 */
+	public void talkWith(Mouglotte other) {
+
+		if (other == null)
+			return;
+
+		// Get relation between me and other mouglotte
+		Relation relation = Relations.get(this.entity, other.getEntity());
+
+		// If the relation doesn't exist, create it
+		if (relation == null) {
+			Relations.create(this.entity, other.getEntity());
+			relation = Relations.get(this.entity, other.getEntity());
+		}
+
+		// Là les deux mouglottes parlent en même temps de choses différents
+		// Soit on gère une conversation chacun son tour avec random ou gene de
+		// bavard
+		// Soit la conversation devient un objet plus complexe
+
+		// Find a conversation and talk about it
+		// Get the value of this conversation for friendship reward
+		int value = other.talkAbout(findConversation());
+
+		// If the conversation was appreciated
+		if (value > 0) {
+			// Reward relation
+			relation.reward(value);
+		}
+		// If the conversation was not appreciated
+		else if (value < 0) {
+			// Penalize relation
+			relation.penalize(Math.abs(value));
+		}
+	}
+
+	/**
+	 * Fin a conversation
+	 * 
+	 * @return Conversation
+	 */
+	private Conversation findConversation() {
+
+		Conversation ret = Conversation.FOOD;
+		double max = Math.random()
+				* this.desires.get(DesireType.HUNGER).getValue();
+		double value = Math.random()
+				* this.desires.get(DesireType.REST).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.desires.get(DesireType.SOCIAL).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.desires.get(DesireType.FUN).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.desires.get(DesireType.LOVE).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.desires.get(DesireType.FIGHT).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.desires.get(DesireType.WORK).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.traits.get(TraitType.STRENGTH).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.skills.get(SkillType.FISHING).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random() * this.skills.get(SkillType.FIGHTING).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+		value = Math.random()
+				* this.skills.get(SkillType.WOODCUTING).getValue();
+		if (value > max) {
+			max = value;
+			ret = Conversation.REST;
+		}
+
+		return ret;
+	}
+
+	/**
+	 * Talk about a conversation
+	 * 
+	 * @param conversation
+	 *            Conversation
+	 * @return Value of the conversation
+	 */
+	public int talkAbout(Conversation conversation) {
+
+		if (conversation == null) return 0;
+		
+		// Gain apporté par la conversation
+
+		// Calcul de la valeur de la conversation
+		// Plutôt aléatoire, il serait bon de prévoir des goûts pour chaque type
+		// de conversation
+		double value = 0;
+		
+		if (conversation.isDesire()) {
+			value = Math.random() * this.desires.get(DesireType.getDesireType(conversation)).getValue(); 
+		}
+		else if (conversation.isTrait()) {
+			value = Math.random() * this.traits.get(TraitType.getTraitType(conversation)).getValue();
+		}
+		else if (conversation.isSkill()) {
+			value = Math.random() * this.skills.get(SkillType.getSkillType(conversation)).getValue();
+		}
+		
+		return (int) value;
 	}
 }

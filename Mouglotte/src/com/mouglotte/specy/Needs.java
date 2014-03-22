@@ -5,132 +5,171 @@ import java.util.Map.Entry;
 
 public class Needs {
 
-	// Mouglotte
+	/** Mouglotte */
 	private Mouglotte mouglotte;
-	
-	// Liste des besoins
+
+	/** Needs */
 	private Hashtable<NeedType, Need> needs;
-	// Besoin en cours
+	/** Current need */
 	private Need current;
-	// Le besoin courant est en chemin pour s'accomplir
+	/** Mouglotte is searching for current need */
 	private boolean searching;
-	// Le besoin courant est en train de s'accomplir
+	/** Current need is fulfilling */
 	private boolean fulfilling;
-	
-	// Constructeur
+
+	/**
+	 * Constructor
+	 * 
+	 * @param mouglotte
+	 *            Mouglotte
+	 */
 	public Needs(Mouglotte mouglotte) {
-		
-		// Mouglotte concernée
+
+		// Mouglotte
 		this.mouglotte = mouglotte;
-		// Initialisation de la liste des besoins
+		// Intialize needs
 		this.needs = new Hashtable<NeedType, Need>();
 	}
-	
-	// Récupération de la mouglotte
+
+	/**
+	 * Get mouglotte
+	 * 
+	 * @return Mouglotte
+	 */
 	public Mouglotte getMouglotte() {
 		return this.mouglotte;
 	}
-	
-	// Récupération d'un besoin
+
+	/**
+	 * Get need from type
+	 * 
+	 * @param type
+	 *            Type
+	 * @return Need
+	 */
 	public Need get(NeedType type) {
 		return this.needs.get(type);
 	}
 
-	// Récupération du besoin en cours
+	/**
+	 * Get current need
+	 * 
+	 * @return Current need
+	 */
 	public Need getCurrent() {
 		return this.current;
 	}
 
-	// Définition du besoin le plus pressant
-	private void setCurrent() {
+	/**
+	 * Calculate current need
+	 */
+	private void calculateCurrent() {
 
 		int value = 0;
 		int maxValue = 0;
 
-		// Parcours de tous les besoins
+		// Read through all needs
 		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
 
-			// Récupération de la valeur actuelle du besoin
+			// Get need with the maximum value
 			value = need.getValue().getValue();
-
-			// Si le besoin est le plus pressant
 			if (value > maxValue) {
 
 				maxValue = value;
-				// C'est ce besoin qui est le plus pressant
+				// This need is the most urgent
 				this.current = need.getValue();
 			}
 		}
-		// Fin du parcours des besoins
 	}
-	
-	// Activation de la recherche du besoin
+
+	/**
+	 * Set mouglotte is searching for current need
+	 * 
+	 * @param searching
+	 *            True if mouglotte is searching for current need
+	 */
 	public void setSearching(boolean searching) {
 		this.searching = searching;
 		if (searching)
 			this.fulfilling = false;
 	}
 
-	// Activation de l'accomplissement du besoin
+	/**
+	 * Set current need is fulfilling
+	 * 
+	 * @param searching
+	 *            True if current need si fulfilling
+	 */
 	public void setFulfilling(boolean fulfilling) {
 		this.fulfilling = fulfilling;
 		if (fulfilling)
 			this.searching = false;
 	}
-	
-	// En recherche ?
+
+	/**
+	 * Is mouglotte searching for the current need ?
+	 * 
+	 * @return True if mouglotte is searching for the current need ?
+	 */
 	public boolean isSearching() {
 		return this.searching;
 	}
 
-	// En accomplissement ?
+	/**
+	 * Is mouglotte fulfilling for the current need ?
+	 * 
+	 * @return True if mouglotte is fulfilling for the current need ?
+	 */
 	public boolean isFulfilling() {
 		return this.fulfilling;
 	}
-	
-	// Ajout d'un besoin
+
+	/**
+	 * Add need
+	 * 
+	 * @param need
+	 *            Need to add
+	 */
 	public void put(Need need) {
 		this.needs.put(need.getType(), need);
 	}
-	
+
 	/**
 	 * Fulfill current need
 	 */
 	public void fulfill() {
-		
+
 		// Fulfill current need if it has to be
 		if (this.current != null && this.fulfilling) {
-			
+
 			this.current.fulfill();
-			
+
 			// If the need is completely fulfilled
 			if (this.current.getValue() <= 0)
 				this.setFulfilling(false);
 		}
 	}
-	
 
 	/**
 	 * Decide current need
 	 */
 	public void decide() {
-	
+
 		// Read through all needs
 		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
 			// Increase need
-				need.getValue().increase();
+			need.getValue().increase();
 		}
-		
+
 		// Needs always increase, so current need stays the same
 		// If it is fulfilling then it can be exceeded by another one
-		
+
 		// If the is no current need
 		// Or if the current need is fulfilling
-		if ((this.current == null) || 
-				this.fulfilling) {
-			
+		if ((this.current == null) || this.fulfilling) {
+
 			// Set current need
-			setCurrent();
+			calculateCurrent();
 			// Initialization
 			this.searching = false;
 			this.fulfilling = false;

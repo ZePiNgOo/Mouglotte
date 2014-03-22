@@ -2,38 +2,60 @@ package com.mouglotte.specy;
 
 public enum DesireType {
 
-	// Besoins
+	// Like needs
 	HUNGER, REST, SOCIAL, FUN,
-	// Envies
+	// Pure desires
 	LOVE, FIGHT, WORK;
 
-	//
-	// //Constructeur
-	// GeneType(String name){
-	// this.name = name;
-	// }
-	//
-	// Conversion en String
-	public String toString() {
-
-		switch (DesireType.this) {
-		case HUNGER:
-			return "HUNGER";
+	/**
+	 * Get desire type from conversation
+	 * 
+	 * @param conversation
+	 *            Conversation
+	 * @return Desire type
+	 */
+	public static DesireType getDesireType(Conversation conversation) {
+		switch (conversation) {
+		case FOOD:
+			return HUNGER;
 		case REST:
-			return "REST";
+			return REST;
 		case SOCIAL:
-			return "SOCIAL";
+			return SOCIAL;
 		case FUN:
-			return "FUN";
+			return FUN;
 		case LOVE:
-			return "LOVE";
+			return LOVE;
 		case FIGHT:
-			return "FIGHT";
+			return FIGHT;
 		case WORK:
-			return "WORK";
+			return WORK;
 		default:
-			return "???";
+			return null;
 		}
 	}
+
+//	// Conversion en String
+//	public String toString() {
+//
+//		switch (DesireType.this) {
+//		case HUNGER:
+//			return "HUNGER";
+//		case REST:
+//			return "REST";
+//		case SOCIAL:
+//			return "SOCIAL";
+//		case FUN:
+//			return "FUN";
+//		case LOVE:
+//			return "LOVE";
+//		case FIGHT:
+//			return "FIGHT";
+//		case WORK:
+//			return "WORK";
+//		default:
+//			return "???";
+//		}
+//	}
 
 }

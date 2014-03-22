@@ -65,7 +65,6 @@ public class TimeKeeper extends TimeDependent {
 	 * @return Time
 	 */
 	public String getTime() {
-		setTime();
 		return this.time;
 	}
 
@@ -81,6 +80,7 @@ public class TimeKeeper extends TimeDependent {
 		this.minute++;
 		if (this.minute >= 60)
 			this.minute = 0;
+		setTime();
 	}
 
 	@Override
@@ -89,6 +89,7 @@ public class TimeKeeper extends TimeDependent {
 		this.hour++;
 		if (this.hour >= 20)
 			this.hour = 0;
+		setTime();
 	}
 
 	@Override
@@ -97,6 +98,7 @@ public class TimeKeeper extends TimeDependent {
 		this.day++;
 		if (this.day > 12)
 			this.day = 1;
+		setTime();
 	}
 
 	@Override
@@ -105,6 +107,7 @@ public class TimeKeeper extends TimeDependent {
 		this.month++;
 		if (this.month > 6)
 			this.month = 1;
+		setTime();
 	}
 
 	@Override
@@ -115,5 +118,6 @@ public class TimeKeeper extends TimeDependent {
 	@Override
 	public void eventYear() {
 		this.year++;
+		setTime();
 	}
 }

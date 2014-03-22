@@ -51,16 +51,16 @@ public class TestDecisionUI extends JFrame implements ActionListener {
 		this.desires = new Desires(this.mouglotte);
 
 		need = new Need(this.needs, NeedType.HUNGER, 150, 75, 50, 40, 12);
-		need.setGeneValue(100);
+//		need.setGeneValue(100);
 		this.needs.put(need);
 
 		desire = new Desire(this.desires, DesireType.HUNGER, 600, 300, 450, 200, 12);
-		desire.setGeneValue(100);
+//		desire.setGeneValue(100);
 		desire.setRelatedNeed(need);
 		this.desires.put(desire);
 
 		need = new Need(this.needs, NeedType.REST, 150, 75, 50, 40, 12);
-		need.setGeneValue(100);
+//		need.setGeneValue(100);
 		this.needs.put(need);
 
 		desire = new Desire(this.desires, DesireType.REST, 600, 300, 450, 200, 12);
@@ -69,7 +69,7 @@ public class TestDecisionUI extends JFrame implements ActionListener {
 		this.desires.put(desire);
 
 		need = new Need(this.needs, NeedType.SOCIAL, 150, 75, 50, 40, 12);
-		need.setGeneValue(100);
+//		need.setGeneValue(100);
 		this.needs.put(need);
 
 		desire = new Desire(this.desires, DesireType.SOCIAL, 600, 300, 450, 200, 12);

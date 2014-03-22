@@ -125,7 +125,7 @@ public class Memory {
 	 * Reward points
 	 * 
 	 * @param points
-	 *            to reward
+	 *            Points to reward
 	 */
 	public void reward(int points) {
 		this.points += points;
@@ -137,11 +137,11 @@ public class Memory {
 	 * Penalize points
 	 * 
 	 * @param points
-	 *            to penalize
+	 *            Points to penalize
 	 */
 	public void penalize(int points) {
 		this.points -= points;
 		if (this.points < 0)
-			this.points = MAX_POINTS;
+			this.points = 0;
 	}
 }

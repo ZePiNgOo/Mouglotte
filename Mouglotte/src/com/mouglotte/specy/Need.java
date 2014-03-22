@@ -2,27 +2,42 @@ package com.mouglotte.specy;
 
 public class Need {
 
-	// Liste des besoins
+	/** Needs */
 	private Needs needs;
 
-	// Type
+	/** Type */
 	private NeedType type;
-	// Valeur du besoin (définie par la génétique)
-	private int geneValue;
-	// Valeur actuelle du besoin
+	/** Need value */
 	private int value;
-	// Envie associée
+	/** Related desire */
 	private Desire relatedDesire;
-	
-	// Evolution par heure selon les ages
+
+	/** Need increase depending on age */
 	private int babyHourGain;
 	private int childHourGain;
 	private int adultHourGain;
 	private int oldHourGain;
-	// Diminution pendant la satisfaction
+	/** Need decrease during fulfilling */
 	private int fulfillLoss;
 
-	// Constructeur
+	/**
+	 * Constructor
+	 * 
+	 * @param needs
+	 *            Needs
+	 * @param type
+	 *            Type
+	 * @param babyHourGain
+	 *            Gain by hour when baby
+	 * @param childHourGain
+	 *            Gain by hour when child
+	 * @param adultHourGain
+	 *            Gain by hour when adult
+	 * @param oldHourGain
+	 *            Gain by hour when old
+	 * @param fulfillLoss
+	 *            Loss by minute
+	 */
 	public Need(Needs needs, NeedType type, int babyHourGain,
 			int childHourGain, int adultHourGain, int oldHourGain,
 			int fulfillLoss) {
@@ -36,67 +51,74 @@ public class Need {
 		this.fulfillLoss = fulfillLoss;
 	}
 
-	// Récupération du type
+	/**
+	 * Get type
+	 * 
+	 * @return Type
+	 */
 	public NeedType getType() {
 		return this.type;
 	}
 
-	// Récupération de la valeur réelle du besoin
-	public int getGeneValue() {
-		return this.geneValue;
-	}
-
-	// Récupération de la valeur actuelle du besoin
+	/**
+	 * Get need value
+	 * 
+	 * @return Value
+	 */
 	public int getValue() {
 		return this.value;
 	}
 
-	// Définition de la valeur
-	public void setGeneValue(int value) {
-		// Cette méthode ne doit pas exister car la valeur est définie
-		// génétiquement
-		this.geneValue = value;
-	}
-
-	// Définition de l'envie correspondante
+	/**
+	 * Set related desire
+	 * 
+	 * @param desire
+	 *            Related desire
+	 */
 	public void setRelatedDesire(Desire desire) {
 		this.relatedDesire = desire;
 	}
-	
-	// Augmentation du besoin
+
+	/**
+	 * Increase need
+	 */
 	public void increase() {
 
-		// Bébé
+		// Baby
 		if (this.needs.getMouglotte().getAge() < 1)
 			this.value += this.babyHourGain;
-		// Enfant
+		// Child
 		else if (this.needs.getMouglotte().getAge() < 2)
 			this.value += this.childHourGain;
-		// Adulte
+		// Adult
 		else if (this.needs.getMouglotte().getAge() < 26)
 			this.value += this.adultHourGain;
-		// Vieux
+		// Old
 		else
 			this.value += this.oldHourGain;
 	}
 
-	// Accomplissement du besoin
+	/**
+	 * Fulfill need
+	 */
 	public void fulfill() {
-		
-		// Evolution de la valeur du besoin
+
+		// Decrease need
 		this.value -= this.fulfillLoss;
 		if (this.value < 0)
 			this.value = 0;
-		
-		// Accomplissement de l'envie correspondante
+
+		// Fulfill related desire
 		if (this.relatedDesire != null)
 			this.relatedDesire.fulfillFromNeed();
 	}
-	
-	// Accomplissement du besoin depuis l'envie
+
+	/**
+	 * Fulfill need from the related desire
+	 */
 	public void fulfillFromDesire() {
-		
-		// Evolution de la valeur du besoin
+
+		// Decrease need
 		this.value -= this.fulfillLoss;
 		if (this.value < 0)
 			this.value = 0;

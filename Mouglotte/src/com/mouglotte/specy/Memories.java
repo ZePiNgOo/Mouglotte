@@ -5,13 +5,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.mouglotte.entities.Entity;
+import com.mouglotte.entities.FoodEntity;
+import com.mouglotte.entities.MouglotteEntity;
 import com.mouglotte.map.Tile;
 import com.mouglotte.utilities.MouglotteUtilities;
 
 public class Memories {
 
+	/** Mouglotte */
+	private Mouglotte mouglotte;
+
 	/** Memories list */
 	private LinkedHashMap<MemoryType, Memory> memories;
+	/** Max number of memories */
+	private int maxNumber;
 	/** Current memory */
 	private Memory current;
 
@@ -20,16 +27,22 @@ public class Memories {
 	 * 
 	 * @param maxMemories
 	 */
-	public Memories(final int maxMemories) {
+	public Memories(Mouglotte mouglotte) {
+
+		// Mouglotte
+		this.mouglotte = mouglotte;
+		// Max number of memories
+		this.maxNumber = this.mouglotte.getGeneValue("ZE");
 
 		// Initialize list with a maximum number of memories
-		this.memories = new LinkedHashMap<MemoryType, Memory>(maxMemories) {
+		this.memories = new LinkedHashMap<MemoryType, Memory>(this.maxNumber) {
 
 			private static final long serialVersionUID = 1L;
+			private int maxNumber = this.maxNumber;
 
 			protected boolean removeEldestEntry(
 					Map.Entry<MemoryType, Memory> eldest) {
-				return size() > maxMemories;
+				return size() > this.maxNumber;
 			}
 		};
 	}
@@ -199,14 +212,80 @@ public class Memories {
 	}
 
 	/**
-	 * Reward points to current memory
+	 * Reward points for food memory
 	 * 
-	 * @param points
-	 *            Points to reward
+	 * @param food
+	 *            Food entity acted with
 	 */
-	public void rewardCurrent(int points) {
-		if (this.current != null)
-			this.current.reward(points);
+	public void rewardFood(FoodEntity food) {
+
+		if (food == null)
+			return;
+
+		Memory memory = null;
+
+		if (hasCurrent())
+			memory = this.current;
+		else {
+			memory = new Memory(MemoryType.FOOD, food);
+			put(memory);
+		}
+
+		// If the food entity has food
+		if (food.hasFood()) {
+
+			// Reward memory
+			memory.reward(Memory.REWARD_POINTS);
+
+			// If the food entity hasn't more food
+		} else {
+
+			// Low reward memory
+			memory.reward(Memory.REWARD_LOW_POINTS);
+		}
+	}
+
+	/**
+	 * Reward points for social memory
+	 * 
+	 * @param other
+	 *            Mouglotte entity acted with
+	 */
+	public void rewardSocial(MouglotteEntity other) {
+
+		if (other == null)
+			return;
+
+		// Attention, si quelqu'un est venu me parler il faut gérer le souvenir
+		// mais ce n'est pas forcément le current
+
+		Memory memory = null;
+
+		// If a memory was followed and we found the right mouglotte
+		if (hasCurrent() && this.current.getEntity() == other) {
+			memory = this.current;
+			// If no memory was followed or we didn't find the right mouglotte
+		} else {
+			// Try to find a memory for the mouglotte
+			memory = get(MemoryType.FRIEND, other);
+			if (memory == null) {
+				memory = new Memory(MemoryType.FRIEND, other);
+				put(memory);
+			}
+		}
+
+		// Reward memory
+		if (memory != null) {
+
+			// Low reward if the mouglotte doesn't want to talk
+			if (other.getMouglotte().wantsToTalk(this.mouglotte))
+				memory.reward(Memory.REWARD_POINTS);
+			else
+				memory.penalize(Memory.PENALIZE_LOW_POINTS);
+
+			// Update location of the memory
+			memory.setTile(other.getTile());
+		}
 	}
 
 	/**

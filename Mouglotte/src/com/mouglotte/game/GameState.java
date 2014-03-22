@@ -1,16 +1,15 @@
 package com.mouglotte.game;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
-import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.BasicGameState;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.mouglotte.entities.MouglotteEntity;
+import com.mouglotte.entities.Relations;
 import com.mouglotte.genetics.Genetics;
 import com.mouglotte.map.GameMap;
 import com.mouglotte.map.Spawner;
@@ -36,8 +35,8 @@ public class GameState extends BasicGameState {
 	private GameMap map;
 	/** Spawner */
 	private Spawner spawner;
-
-	private List<MouglotteEntity> mouglottes;
+	
+	private ArrayList<MouglotteEntity> mouglottes;
 
 	/**
 	 * Get game state ID
@@ -99,6 +98,8 @@ public class GameState extends BasicGameState {
 
 		// Initialize genetics
 		Genetics.initialize();
+		// Intialize relations between entities
+		Relations.initialize();
 
 		// Create right panel
 		this.rightPanel = new RightPanel(this);
@@ -175,11 +176,11 @@ public class GameState extends BasicGameState {
 		// la première appelée
 		this.map.render(container, g);
 
-		// Render mouglottes
-		for (final MouglotteEntity mouglotte : this.mouglottes) {
-			mouglotte.render(container, g);
-		}
-		// this.mouglotte2.render(container, g);
+		// Effectué sur le tile
+//		// Render mouglottes
+//		for (final MouglotteEntity mouglotte : this.mouglottes) {
+//			mouglotte.render(container, g);
+//		}
 
 		g.drawString(this.timeKeeper.getTime(), 300, 10);
 	}
