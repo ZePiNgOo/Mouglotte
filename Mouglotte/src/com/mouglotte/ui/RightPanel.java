@@ -57,19 +57,19 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 		this.barNeedFun.setLocation(2, 85);
 		// Desires
 		this.barDesireHunger = new Bar(game.getContainer());
-		this.barDesireHunger.setLocation(2, 105);
+		this.barDesireHunger.setLocation(2, 115);
 		this.barDesireRest = new Bar(game.getContainer());
-		this.barDesireRest.setLocation(2, 130);
+		this.barDesireRest.setLocation(2, 140);
 		this.barDesireSocial = new Bar(game.getContainer());
-		this.barDesireSocial.setLocation(2, 155);
+		this.barDesireSocial.setLocation(2, 165);
 		this.barDesireFun = new Bar(game.getContainer());
-		this.barDesireFun.setLocation(2, 180);
+		this.barDesireFun.setLocation(2, 190);
 		this.barDesireLove = new Bar(game.getContainer());
-		this.barDesireLove.setLocation(2, 205);
+		this.barDesireLove.setLocation(2, 215);
 		this.barDesireFight = new Bar(game.getContainer());
-		this.barDesireFight.setLocation(2, 230);
+		this.barDesireFight.setLocation(2, 240);
 		this.barDesireWork = new Bar(game.getContainer());
-		this.barDesireWork.setLocation(2, 255);
+		this.barDesireWork.setLocation(2, 265);
 	}
 
 	/**
@@ -233,6 +233,18 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 			this.barDesireLove.render(container, g);
 			this.barDesireFight.render(container, g);
 			this.barDesireWork.render(container, g);
+			
+			g.drawString("Hunger", 102, 10);
+			g.drawString("Rest", 102, 35);
+			g.drawString("Social", 102, 60);
+			g.drawString("Fun", 102, 85);
+			g.drawString("Hunger", 102, 115);
+			g.drawString("Rest", 102, 140);
+			g.drawString("Social", 102, 165);
+			g.drawString("Fun", 102, 190);
+			g.drawString("Love", 102, 215);
+			g.drawString("Fight", 102, 240);
+			g.drawString("Work", 102, 265);
 		} catch (SlickException e) {
 			e.printStackTrace();
 		}

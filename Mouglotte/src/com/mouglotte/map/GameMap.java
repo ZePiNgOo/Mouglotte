@@ -1,18 +1,14 @@
 package com.mouglotte.map;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.MouseListener;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.tiled.TiledMap;
 import org.newdawn.slick.util.pathfinding.Mover;
 
-import com.mouglotte.entities.Entity;
+import com.mouglotte.entities.BeanTree;
 import com.mouglotte.entities.Mushroom;
 import com.mouglotte.entities.Tree;
 import com.mouglotte.game.GameState;
@@ -201,21 +197,19 @@ public class GameMap implements TileBasedMap {
 		}
 
 		// Trees
-		// this.entities[5][5] = new Tree(this.game, 5, 5);
-		// this.entities[7][8] = new Tree(this.game, 7, 8);
-		// this.entities[8][8] = new Tree(this.game, 8, 8);
-		// this.entities[9][8] = new Tree(this.game, 9, 8);
-		// this.entities[8][9] = new Tree(this.game, 8, 9);
-		new Tree(this.game, getTile(5, 5));
-		new Tree(this.game, getTile(7, 8));
-		new Tree(this.game, getTile(8, 8));
-		new Tree(this.game, getTile(8, 9));
-		new Tree(this.game, getTile(9, 8));
+//		new Tree(this.game, getTile(5, 5));
+//		new Tree(this.game, getTile(7, 8));
+//		new Tree(this.game, getTile(8, 8));
+//		new Tree(this.game, getTile(8, 9));
+//		new Tree(this.game, getTile(9, 8));
 
 		// Mushrooms
 		new Mushroom(this.game, getTile(2, 3));
 		new Mushroom(this.game, getTile(6, 13));
 		new Mushroom(this.game, getTile(11, 5));
+		
+		// BeanTree
+		new BeanTree(this.game,getTile(4, 4));
 	}
 
 	/**

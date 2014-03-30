@@ -4,6 +4,9 @@ import org.newdawn.slick.GameContainer;
 
 public abstract class TimeDependent implements TimeListener {
 
+	/** Time factor */
+	private final static int TIME_FACTOR = 3600;
+	
 	/** Time passed */
 	protected int passedTime = 0;
 	protected int secondesR = 0;
@@ -25,7 +28,7 @@ public abstract class TimeDependent implements TimeListener {
 	public void update(GameContainer container, long delta) {
 
 		// Passed time
-		this.passedTime += delta;
+		this.passedTime += delta * TIME_FACTOR;
 
 		// Every real second
 		if (this.passedTime >= 1000) {

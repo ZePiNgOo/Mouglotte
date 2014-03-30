@@ -441,7 +441,7 @@ public class Mouglotte {
 		// If they are fulfilling, they decrease
 
 		// Fulfill
-		if (this.action.isFulfilling())
+		if (this.action != null && this.action.isFulfilling())
 			fulfill();
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute::End");
@@ -554,7 +554,10 @@ public class Mouglotte {
 			setSearching(true);
 
 			// Search memory
-			searchMemory(false);
+			if (this.decision.isResting())
+				fulfill();
+			else
+				searchMemory(false);
 
 		} else
 			Debug.log("MOUGLOTTE", "Mouglotte::Decide:Finishing current action");
@@ -657,6 +660,18 @@ public class Mouglotte {
 	 *            True to exclude the current memory
 	 */
 	private void searchMemory(boolean excludeCurrent) {
+
+		// Pour les tests : getClosest trouve tout ce qu'il faut
+		switch (MemoryType.getMemoryType(this.decision)) {
+		case ENEMY:
+		case FRIEND:
+		case LOVER:
+		case WORK:
+			fulfill();
+			break;
+		default:
+			break;
+		}
 
 		// Get another closest memory if exist
 		Memory memory = this.memories.getClosest(this.decision,
@@ -761,6 +776,7 @@ public class Mouglotte {
 
 			// The action has to end
 			this.action = null;
+			this.actWith = null;
 		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Eat::End");
@@ -790,6 +806,7 @@ public class Mouglotte {
 
 			// The action has to end
 			this.action = null;
+			this.actWith = null;
 		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Rest::End");
@@ -835,6 +852,7 @@ public class Mouglotte {
 
 			// The action has to end
 			this.action = null;
+			this.actWith = null;
 		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Talk::End");
@@ -1065,25 +1083,30 @@ public class Mouglotte {
 	 */
 	public int talkAbout(Conversation conversation) {
 
-		if (conversation == null) return 0;
-		
+		if (conversation == null)
+			return 0;
+
 		// Gain apporté par la conversation
 
 		// Calcul de la valeur de la conversation
 		// Plutôt aléatoire, il serait bon de prévoir des goûts pour chaque type
 		// de conversation
 		double value = 0;
-		
+
 		if (conversation.isDesire()) {
-			value = Math.random() * this.desires.get(DesireType.getDesireType(conversation)).getValue(); 
+			value = Math.random()
+					* this.desires.get(DesireType.getDesireType(conversation))
+							.getValue();
+		} else if (conversation.isTrait()) {
+			value = Math.random()
+					* this.traits.get(TraitType.getTraitType(conversation))
+							.getValue();
+		} else if (conversation.isSkill()) {
+			value = Math.random()
+					* this.skills.get(SkillType.getSkillType(conversation))
+							.getValue();
 		}
-		else if (conversation.isTrait()) {
-			value = Math.random() * this.traits.get(TraitType.getTraitType(conversation)).getValue();
-		}
-		else if (conversation.isSkill()) {
-			value = Math.random() * this.skills.get(SkillType.getSkillType(conversation)).getValue();
-		}
-		
+
 		return (int) value;
 	}
 }

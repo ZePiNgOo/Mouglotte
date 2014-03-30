@@ -236,8 +236,10 @@ public abstract class FoodEntity extends Entity {
 	@Override
 	public void render(GameContainer container, Graphics g) {
 
-		g.drawString(Integer.toString(this.food), this.x + GameMap.TILE_SIZE
-				/ 2, this.y + GameMap.TILE_SIZE / 2);
+		g.drawString(
+				Integer.toString(this.level) + ","
+						+ Integer.toString(this.food), this.x
+						+ GameMap.TILE_SIZE / 2, this.y + GameMap.TILE_SIZE / 2);
 	}
 
 	@Override

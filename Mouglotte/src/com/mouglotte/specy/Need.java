@@ -2,6 +2,9 @@ package com.mouglotte.specy;
 
 public class Need {
 
+	/** Max value */
+	private final static int MAX_VALUE = 1000;
+	
 	/** Needs */
 	private Needs needs;
 
@@ -96,6 +99,8 @@ public class Need {
 		// Old
 		else
 			this.value += this.oldHourGain;
+		
+		if (this.value > MAX_VALUE) this.value = MAX_VALUE;
 	}
 
 	/**

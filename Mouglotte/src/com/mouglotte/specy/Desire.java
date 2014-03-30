@@ -4,9 +4,11 @@ import java.util.Random;
 
 public class Desire {
 
+	/** Max value */
+	private final static int MAX_VALUE = 1000;
 	// Facteur aléatoire appliqué à l'envie actuelle
 	// Valeur actuelle = Valeur +/- Valeur * cette constante
-	private static double RANDOM_EFFECT = 0.25;
+	private final static double RANDOM_EFFECT = 0.25;
 
 	// Liste des envies
 	private Desires desires;
@@ -81,6 +83,8 @@ public class Desire {
 		else
 			this.value = this.geneValue
 					- this.random.nextInt((int) (this.geneValue * RANDOM_EFFECT));
+		
+		if (this.value > MAX_VALUE) this.value = MAX_VALUE;
 	}
 
 	// Définition du besoin correspondant

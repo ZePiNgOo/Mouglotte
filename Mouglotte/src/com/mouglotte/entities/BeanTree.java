@@ -2,11 +2,21 @@ package com.mouglotte.entities;
 
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
+import org.newdawn.slick.Image;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.SpriteSheet;
 
 import com.mouglotte.game.GameState;
 import com.mouglotte.map.Tile;
 
 public class BeanTree extends FoodEntity {
+
+	/** Image */
+	private SpriteSheet image;
+	/** Number of sprites in the sprite sheet */
+	private int spriteNumber;
+	/** Number of columns in the sprite sheet */
+	private int spriteColumns;
 
 	/**
 	 * Constructor
@@ -20,13 +30,16 @@ public class BeanTree extends FoodEntity {
 
 		super(game, tile);
 
-		// // Set image
-		// try {
-		// this.image = new Image("res/mushroom.png", new Color(255, 0, 255));
-		// } catch (SlickException e) {
-		// e.printStackTrace();
-		// }
-		//
+		// Set image
+		try {
+			this.image = new SpriteSheet("res/beanTree/beanTreeLevel1.png", 66,
+					90);
+		} catch (SlickException e) {
+			e.printStackTrace();
+		}
+		this.spriteNumber = 9;
+		this.spriteColumns = 5;
+
 		// // Set real coordinates
 		// this.realX = this.x - this.image.getWidth() / 2;
 		// this.realY = this.y - this.image.getHeight() + GameMap.TILE_SIZE / 2
@@ -35,7 +48,28 @@ public class BeanTree extends FoodEntity {
 		// Begins at the first growth level
 		this.level = 1;
 	}
-	
+
+	/**
+	 * Get actual sprite from the sprite sheet
+	 * 
+	 * @return Actuel sprite
+	 */
+	private Image getSprite() {
+
+		// Index of the sprite (depending on health surplus)
+		int index = 1 + this.healthSurplus / (MAX_HEALTH / this.spriteNumber);
+		if (index < 1)
+			index = 1;
+		if (index > this.spriteNumber)
+			index = this.spriteNumber;
+		int row = index / (this.spriteColumns + 1);
+		int column = (index % this.spriteColumns) - 1;
+		if (column == -1)
+			column = this.spriteColumns - 1;
+
+		return this.image.getSprite(column, row);
+	}
+
 	@Override
 	public boolean contains(int x, int y) {
 		// TODO Auto-generated method stub
@@ -58,10 +92,10 @@ public class BeanTree extends FoodEntity {
 		if (newHealth <= 0) {
 
 			// Le beantree doit mourir
-			
+
 			return;
 		}
-		
+
 		// Calculate health surplus
 		calculateHealthSurplus();
 
@@ -74,7 +108,7 @@ public class BeanTree extends FoodEntity {
 
 		// Modification de l'image ou du spritesheet
 	}
-	
+
 	@Override
 	protected void eventFoodChanged(int oldFood, int newFood) {
 		// TODO Auto-generated method stub
@@ -125,7 +159,7 @@ public class BeanTree extends FoodEntity {
 			this.healthSurplus = LEVEL_MEDIUM_HEALTH;
 		}
 		// If health surplus is empty
-		else if (this.healthSurplus <= MAX_HEALTH) {
+		else if (this.healthSurplus <= 0) {
 
 			// Change level (will decrease)
 			calculateLevel();
@@ -173,12 +207,18 @@ public class BeanTree extends FoodEntity {
 
 	@Override
 	public void render(GameContainer container, Graphics g) {
-		// TODO Auto-generated method stub
 
+		super.render(container, g);
+
+		g.drawImage(getSprite(), this.x, this.y);
+		g.drawString(
+				Integer.toString(this.health) + ","
+						+ Integer.toString(this.healthSurplus), this.x + 10,
+				this.y + 10);
 	}
-	
+
 	@Override
-//	protected void mouseLeftClicked(int x, int y, int clickCount) {
+	// protected void mouseLeftClicked(int x, int y, int clickCount) {
 	protected void mouseLeftClicked(int x, int y) {
 		// TODO Auto-generated method stub
 
@@ -189,9 +229,9 @@ public class BeanTree extends FoodEntity {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
-//	public void mouseMoved(int oldx, int oldy, int newx, int newy) {
+	// public void mouseMoved(int oldx, int oldy, int newx, int newy) {
 	public void mouseMoved(int x, int y) {
 		// TODO Auto-generated method stub
 
