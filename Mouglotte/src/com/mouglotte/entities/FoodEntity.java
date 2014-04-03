@@ -21,7 +21,12 @@ public abstract class FoodEntity extends Entity {
 	protected static int LEVEL_3 = 3;
 	protected static int LEVEL_4 = 4;
 	protected static int LEVEL_5 = 5;
-	protected static int MAX_LEVEL = LEVEL_5;
+	protected static int LEVEL_6 = 6;
+	protected static int LEVEL_7 = 7;
+	protected static int LEVEL_8 = 8;
+	protected static int LEVEL_9 = 9;
+	protected static int LEVEL_10 = 10;
+	protected static int MAX_LEVEL = LEVEL_10;
 	protected static int LEVEL_MEDIUM_HEALTH = 500;
 	/** Maximum age */
 	protected static int MAX_AGE = 10;
@@ -55,10 +60,26 @@ public abstract class FoodEntity extends Entity {
 		super(game, tile);
 
 		// Level
-		this.level = LEVEL_1;
+		setLevel(LEVEL_1);
+	}
+
+	/**
+	 * Set level of the entity
+	 * 
+	 * @param level
+	 *            Level
+	 */
+	public void setLevel(int level) {
+
+		// Level
+		this.level = level;
+		if (this.level > MAX_LEVEL)
+			this.level = MAX_LEVEL;
 		// Health
 		this.health = LEVEL_MEDIUM_HEALTH;
 		this.healthSurplus = LEVEL_MEDIUM_HEALTH;
+		// Food
+		this.food = MAX_FOOD - (MAX_FOOD/MAX_LEVEL) * (MAX_LEVEL - this.level);
 	}
 
 	/**
@@ -76,7 +97,7 @@ public abstract class FoodEntity extends Entity {
 	 * @return True if the entity has food
 	 */
 	public boolean hasFood() {
-		return (food > 0);
+		return (this.food > 0);
 	}
 
 	/**

@@ -93,6 +93,16 @@ public class Mushroom extends FoodEntity {
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void removeFood(int food) {
+
+		super.removeFood(food);
+		
+		// If there is no more food then the mushroom dies
+		if (!hasFood())
+			die();
+	}
 
 //	@Override
 //	protected void mouseMoved(int x, int y) {

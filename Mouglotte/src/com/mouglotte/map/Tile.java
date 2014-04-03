@@ -134,11 +134,11 @@ public class Tile {
 	 * 
 	 * @return Food entity
 	 */
-	public Entity getFood() {
+	public FoodEntity getFood() {
 
 		for (Entity entity : this.entities) {
 			if (entity instanceof FoodEntity)
-				return entity;
+				return (FoodEntity) entity;
 		}
 		return null;
 	}
@@ -243,17 +243,18 @@ public class Tile {
 	}
 
 	/**
-	 * Are the coordinates in the tile ?
+	 * Is the entity in the tile ?
 	 * 
-	 * @param x
-	 *            x position
-	 * @param y
-	 *            y position
-	 * @return True if the coordinates are in the tile
+	 * @param entity
+	 *            Entity
+	 * @return True if the entity is in the tile
 	 */
-	public boolean contains(int x, int y) {
-		return x >= getX() && x <= getX() + GameMap.TILE_SIZE && y >= getY()
-				&& y <= getY() + GameMap.TILE_SIZE;
+	public boolean contains(Entity entity) {
+		// return entity.getX() >= getX()
+		// && entity.getX() <= getX() + GameMap.TILE_SIZE
+		// && entity.getY() >= getY()
+		// && entity.getY() <= getY() + GameMap.TILE_SIZE;
+		return this.entities.contains(entity);
 	}
 
 	/**

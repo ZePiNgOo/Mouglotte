@@ -224,24 +224,39 @@ public class Memories {
 
 		Memory memory = null;
 
-		if (hasCurrent())
+		// If the current memory has to be rewarded
+		if (hasCurrent() && this.current.getEntity() == food) {
 			memory = this.current;
-		else {
+			// If it's not the current memory
+		} else {
+			// Search if this entity exists in memory
+			memory = get(MemoryType.FOOD, food);
+		}
+
+		// If it's a new memory, create it
+		if (memory == null) {
 			memory = new Memory(MemoryType.FOOD, food);
 			put(memory);
 		}
 
-		// If the food entity has food
-		if (food.hasFood()) {
+		// Reward memory
+		if (memory != null) {
 
-			// Reward memory
-			memory.reward(Memory.REWARD_POINTS);
+			// If the food entity has food
+			if (food.hasFood()) {
 
-			// If the food entity hasn't more food
-		} else {
+				// Reward memory
+				memory.reward(Memory.REWARD_POINTS);
 
-			// Low reward memory
-			memory.reward(Memory.REWARD_LOW_POINTS);
+				// If the food entity hasn't more food
+			} else {
+
+				// Low reward memory
+				memory.reward(Memory.REWARD_LOW_POINTS);
+			}
+
+			// Update location of the memory
+			memory.setTile(food.getTile());
 		}
 	}
 
@@ -261,27 +276,36 @@ public class Memories {
 
 		Memory memory = null;
 
-		// If a memory was followed and we found the right mouglotte
+		// If the current memory has to be rewarded
 		if (hasCurrent() && this.current.getEntity() == other) {
 			memory = this.current;
 			// If no memory was followed or we didn't find the right mouglotte
 		} else {
-			// Try to find a memory for the mouglotte
+			// Search if this entity exists in memory
 			memory = get(MemoryType.FRIEND, other);
-			if (memory == null) {
-				memory = new Memory(MemoryType.FRIEND, other);
-				put(memory);
-			}
+		}
+
+		// If it's a new memory, create it
+		if (memory == null) {
+			memory = new Memory(MemoryType.FRIEND, other);
+			put(memory);
 		}
 
 		// Reward memory
 		if (memory != null) {
 
-			// Low reward if the mouglotte doesn't want to talk
-			if (other.getMouglotte().wantsToTalk(this.mouglotte))
+			// If the mouglotte wants to talk
+			if (other.getMouglotte().wantsToTalk(this.mouglotte)) {
+
+				// Reward memory
 				memory.reward(Memory.REWARD_POINTS);
-			else
-				memory.penalize(Memory.PENALIZE_LOW_POINTS);
+				
+				// If the mouglotte doesn't want to talk
+			} else {
+
+//				// No reward, penalize (handled in mouglotte.talk())
+//				memory.penalize(Memory.PENALIZE_LOW_POINTS);
+			}
 
 			// Update location of the memory
 			memory.setTile(other.getTile());

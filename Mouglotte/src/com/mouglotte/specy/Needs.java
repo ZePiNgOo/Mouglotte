@@ -149,17 +149,23 @@ public class Needs {
 				this.setFulfilling(false);
 		}
 	}
-
+	
 	/**
-	 * Decide current need
+	 * Increase needs
 	 */
-	public void decide() {
+	public void increase() {
 
 		// Read through all needs
 		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
 			// Increase need
 			need.getValue().increase();
 		}
+	}
+
+	/**
+	 * Decide current need
+	 */
+	public void decide() {
 
 		// Needs always increase, so current need stays the same
 		// If it is fulfilling then it can be exceeded by another one

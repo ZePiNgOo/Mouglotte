@@ -24,12 +24,12 @@ public class TestTile {
 		x = tile.getCenterX();
 		y = tile.getCenterY();
 		
-		boolean toto = tile.contains(150, 100);
-		toto = tile.contains(142, 88);
-		toto = tile.contains(174, 120);
-		toto = tile.contains(206, 152);
-		toto = tile.contains(207, 152);
-		toto = tile.contains(142, 87);
+//		boolean toto = tile.contains(150, 100);
+//		toto = tile.contains(142, 88);
+//		toto = tile.contains(174, 120);
+//		toto = tile.contains(206, 152);
+//		toto = tile.contains(207, 152);
+//		toto = tile.contains(142, 87);
 	}
 	
     public static void main(String args[]) {

@@ -14,8 +14,10 @@ import com.mouglotte.utilities.Debug;
 
 public class Mouglotte {
 
-	/** Walk around max distance */
-	private final int WALK_AROUND_DISTANCE = 1000;
+	// /** Walk around max distance */
+	// private final static int WALK_AROUND_DISTANCE = 1000;
+	/** Max idle time (in minutes) */
+	private final static int MAX_IDLE_TIME = 5;
 
 	/** Entity */
 	private MouglotteEntity entity;
@@ -42,6 +44,8 @@ public class Mouglotte {
 	private ActionType action;
 	/** Act with */
 	private Entity actWith;
+	/** Action time (in minutes) */
+	private double actionTime;
 
 	/**
 	 * Constructor
@@ -121,6 +125,12 @@ public class Mouglotte {
 	 */
 	private void setFulfilling(boolean fulfilling) {
 
+		// Start fulfilling
+		// Real action will be determined in fulfill()
+		if (fulfilling == true) {
+			this.action = ActionType.FULFILLING;
+		}
+
 		// If the decision is a need
 		if (this.decision.isNeed()) {
 			this.needs.setFulfilling(fulfilling);
@@ -166,102 +176,47 @@ public class Mouglotte {
 	}
 
 	/**
-	 * Get hunger need value
+	 * Get need value
 	 * 
-	 * @return Hunger need value
+	 * @param type
+	 *            Need type
+	 * @return Need value
 	 */
-	public int getNeedHungerValue() {
-		return this.needs.get(NeedType.HUNGER).getValue();
+	public int getNeedValue(NeedType type) {
+		return this.needs.get(type).getValue();
 	}
 
 	/**
-	 * Get rest need value
+	 * Get desire value
 	 * 
-	 * @return Rest need value
+	 * @param type
+	 *            Desire type
+	 * @return Desire value
 	 */
-	public int getNeedRestValue() {
-		return this.needs.get(NeedType.REST).getValue();
+	public int getDesireValue(DesireType type) {
+		return this.desires.get(type).getValue();
 	}
 
 	/**
-	 * Get social need value
+	 * Get trait value
 	 * 
-	 * @return Social need value
+	 * @param type
+	 *            Trait type
+	 * @return Trait value
 	 */
-	public int getNeedSocialValue() {
-		return this.needs.get(NeedType.SOCIAL).getValue();
+	public int getTraitValue(TraitType type) {
+		return this.traits.get(type).getValue();
 	}
 
 	/**
-	 * Get fun need value
+	 * Get skill value
 	 * 
-	 * @return Fun need value
+	 * @param type
+	 *            Skill type
+	 * @return Skill value
 	 */
-	public int getNeedFunValue() {
-		return this.needs.get(NeedType.FUN).getValue();
-	}
-
-	/**
-	 * Get hunger desire value
-	 * 
-	 * @return Hunger desire value
-	 */
-	public int getDesireHungerValue() {
-		return this.desires.get(DesireType.HUNGER).getValue();
-	}
-
-	/**
-	 * Get rest desire value
-	 * 
-	 * @return Rest desire value
-	 */
-	public int getDesireRestValue() {
-		return this.desires.get(DesireType.REST).getValue();
-	}
-
-	/**
-	 * Get social desire value
-	 * 
-	 * @return Social desire value
-	 */
-	public int getDesireSocialValue() {
-		return this.desires.get(DesireType.SOCIAL).getValue();
-	}
-
-	/**
-	 * Get fun desire value
-	 * 
-	 * @return Fun desire value
-	 */
-	public int getDesireFunValue() {
-		return this.desires.get(DesireType.FUN).getValue();
-	}
-
-	/**
-	 * Get love desire value
-	 * 
-	 * @return Love desire value
-	 */
-	public int getDesireLoveValue() {
-		return this.desires.get(DesireType.LOVE).getValue();
-	}
-
-	/**
-	 * Get fight desire value
-	 * 
-	 * @return Fight desire value
-	 */
-	public int getDesireFightValue() {
-		return this.desires.get(DesireType.FIGHT).getValue();
-	}
-
-	/**
-	 * Get work desire value
-	 * 
-	 * @return Work desire value
-	 */
-	public int getDesireWorkValue() {
-		return this.desires.get(DesireType.WORK).getValue();
+	public int getSkillValue(SkillType type) {
+		return this.skills.get(type).getValue();
 	}
 
 	// Naissance
@@ -437,9 +392,6 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventMinute");
 
-		// Needs and desires change
-		// If they are fulfilling, they decrease
-
 		// Fulfill
 		if (this.action != null && this.action.isFulfilling())
 			fulfill();
@@ -454,6 +406,9 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventHour");
 
+		// Needs increase
+		this.needs.increase();
+
 		// Needs raise and the most urgent need is chosen
 		// A new desire is chosen if the current desire is fulfilling or
 		// couldn't be
@@ -461,9 +416,6 @@ public class Mouglotte {
 		// Take a decision
 		// The need or the desire is chosen
 		decide();
-
-		// A new action begins
-		// this.actionInProgress = false;
 
 		Debug.log("MOUGLOTTE", "Mouglotte::EventHour::End");
 	}
@@ -507,14 +459,14 @@ public class Mouglotte {
 		if (this.action == null)
 			decide();
 		// Idle
-		if (this.action == ActionType.IDLE)
+		if (this.action.isIdle())
 			idle();
 		// Le fulfill se fait toutes les minutes
 		// // Fulfill
 		// else if (this.action.isFulfilling())
 		// fulfill();
 		// Search
-		else if (this.action == ActionType.SEARCHING)
+		else if (this.action.isSearching())
 			search();
 
 		// Debug.log("MOUGLOTTE", "Mouglotte::Action::End");
@@ -529,36 +481,47 @@ public class Mouglotte {
 
 		// Ajouter la gestion des ordres et des solicitations extérieurs
 
-		// Needs
-		this.needs.decide();
-		// Desires
-		this.desires.decide();
-
-		// Follow a need
-		if (this.needs.getCurrent().getValue() > this.desires.getCurrent()
-				.getValue())
-			this.decision = DecisionType.getDecisionType(this.needs
-					.getCurrent().getType());
-
-		// Follow a desire
-		else
-			this.decision = DecisionType.getDecisionType(this.desires
-					.getCurrent().getType());
-
-		Debug.log("MOUGLOTTE", "Mouglotte::Decide:Decision=" + this.decision);
-
-		// If the current action can be interrupted
+		// If no current action or current one can be interrupted
 		if (this.action == null || !this.action.hasToFinish()) {
+
+			// Decide current need
+			this.needs.decide();
+			// Decide current desire
+			this.desires.decide();
+
+			// Follow a need
+			if (this.needs.getCurrent().getValue() > this.desires.getCurrent()
+					.getValue())
+				this.decision = DecisionType.getDecisionType(this.needs
+						.getCurrent().getType());
+
+			// Follow a desire
+			else
+				this.decision = DecisionType.getDecisionType(this.desires
+						.getCurrent().getType());
+
+			Debug.log("MOUGLOTTE", "Mouglotte::Decide:Decision="
+					+ this.decision);
 
 			// Starting to search
 			setSearching(true);
 
+			// Dans le futur REST nécessitera un search également
 			// Search memory
-			if (this.decision.isResting())
-				fulfill();
-			else
+			if (this.decision.isResting()) {
+
+				// Starting to fulfill (or going on)
+				setFulfilling(true);
+			} else {
+
+				// Search for a memory
 				searchMemory(false);
 
+				// Follow a memory
+				followMemory();
+			}
+
+			// If there's already an action that has to be finished
 		} else
 			Debug.log("MOUGLOTTE", "Mouglotte::Decide:Finishing current action");
 
@@ -572,8 +535,30 @@ public class Mouglotte {
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle");
 
-		// this.actionInProgress = false;
-		// Il faut gérer un idle time
+		// Beginning to idle
+		if (this.action != ActionType.IDLE) {
+
+			// Set idle time (in minutes)
+			this.actionTime = Math.random() * MAX_IDLE_TIME;
+		}
+
+		// Change action (or go on)
+		this.action = ActionType.IDLE;
+
+		// Consume idle time
+		// (supposed idle is called every real second (1 minute = 3 real
+		// seconds))
+		this.actionTime -= 1 / 3;
+
+		// Gestion de l'animation (dans MouglotteEntity)
+
+		// If idle time is finished
+		if (this.actionTime <= 0) {
+
+			// The action has to end
+			this.action = null;
+			this.actionTime = 0;
+		}
 
 		Debug.log("MOUGLOTTE", "Mouglotte::Idle::End");
 	}
@@ -611,10 +596,10 @@ public class Mouglotte {
 			this.entity.stop();
 
 			// If we're on the right tile
-			if (tile.contains(this.entity.getX(), this.entity.getY())) {
+			if (tile.contains(this.entity)) {
 
-				// Fulfill
-				fulfill();
+				// Start fulfilling
+				setFulfilling(true);
 
 				// If we're close to the tile
 			} else
@@ -635,18 +620,27 @@ public class Mouglotte {
 
 				Debug.log("MOUGLOTTE", "Mouglotte::Search:Destination reached");
 
-				// Penalize current memory
+				// Penalize current memory (if exists)
 				this.memories.penalizeCurrent(Memory.PENALIZE_POINTS);
 
-				// Search memory
+				// Search memory (excluding current)
 				searchMemory(true);
+
+				// Follow a memory
+				followMemory();
 
 				// If we're not at destination
 			} else {
 
-				// If we're not on a path, then nothing to do
-				if (!this.entity.isOnAPath())
-					nothingToDo();
+				// If we're not on a path
+				if (!this.entity.isOnAPath()) {
+
+					// Search memory (excluding current)
+					searchMemory(true);
+
+					// Follow a memory
+					followMemory();
+				}
 			}
 		}
 
@@ -661,19 +655,22 @@ public class Mouglotte {
 	 */
 	private void searchMemory(boolean excludeCurrent) {
 
-		// Pour les tests : getClosest trouve tout ce qu'il faut
+		Debug.log("MOUGLOTTE", "Mouglotte::SearchMemory");
+
+		// Pour les tests : searchMemory uniquement pour FOOD
 		switch (MemoryType.getMemoryType(this.decision)) {
 		case ENEMY:
 		case FRIEND:
 		case LOVER:
 		case WORK:
-			fulfill();
-			break;
+			setFulfilling(true);
+			return;
 		default:
 			break;
 		}
 
-		// Get another closest memory if exist
+		// Get the closest memory if exist
+		// (eventually exclude current memory)
 		Memory memory = this.memories.getClosest(this.decision,
 				this.entity.getTile(), excludeCurrent);
 		// Refresh memory
@@ -686,15 +683,27 @@ public class Mouglotte {
 
 			// Set current memory
 			this.memories.setCurrent(memory);
-
-			// Go to memory place
-			this.entity.goTo(memory.getTile());
-
-			// Nothing to do
-		} else {
-			nothingToDo();
 		}
 
+		Debug.log("MOUGLOTTE", "Mouglotte::SearchMemory::End");
+	}
+
+	/**
+	 * Follow a memory
+	 */
+	private void followMemory() {
+
+		// If a memory has been found
+		if (this.memories.hasCurrent()) {
+
+			// Go to memory place
+			this.entity.goTo(this.memories.getCurrent().getTile());
+
+			// No memory found
+		} else {
+			// Nothing to do
+			nothingToDo();
+		}
 	}
 
 	/**
@@ -707,9 +716,9 @@ public class Mouglotte {
 		// Starting to fulfill (or going on)
 		setFulfilling(true);
 
-		// Needs
+		// Needs and desires change
+		// If they are fulfilling, they decrease
 		this.needs.fulfill();
-		// Desires
 		this.desires.fulfill();
 
 		// If the need or the desire is not fulfilled
@@ -767,6 +776,13 @@ public class Mouglotte {
 		// Sinon il faurait gérer le temps passé (a la fin de l'action)
 		// Consume food
 		food.removeFood(FoodEntity.CONSUME_AMOUNT);
+
+		// If all the food has been consumed
+		if (!food.hasFood()) {
+
+			// Penalize current memory
+			this.memories.penalizeCurrent(Memory.PENALIZE_LOW_POINTS);
+		}
 
 		// Gestion de l'animation (dans MouglotteEntity)
 

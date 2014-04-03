@@ -209,7 +209,7 @@ public class GameMap implements TileBasedMap {
 		new Mushroom(this.game, getTile(11, 5));
 		
 		// BeanTree
-		new BeanTree(this.game,getTile(4, 4));
+		new BeanTree(this.game,getTile(4, 4),5);
 	}
 
 	/**

@@ -3,7 +3,6 @@ package com.mouglotte.entities;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
-import org.newdawn.slick.MouseListener;
 
 import com.mouglotte.game.GameState;
 import com.mouglotte.map.GameMap;

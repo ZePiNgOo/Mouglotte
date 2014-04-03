@@ -26,13 +26,20 @@ public class TimeKeeper extends TimeDependent {
 	 */
 	private void setTime() {
 
-		this.time = (String) (this.day > 9 ? this.day : "0" + this.day);
-		this.time += "/" + (this.month > 9 ? this.month : "0" + this.month);
-		this.time += "/" + (this.year > 9 ? this.year : "0" + this.year);
-		this.time += " " + (this.hour > 9 ? this.hour : "0" + this.hour);
-		this.time += ":" + (this.minute > 9 ? this.minute : "0" + this.minute);
-		// this.time = this.day + "/" + this.month + "/" + this.year + " "
-		// + this.hour + ":" + this.minute;
+		this.time = this.day > 9 ? Integer.toString(this.day) : "0"
+				+ Integer.toString(this.day);
+		this.time += "/"
+				+ (this.month > 9 ? Integer.toString(this.month) : "0"
+						+ Integer.toString(this.month));
+		this.time += "/"
+				+ (this.year > 9 ? Integer.toString(this.year) : "0"
+						+ Integer.toString(this.year));
+		this.time += " "
+				+ (this.hour > 9 ? Integer.toString(this.hour) : "0"
+						+ Integer.toString(this.hour));
+		this.time += ":"
+				+ (this.minute > 9 ? Integer.toString(this.minute) : "0"
+						+ Integer.toString(this.minute));
 	}
 
 	/**

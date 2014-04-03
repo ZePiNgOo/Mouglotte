@@ -11,12 +11,16 @@ import com.mouglotte.map.Tile;
 
 public class BeanTree extends FoodEntity {
 
-	/** Image */
-	private SpriteSheet image;
+	/** Sprite sheet */
+	private SpriteSheet spriteSheet;
 	/** Number of sprites in the sprite sheet */
 	private int spriteNumber;
 	/** Number of columns in the sprite sheet */
 	private int spriteColumns;
+	/** Displayed image */
+	private Image image;
+
+	private int index;
 
 	/**
 	 * Constructor
@@ -26,13 +30,13 @@ public class BeanTree extends FoodEntity {
 	 * @param tile
 	 *            Tile
 	 */
-	public BeanTree(GameState game, Tile tile) {
+	public BeanTree(GameState game, Tile tile, int level) {
 
 		super(game, tile);
 
 		// Set image
 		try {
-			this.image = new SpriteSheet("res/beanTree/beanTreeLevel1.png", 66,
+			this.spriteSheet = new SpriteSheet("res/beanTree/beanTreeLevel1.png", 66,
 					90);
 		} catch (SlickException e) {
 			e.printStackTrace();
@@ -45,19 +49,19 @@ public class BeanTree extends FoodEntity {
 		// this.realY = this.y - this.image.getHeight() + GameMap.TILE_SIZE / 2
 		// - 10;
 
-		// Begins at the first growth level
-		this.level = 1;
+		// Level
+		setLevel(level);
 	}
 
 	/**
 	 * Get actual sprite from the sprite sheet
 	 * 
-	 * @return Actuel sprite
+	 * @return Actual sprite (image)
 	 */
 	private Image getSprite() {
 
 		// Index of the sprite (depending on health surplus)
-		int index = 1 + this.healthSurplus / (MAX_HEALTH / this.spriteNumber);
+		index = 1 + this.healthSurplus / (MAX_HEALTH / this.spriteNumber);
 		if (index < 1)
 			index = 1;
 		if (index > this.spriteNumber)
@@ -67,7 +71,7 @@ public class BeanTree extends FoodEntity {
 		if (column == -1)
 			column = this.spriteColumns - 1;
 
-		return this.image.getSprite(column, row);
+		return this.spriteSheet.getSprite(column, row);
 	}
 
 	@Override
@@ -86,13 +90,14 @@ public class BeanTree extends FoodEntity {
 	@Override
 	protected void eventHealthChanged(int oldHealth, int newHealth) {
 
-		// Modification de l'image
+		// Change image
+		this.image = getSprite();
 
 		// If health is empty
 		if (newHealth <= 0) {
 
-			// Le beantree doit mourir
-
+			// Die
+			die();
 			return;
 		}
 
@@ -107,6 +112,13 @@ public class BeanTree extends FoodEntity {
 	protected void eventLevelChanged(int oldLevel, int newLevel) {
 
 		// Modification de l'image ou du spritesheet
+		// Change sprite sheet
+//		this.spriteSheet = ?;
+//		this.spriteNumber = ?;
+//		this.spriteColumns = ?;
+		
+		// Change image
+		this.image = getSprite();
 	}
 
 	@Override
@@ -131,13 +143,14 @@ public class BeanTree extends FoodEntity {
 		// Gain health
 		if (gainOrLoss <= lossLevel) {
 
-			addHealth(this.random
-					.nextInt(MAX_AGE - this.age > 0 ? CURRENT_HEALTH_CHANGE
-							* (MAX_AGE - this.age) : 0));
+			if (MAX_AGE - this.age > 0)
+				addHealth(this.random.nextInt(CURRENT_HEALTH_CHANGE
+						* (MAX_AGE - this.age)));
 		}
 		// Loose health
 		else {
-			removeHealth(this.random.nextInt(CURRENT_HEALTH_CHANGE * this.age));
+			removeHealth(this.random.nextInt(CURRENT_HEALTH_CHANGE
+					* (this.age + 1)));
 		}
 
 		// Health changed
@@ -210,11 +223,11 @@ public class BeanTree extends FoodEntity {
 
 		super.render(container, g);
 
-		g.drawImage(getSprite(), this.x, this.y);
+		g.drawImage(this.image, this.x, this.y);
 		g.drawString(
 				Integer.toString(this.health) + ","
-						+ Integer.toString(this.healthSurplus), this.x + 10,
-				this.y + 10);
+						+ Integer.toString(this.healthSurplus) + " (" + index
+						+ ")", this.x + 10, this.y + 10);
 	}
 
 	@Override

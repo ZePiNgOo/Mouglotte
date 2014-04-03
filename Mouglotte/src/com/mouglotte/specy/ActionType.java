@@ -2,7 +2,16 @@ package com.mouglotte.specy;
 
 public enum ActionType {
 
-	IDLE, SEARCHING, EATING, RESTING, TALKING, PLAYING, FUCKING, FIGHTING, WORKING;
+	IDLE, SEARCHING, FULFILLING, EATING, RESTING, TALKING, PLAYING, FUCKING, FIGHTING, WORKING;
+
+	/**
+	 * Is this a searching action ?
+	 * 
+	 * @return True if the action is searching for a need or a desire
+	 */
+	public boolean isSearching() {
+		return this == SEARCHING;
+	}
 
 	/**
 	 * Is this a fulfilling action ?
@@ -10,9 +19,18 @@ public enum ActionType {
 	 * @return True if the action is fulfilling a need or a desire
 	 */
 	public boolean isFulfilling() {
-		return this == EATING || this == RESTING || this == TALKING
-				|| this == PLAYING || this == FUCKING || this == FIGHTING
-				|| this == WORKING;
+		return this == FULFILLING || this == EATING || this == RESTING
+				|| this == TALKING || this == PLAYING || this == FUCKING
+				|| this == FIGHTING || this == WORKING;
+	}
+
+	/**
+	 * Is this an idle action ?
+	 * 
+	 * @return True if the action is idle
+	 */
+	public boolean isIdle() {
+		return this == IDLE;
 	}
 
 	/**

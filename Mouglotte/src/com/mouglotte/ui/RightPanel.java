@@ -10,8 +10,10 @@ import org.newdawn.slick.gui.ComponentListener;
 import com.mouglotte.game.Game;
 import com.mouglotte.game.GameState;
 import com.mouglotte.map.GameMap;
+import com.mouglotte.specy.DesireType;
 import com.mouglotte.specy.MemoryType;
 import com.mouglotte.specy.Mouglotte;
+import com.mouglotte.specy.NeedType;
 
 public class RightPanel extends MouglotteGUI implements ComponentListener {
 
@@ -99,17 +101,17 @@ public class RightPanel extends MouglotteGUI implements ComponentListener {
 	private void updateForMouglotte(Mouglotte mouglotte) {
 
 		// Set needs and desires values
-		this.barNeedHunger.setValue(mouglotte.getNeedHungerValue());
-		this.barNeedRest.setValue(mouglotte.getNeedRestValue());
-		this.barNeedSocial.setValue(mouglotte.getNeedSocialValue());
-		this.barNeedFun.setValue(mouglotte.getNeedFunValue());
-		this.barDesireHunger.setValue(mouglotte.getDesireHungerValue());
-		this.barDesireRest.setValue(mouglotte.getDesireRestValue());
-		this.barDesireSocial.setValue(mouglotte.getDesireSocialValue());
-		this.barDesireFun.setValue(mouglotte.getDesireFunValue());
-		this.barDesireLove.setValue(mouglotte.getDesireLoveValue());
-		this.barDesireFight.setValue(mouglotte.getDesireFightValue());
-		this.barDesireWork.setValue(mouglotte.getDesireWorkValue());
+		this.barNeedHunger.setValue(mouglotte.getNeedValue(NeedType.HUNGER));
+		this.barNeedRest.setValue(mouglotte.getNeedValue(NeedType.REST));
+		this.barNeedSocial.setValue(mouglotte.getNeedValue(NeedType.SOCIAL));
+		this.barNeedFun.setValue(mouglotte.getNeedValue(NeedType.FUN));
+		this.barDesireHunger.setValue(mouglotte.getDesireValue(DesireType.HUNGER));
+		this.barDesireRest.setValue(mouglotte.getDesireValue(DesireType.REST));
+		this.barDesireSocial.setValue(mouglotte.getDesireValue(DesireType.SOCIAL));
+		this.barDesireFun.setValue(mouglotte.getDesireValue(DesireType.FUN));
+		this.barDesireLove.setValue(mouglotte.getDesireValue(DesireType.LOVE));
+		this.barDesireFight.setValue(mouglotte.getDesireValue(DesireType.FIGHT));
+		this.barDesireWork.setValue(mouglotte.getDesireValue(DesireType.WORK));
 
 		// Highlight current need or desire
 		highlightDecision(mouglotte);

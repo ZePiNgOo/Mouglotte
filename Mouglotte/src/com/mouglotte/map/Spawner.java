@@ -97,7 +97,7 @@ public class Spawner extends TimeDependent {
 				foodProba = this.r.nextInt(BEANTREE_PROBA + MUSHROOM_PROBA);
 
 				if (foodProba < BEANTREE_PROBA) {
-					new BeanTree(this.map.getGame(), this.map.getTile(i, j));
+					new BeanTree(this.map.getGame(), this.map.getTile(i, j),1);
 				} else if (foodProba < BEANTREE_PROBA + MUSHROOM_PROBA) {
 					new Mushroom(this.map.getGame(), this.map.getTile(i, j));
 				}
