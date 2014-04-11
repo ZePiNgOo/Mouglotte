@@ -51,6 +51,9 @@ public class BeanTree extends FoodEntity {
 
 		// Level
 		setLevel(level);
+		
+		// Image
+		this.image = getSprite();
 	}
 
 	/**

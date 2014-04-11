@@ -72,7 +72,7 @@ public class Desires {
 	public void setCurrent() {
 
 		int value = 0;
-		int maxValue = 0;
+		int maxValue = -1;
 
 		// Parcours de toutes les envies
 		for (final Entry<DesireType, Desire> desire : this.desires.entrySet()) {

@@ -66,7 +66,7 @@ public class Needs {
 	private void calculateCurrent() {
 
 		int value = 0;
-		int maxValue = 0;
+		int maxValue = -1;
 
 		// Read through all needs
 		for (final Entry<NeedType, Need> need : this.needs.entrySet()) {
